@@ -45,19 +45,36 @@ npm install
 
 ## <h1> Endpoints </h1>
 
-1. Register User: http://localhost:3000/auth/register
+1. Register User: POST: http://localhost:3000/auth/register
     {
     "username": "john_doe",
     "email": "john@example.com",
     "password": "your_password"
     }
 
-2. Login user: http://localhost:3000/auth/login
+2. Login user: POST: http://localhost:3000/auth/login
     {
     "username": "john_doe",
     "email": "john@example.com",
     "password": "your_password"
     }
+
+2. Create Campaign: POST: http://localhost:3000/campaign
+    {
+    "title": "Sample Campaign",
+    "instructions": "Upload your content.",
+    "startDate": "2025-06-01T00:00:00Z",
+    "endDate": "2025-08-31T23:59:59Z",
+    "images": ["image1.jpg", "image2.jpg"],
+    "_id": "someGeneratedId",
+    "createdAt": "2025-01-10T00:00:00Z",
+    "updatedAt": "2025-01-10T00:00:00Z"
+    }
+
+3. Campaign List Page: GET: http://localhost:3000/campaign
+
+4. Get Individual campaign: GET: http://localhost:3000/campaign/ID
+
 
 ## <h1> Author </h1>
 Built by <b>Andrew Indeche</b>
