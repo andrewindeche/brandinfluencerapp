@@ -70,10 +70,18 @@ npm install
     "createdAt": "2025-01-10T00:00:00Z",
     "updatedAt": "2025-01-10T00:00:00Z"
     }
+3. Login submission by influencer: POST: http://localhost:3000/{campaignID}/submissions
+    POST: http://localhost:3000/campaign/{campaignId}/submissions
+    Headers: Add the Authorization header with the value Bearer your-jwt-token.
+    Body (Form-data):
+    Key: file (upload a file)
+    Key: content (write the content of the submission)
 
 3. Campaign List Page: GET: http://localhost:3000/campaign
 
 4. Get Individual campaign: GET: http://localhost:3000/campaign/ID
+
+5. Add submission: GET:http://localhost:3000/campaign/:id/submissions
 
 
 ## <h1> Author </h1>
