@@ -15,4 +15,7 @@ export class CreateCampaignDto {
 
   @IsArray()
   images: string[];
+
+  @IsString()
+  status?: 'active' | 'inactive';
 }
