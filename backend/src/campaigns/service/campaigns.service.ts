@@ -30,7 +30,7 @@ export class CampaignsService {
         });
         return createdCampaign.save();
 }
-  async addSubmission(campaignId: string, content: string,  influencerId: string,fileUrl: string,): Promise<Submission> {
+  async addSubmission(campaignId: string, content: string, influencerId: string, fileUrl: string,): Promise<Submission> {
       const campaign = await this.campaignModel.findById(campaignId);
       if (!campaign) {
         throw new Error('Campaign not found');
@@ -120,9 +120,9 @@ export class CampaignsService {
       throw new Error('Campaign not found');
     }
   
-    return campaign.influencers.map(influencer => ({
+    return campaign.influencers.map((influencer: any) => ({
       influencer,
-      submissions: influencer.submissions,
+      submissions: influencer.submissions || [],
     }));
   }
 }
