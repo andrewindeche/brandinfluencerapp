@@ -79,9 +79,11 @@ npm install
 
 3. Campaign List Page: GET: http://localhost:3000/campaign
 
-4. Get Individual campaign: GET: http://localhost:3000/campaign/ID
+4. Get Individual campaign by ID: GET: http://localhost:3000/campaign/ID
 
-5. Add submission: GET:http://localhost:3000/campaign/:id/submissions
+5. Get submission: GET:http://localhost:3000/campaign/:id/submissions
+
+6. Get influencer by campaign:  http://localhost:3000/campaign/678132fd5f21b60d6d6f6601/influencers
 
 
 ## <h1> Author </h1>
