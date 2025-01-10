@@ -19,6 +19,9 @@ export class Campaign extends Document {
   @Prop({ type: [String], default: [] })
   images: string[];
 
+  @Prop({ default: 'active' })
+  status: 'active' | 'inactive';
+
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] }) 
   submissions: string[];
 }
