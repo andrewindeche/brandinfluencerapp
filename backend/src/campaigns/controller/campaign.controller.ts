@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, UploadedFiles, UseInterceptors  } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UploadedFiles, UseInterceptors, BadRequestException  } from '@nestjs/common';
 import { CampaignsService } from '../service/campaigns.service';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -20,13 +20,17 @@ export class CampaignController {
     }
   
     @Post(':campaignId/submissions')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', { dest: './uploads' }))
     async addSubmission(
       @Param('campaignId') campaignId: string,
       @UploadedFiles() file: Express.Multer.File,
+      @Body('content') content: string
     ) {
-      const fileUrl = file.filename;
-      return this.campaignService.addSubmission(campaignId, fileUrl);
+      const fileUrl = file ? file.filename: null;
+      if (!fileUrl && !content) {
+        throw new BadRequestException('Either content or file must be provided');
+      }
+      return this.campaignService.addSubmission(campaignId, fileUrl || content);
     }
   
     @Get()
