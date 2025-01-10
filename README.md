@@ -19,5 +19,29 @@
 <li> Unzip the file and add the Project folder to your IDE/Compiler</li>
 </ul>
 
+<p><b>Nest Js</b></p>
+The backend is built using Nest Js .node v21.4.0 (npm v10.2.4)
+<ul>
+1. Install the required dependencies using the commands 
+
+```bash
+npm install
+```
+
+2. For scripts and detailed instructions on NestJs VISIT: [this README](backend/README.md)
+
+</ul>
+
+<p><b>Nest Js</b></p>
+The frontend was build using NextJs .node v21.4.0 (npm v10.2.4)
+
+1. Install the required dependencies using the commands 
+
+```bash
+npm install
+```
+
+2. For scripts and detailed instructions on NextJs VISIT: [this README](frontend/README.md)
+
 ## <h1> Author </h1>
 Built by <b>Andrew Indeche</b>
