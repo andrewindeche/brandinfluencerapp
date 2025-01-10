@@ -13,27 +13,57 @@ export class CampaignsService {
       ) {}
     
       async createCampaign(createCampaignDto: CreateCampaignDto): Promise<Campaign> {
-        const createdCampaign = new this.campaignModel(createCampaignDto);
+        const currentDate = new Date();
+        const startDate = new Date(createCampaignDto.startDate);
+        const endDate = new Date(createCampaignDto.endDate);
+        let status: 'active' | 'inactive';
+
+        if (currentDate >= startDate && currentDate <= endDate) {
+          status = 'active';
+        } else {
+          status = 'inactive';
+        }
+
+        const createdCampaign = new this.campaignModel({
+          ...createCampaignDto,
+          status,
+        });
         return createdCampaign.save();
 }
-async addSubmission(campaignId: string, content: string): Promise<Submission> {
-    const campaign = await this.campaignModel.findById(campaignId);
-    if (!campaign) {
-      throw new Error('Campaign not found');
+  async addSubmission(campaignId: string, content: string): Promise<Submission> {
+      const campaign = await this.campaignModel.findById(campaignId);
+      if (!campaign) {
+        throw new Error('Campaign not found');
+      }
+
+      const submission = new this.submissionModel({
+        campaign: campaign._id,
+        content,
+        submittedAt: new Date(),
+      });
+
+      await submission.save();
+      campaign.submissions.push(submission._id as string);
+      await campaign.save();
+
+      return submission;
     }
 
-    const submission = new this.submissionModel({
-      campaign: campaign._id,
-      content,
-      submittedAt: new Date(),
-    });
+    async updateCampaignStatus(campaignId: string): Promise<Campaign> {
+      const campaign = await this.campaignModel.findById(campaignId);
 
-    await submission.save();
-    campaign.submissions.push(submission._id as string);
-    await campaign.save();
-
-    return submission;
-  }
+      const startDate = new Date(campaign.startDate);
+      const endDate = new Date(campaign.endDate);
+      const currentDate = new Date();
+    
+      if (currentDate >= startDate && currentDate <= endDate) {
+        campaign.status = 'active';
+      } else {
+        campaign.status = 'inactive';
+      }
+  
+      return campaign.save();
+    }
 
   async getInfluencersByCampaign(campaignId: string): Promise<any> {
     const campaign = await this.campaignModel
