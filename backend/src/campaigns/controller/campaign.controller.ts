@@ -38,4 +38,9 @@ export class CampaignController {
     getCampaign(@Param('id') id: string) {
       return this.campaignService.getCampaignById(id);
     }
+
+    @Get(':id/influencers')
+    async getInfluencersByCampaign(@Param('id') campaignId: string) {
+      return this.campaignService.getInfluencersByCampaign(campaignId);
+  }
 }

@@ -35,6 +35,28 @@ async addSubmission(campaignId: string, content: string): Promise<Submission> {
     return submission;
   }
 
+  async getInfluencersByCampaign(campaignId: string): Promise<any> {
+    const campaign = await this.campaignModel
+      .findById(campaignId)
+      .populate('submissions')
+      .exec();
+  
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+  
+    const influencers = campaign.submissions.map((submission: any) => {
+      return {
+        influencer: submission.influencer, 
+        submissionDate: submission.submittedAt, 
+        postCount: submission.postCount, 
+      };
+    });
+  
+    return influencers;
+  }
+  
+
 
   async getCampaigns(): Promise<Campaign[]> {
     return this.campaignModel.find().populate('submissions').exec();

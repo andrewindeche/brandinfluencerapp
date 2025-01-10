@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { InfluencerLoginDto } from '../campaigns/dto/influencer-login.dto';
+import { AuthService } from '../service/auth.service';
+import { InfluencerLoginDto } from '../../campaigns/dto/influencer-login.dto';
 
 @Controller('auth')
 export class AuthController {

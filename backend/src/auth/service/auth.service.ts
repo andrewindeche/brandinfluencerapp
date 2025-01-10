@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { Influencer } from './influencer.schema';
+import { Influencer } from '../schema/influencer.schema';
 import * as bcrypt from 'bcryptjs';
 
 
