@@ -6,8 +6,14 @@ export class Submission extends Document {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Campaign' })
   campaign: string;
 
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Influencer' })
+  influencer: string;
+
   @Prop({ required: true })
   content: string;
+
+  @Prop({ required: true })
+  fileUrl: string;
 
   @Prop({ required: true })
   submittedAt: Date;
