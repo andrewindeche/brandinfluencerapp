@@ -30,15 +30,21 @@ export class CampaignsService {
         });
         return createdCampaign.save();
 }
-  async addSubmission(campaignId: string, content: string): Promise<Submission> {
+  async addSubmission(campaignId: string, content: string,  influencerId: string,fileUrl: string,): Promise<Submission> {
       const campaign = await this.campaignModel.findById(campaignId);
       if (!campaign) {
         throw new Error('Campaign not found');
       }
 
+      if (!campaign.influencers.includes(influencerId)) {
+        throw new Error('Influencer has not joined the campaign');
+      }
+
       const submission = new this.submissionModel({
         campaign: campaign._id,
+        influencer: influencerId, 
         content,
+        fileUrl,
         submittedAt: new Date(),
       });
 
@@ -92,5 +98,11 @@ export class CampaignsService {
 
   async getCampaignById(id: string): Promise<Campaign> {
     return this.campaignModel.findById(id).populate('submissions').exec();
+  }
+
+  async getCampaignsByInfluencer(influencerId: string): Promise<Campaign[]> {
+    return this.campaignModel
+      .find({ influencers: influencerId })
+      .exec();
   }
 }
