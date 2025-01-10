@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, Param, UploadedFiles, UseInterceptors  } f
 import { CampaignsService } from '../service/campaigns.service';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @Controller('campaign')
 export class CampaignController {
@@ -10,6 +11,12 @@ export class CampaignController {
     @Post()
     async createCampaign(@Body() createCampaignDto: CreateCampaignDto) {
       return this.campaignService.createCampaign(createCampaignDto);
+    }
+
+    @Post('upload')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadFile(@UploadedFiles() file: Express.Multer.File) {
+      console.log(file);
     }
   
     @Post(':campaignId/submissions')

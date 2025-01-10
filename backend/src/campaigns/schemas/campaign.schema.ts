@@ -1,8 +1,8 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema as NestSchema , SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose'; 
 import { Document } from 'mongoose';
-import { Submission } from './submission.schema';
 
-@Schema()
+@NestSchema()
 export class Campaign extends Document {
   @Prop({ required: true })
   title: string;
@@ -17,10 +17,10 @@ export class Campaign extends Document {
   endDate: string;
 
   @Prop({ type: [String], default: [] })
-  images: string[]; // An array of image URLs
+  images: string[];
 
-  @Prop({ type: [{ type: Schema.Types.ObjectId, ref: 'Submission' }] })
-  submissions: Submission[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] }) 
+  submissions: string[];
 }
 
 export const CampaignSchema = SchemaFactory.createForClass(Campaign);

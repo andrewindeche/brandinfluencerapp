@@ -29,7 +29,7 @@ async addSubmission(campaignId: string, content: string): Promise<Submission> {
     });
 
     await submission.save();
-    campaign.submissions.push(submission._id);
+    campaign.submissions.push(submission._id as string);
     await campaign.save();
 
     return submission;

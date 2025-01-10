@@ -1,11 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { Campaign } from './campaign.schema';
+import { Prop, Schema as NestSchema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema  } from 'mongoose';
 
-@Schema()
+@NestSchema()
 export class Submission extends Document {
-  @Prop({ type: Schema.Types.ObjectId, ref: 'Campaign' })
-  campaign: Campaign;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Campaign' })
+  campaign: string;
 
   @Prop({ required: true })
   content: string;
