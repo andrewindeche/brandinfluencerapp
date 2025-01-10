@@ -25,7 +25,7 @@ export class CampaignController {
       @Param('campaignId') campaignId: string,
       @UploadedFiles() file: Express.Multer.File,
     ) {
-      const fileUrl = file.filename; // Save the file path or URL
+      const fileUrl = file.filename;
       return this.campaignService.addSubmission(campaignId, fileUrl);
     }
   

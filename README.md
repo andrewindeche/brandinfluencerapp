@@ -43,5 +43,21 @@ npm install
 
 2. For scripts and detailed instructions on NextJs VISIT: [this README](frontend/README.md)
 
+## <h1> Endpoints </h1>
+
+1. Register User: http://localhost:3000/auth/register
+    {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "your_password"
+    }
+
+2. Login user: http://localhost:3000/auth/login
+    {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "your_password"
+    }
+
 ## <h1> Author </h1>
 Built by <b>Andrew Indeche</b>

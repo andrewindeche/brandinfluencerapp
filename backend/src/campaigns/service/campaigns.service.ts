@@ -56,8 +56,6 @@ async addSubmission(campaignId: string, content: string): Promise<Submission> {
     return influencers;
   }
   
-
-
   async getCampaigns(): Promise<Campaign[]> {
     return this.campaignModel.find().populate('submissions').exec();
   }
