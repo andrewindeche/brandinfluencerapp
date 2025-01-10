@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Campaign } from '../schemas/campaign.schema';
-import { Submission } from '../schemas/submission.schema';
+import { Submission } from '../../auth/schema/submission.schema';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 
 @Injectable()
@@ -104,5 +104,25 @@ export class CampaignsService {
     return this.campaignModel
       .find({ influencers: influencerId })
       .exec();
+  }
+  async getInfluencersWithSubmissions(campaignId: string) {
+    const campaign = await this.campaignModel
+      .findById(campaignId)
+      .populate('influencers', 'username email')
+      .populate({
+        path: 'submissions',
+        select: 'content fileUrl submittedAt',
+        match: { campaign: campaignId },
+      })
+      .exec();
+  
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+  
+    return campaign.influencers.map(influencer => ({
+      influencer,
+      submissions: influencer.submissions,
+    }));
   }
 }

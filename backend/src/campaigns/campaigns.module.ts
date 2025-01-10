@@ -3,13 +3,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CampaignsService } from './service/campaigns.service';
 import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
-import { Submission, SubmissionSchema } from './schemas/submission.schema';
+import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
+import { Influencer, InfluencerSchema } from '../auth/schema/influencer.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Campaign.name, schema: CampaignSchema },
       { name: Submission.name, schema: SubmissionSchema },
+      { name: 'Influencer', schema: InfluencerSchema },
     ]),
   ],
   providers: [CampaignsService],
