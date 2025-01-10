@@ -5,7 +5,7 @@ import { AuthController } from './controller/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { InfluencerSchema } from './schema/influencer.schema'; 
+import { Influencer,InfluencerSchema } from './schema/influencer.schema'; 
 
 @Module({
   imports: [
