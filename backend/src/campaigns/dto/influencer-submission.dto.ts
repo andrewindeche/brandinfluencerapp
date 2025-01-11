@@ -1,4 +1,3 @@
 export class InfluencerSubmissionDto {
-    content: string;
-  }
-  
+  content: string;
+}

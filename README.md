@@ -60,17 +60,17 @@ npm install
     }
 
 2. Create Campaign: POST: http://localhost:3000/campaign
+    Make sure campaigns are within the correct range in relation to the current date
+    for the campaign tp be active.
     {
     "title": "Sample Campaign",
     "instructions": "Upload your content.",
     "startDate": "2025-06-01T00:00:00Z",
-    "endDate": "2025-08-31T23:59:59Z",
+    "endDate": "2025-06-01T07:00:00Z",
     "images": ["image1.jpg", "image2.jpg"],
-    "_id": "someGeneratedId",
-    "createdAt": "2025-01-10T00:00:00Z",
-    "updatedAt": "2025-01-10T00:00:00Z"
+    "status": "active"
     }
-3. Login submission by influencer: POST: http://localhost:3000/{campaignID}/submissions
+3. Create submission by influencer:
     POST: http://localhost:3000/campaign/{campaignId}/submissions
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
     Body (Form-data):
@@ -83,7 +83,7 @@ npm install
 
 5. Get submission: GET:http://localhost:3000/campaign/:id/submissions
 
-6. Get influencer by campaign:  http://localhost:3000/campaign/678132fd5f21b60d6d6f6601/influencers
+6. Get influencer by campaign:  http://localhost:3000/campaign/:id/influencers
 
 
 ## <h1> Author </h1>

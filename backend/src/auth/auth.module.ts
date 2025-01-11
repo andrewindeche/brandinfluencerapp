@@ -5,11 +5,13 @@ import { AuthController } from './controller/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { Influencer,InfluencerSchema } from './schema/influencer.schema'; 
+import { InfluencerSchema } from './schema/influencer.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Influencer', schema: InfluencerSchema }]),
+    MongooseModule.forFeature([
+      { name: 'Influencer', schema: InfluencerSchema },
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: 'yourSecretKey',

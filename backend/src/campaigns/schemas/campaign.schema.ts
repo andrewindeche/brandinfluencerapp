@@ -1,5 +1,5 @@
-import { Prop, Schema as NestSchema , SchemaFactory } from '@nestjs/mongoose';
-import { Schema as MongooseSchema } from 'mongoose'; 
+import { Prop, Schema as NestSchema, SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 import { Document } from 'mongoose';
 
 @NestSchema()
@@ -20,12 +20,12 @@ export class Campaign extends Document {
   images: string[];
 
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Influencer' }])
-  influencers: string[];
+  influencers: MongooseSchema.Types.ObjectId[];
 
   @Prop({ default: 'active' })
   status: 'active' | 'inactive';
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] }) 
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] })
   submissions: string[];
 }
 
