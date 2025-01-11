@@ -1,1 +1,90 @@
-# brandinfluencerapp
+# Brandinfluencer App
+
+|Tool                | Description                    | Tags for tools used                                                                                               |
+| ------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| 1.GitHub| Version Control| [Version-Control]; [Repository];|
+| 2.Next Js| Front End Framework| [Typescript];|
+| 3.Nest Js |  Javascript Based Backend Framework| [Javascript];|
+| 4.ESLint| Linting Framework| [Lint]; [syntax];|
+| 5.MongoDB | Not Only Relational Database| [Not Only relational Integrity]; [Database];|
+
+## <h1> Description</h1>
+<p>The aim of the project is to build a brand-influencer app that allow brands to connect to influencers to monitor active campaigns so that an influencer can view ongoing campaigns, track submission statuses, and monitor their performance while brands/SMEs to monitor influencers' participation in campaigns and approve/reject submissions..</p>
+
+## <h1> Set up Instructions</h1>
+<p><b>Github</b></p>
+<ul>
+<li> Download the Zip file from the code tab on github to get the project Zip files (Recommended)</li>
+<li> Clone the project using 'git clone https://github.com/yourusername/yourproject.git'.</li>
+<li> Unzip the file and add the Project folder to your IDE/Compiler</li>
+</ul>
+
+<p><b>Nest Js</b></p>
+The backend is built using Nest Js .node v21.4.0 (npm v10.2.4)
+<ul>
+1. Install the required dependencies using the commands 
+
+```bash
+npm install
+```
+
+2. For scripts and detailed instructions on NestJs VISIT: [this README](backend/README.md)
+
+</ul>
+
+<p><b>Nest Js</b></p>
+The frontend was build using NextJs .node v21.4.0 (npm v10.2.4)
+
+1. Install the required dependencies using the commands 
+
+```bash
+npm install
+```
+
+2. For scripts and detailed instructions on NextJs VISIT: [this README](frontend/README.md)
+
+## <h1> Endpoints </h1>
+
+1. Register User: POST: http://localhost:3000/auth/register
+    {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "your_password"
+    }
+
+2. Login user: POST: http://localhost:3000/auth/login
+    {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "your_password"
+    }
+
+2. Create Campaign: POST: http://localhost:3000/campaign
+    Make sure campaigns are within the correct range in relation to the current date
+    for the campaign tp be active.
+    {
+    "title": "Sample Campaign",
+    "instructions": "Upload your content.",
+    "startDate": "2025-06-01T00:00:00Z",
+    "endDate": "2025-06-01T07:00:00Z",
+    "images": ["image1.jpg", "image2.jpg"],
+    "status": "active"
+    }
+3. Create submission by influencer:
+    POST: http://localhost:3000/campaign/{campaignId}/submissions
+    Headers: Add the Authorization header with the value Bearer your-jwt-token.
+    Body (Form-data):
+    Key: file (upload a file)
+    Key: content (write the content of the submission)
+
+3. Campaign List Page: GET: http://localhost:3000/campaign
+
+4. Get Individual campaign by ID: GET: http://localhost:3000/campaign/ID
+
+5. Get submission: GET:http://localhost:3000/campaign/:id/submissions
+
+6. Get influencer by campaign:  http://localhost:3000/campaign/:id/influencers
+
+
+## <h1> Author </h1>
+Built by <b>Andrew Indeche</b>
