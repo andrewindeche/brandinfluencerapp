@@ -70,6 +70,14 @@ npm install
     "images": ["image1.jpg", "image2.jpg"],
     "status": "active"
     }
+
+3. Join submission by influencer:
+    POST: http://localhost:3000/campaign/{campaignId}/join
+    Headers: Add the Authorization header with the value Bearer your-jwt-token.
+    Body (Form-data):
+    Key: file (upload a file)
+    Key: content (write the content of the submission)
+
 3. Create submission by influencer:
     POST: http://localhost:3000/campaign/{campaignId}/submissions
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
@@ -85,6 +93,9 @@ npm install
 
 6. Get influencer by campaign:  http://localhost:3000/campaign/:id/influencers
 
+## <h1> Figma Designs </h1>
+https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bwG3VeJPii4DMXfm-1
+![Landing Page](<Screenshot 2025-01-16 092956.png>)
 
 ## <h1> Author </h1>
 Built by <b>Andrew Indeche</b>

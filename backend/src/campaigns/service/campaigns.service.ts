@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Types, Schema } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Campaign } from '../schemas/campaign.schema';
 import { Submission } from '../../auth/schema/submission.schema';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class CampaignsService {
   constructor(
-    @InjectModel(Campaign.name) private campaignModel: Model<Campaign>,
-    @InjectModel(Submission.name) private submissionModel: Model<Submission>,
+    @InjectModel(Campaign.name) private readonly campaignModel: Model<Campaign>,
+    @InjectModel(Submission.name)
+    private readonly submissionModel: Model<Submission>,
   ) {}
 
   async createCampaign(
@@ -41,10 +41,14 @@ export class CampaignsService {
     influencerId: string,
     fileUrl: string,
   ): Promise<Submission> {
+    if (!Types.ObjectId.isValid(campaignId)) {
+      throw new Error('Invalid campaignId');
+    }
     const campaign = await this.campaignModel.findById(campaignId);
     if (!campaign) {
       throw new Error('Campaign not found');
     }
+
     const influencerObjectId = new Types.ObjectId(influencerId);
     if (
       !campaign.influencers.some(
@@ -63,7 +67,9 @@ export class CampaignsService {
     });
 
     await submission.save();
-    campaign.submissions.push(submission._id as string);
+
+    const submissionId = submission._id.toString();
+    campaign.submissions.push(submissionId);
     await campaign.save();
 
     return submission;
@@ -123,18 +129,26 @@ export class CampaignsService {
   }
 
   async getCampaigns(): Promise<Campaign[]> {
-    return this.campaignModel.find().populate('submissions').exec();
+    const campaigns = await this.campaignModel
+      .find()
+      .populate('influencers', 'username email');
+    return campaigns;
   }
 
   async getCampaignById(id: string): Promise<Campaign> {
-    return this.campaignModel.findById(id).populate('submissions').exec();
+    return this.campaignModel
+      .findById(id)
+      .populate('influencers', 'username email')
+      .exec();
   }
 
   async joinCampaign(
     campaignId: string,
     influencerId: string,
   ): Promise<Campaign> {
-    const campaign = await this.campaignModel.findById(campaignId);
+    const campaign = await this.campaignModel
+      .findById(campaignId)
+      .populate('influencers', 'username');
     if (!campaign) {
       throw new Error('Campaign not found');
     }
@@ -144,14 +158,16 @@ export class CampaignsService {
 
     const influencerObjectId = new Types.ObjectId(influencerId);
 
-    const influencerExists = campaign.influencers.some(
-      (id) => id.toString() === influencerObjectId.toString(),
+    const influencerExists = campaign.influencers.some((influencer: any) =>
+      influencer._id
+        ? influencer._id.toString() === influencerObjectId.toString()
+        : influencer.toString() === influencerObjectId.toString(),
     );
     if (!influencerExists) {
       campaign.influencers.push(influencerObjectId as any);
       await campaign.save();
     }
-    return campaign;
+    return campaign.populate('influencers', 'username');
   }
 
   async getCampaignsByInfluencer(influencerId: string): Promise<Campaign[]> {
