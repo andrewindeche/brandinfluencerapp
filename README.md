@@ -98,6 +98,7 @@ https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bw
 
 ## <h1> Sample Designs </h1>
 ![Landing Page](<Screenshot 2025-01-16 092956.png>)
+![Brand admin page](<Screenshot 2025-01-16 160200.png>)
 
 ## <h1> Author </h1>
 Built by <b>Andrew Indeche</b>
