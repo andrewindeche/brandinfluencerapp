@@ -97,7 +97,7 @@ npm install
 https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bwG3VeJPii4DMXfm-1
 
 ## <h1> Sample Designs </h1>
-![Landing Page](<Screenshot 2025-01-16 160200-1.png>)
+![Landing Page](<Screenshot 2025-01-16 160955.png>)
 ![Brand admin page](<Screenshot 2025-01-16 160200.png>)
 
 ## <h1> Author </h1>
