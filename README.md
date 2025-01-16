@@ -95,6 +95,8 @@ npm install
 
 ## <h1> Figma Designs </h1>
 https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bwG3VeJPii4DMXfm-1
+
+## <h1> Sample Designs </h1>
 ![Landing Page](<Screenshot 2025-01-16 092956.png>)
 
 ## <h1> Author </h1>
