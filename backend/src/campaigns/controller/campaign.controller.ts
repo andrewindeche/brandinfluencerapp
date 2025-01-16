@@ -35,7 +35,22 @@ export class CampaignController {
   @UseGuards(JwtAuthGuard)
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
     const influencerId = req.user.sub;
-    return this.campaignService.joinCampaign(campaignId, influencerId);
+
+    const campaign = await this.campaignService.getCampaignById(campaignId);
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    if (
+      !campaign.influencers.some(
+        (influencer) => influencer.toString() === influencerId,
+      )
+    ) {
+      campaign.influencers.push(influencerId);
+      await campaign.save();
+    }
+
+    return campaign.populate('influencers', 'username email');
   }
 
   @Post(':campaignId/submissions')
@@ -45,6 +60,7 @@ export class CampaignController {
     @Param('campaignId') campaignId: string,
     @UploadedFiles() file: Express.Multer.File,
     @Body('content') content: string,
+    @Body('submissionData') submissionData: any,
     @Req() req,
   ) {
     const influencerId = req.user.sub;
@@ -56,7 +72,7 @@ export class CampaignController {
       campaignId,
       content,
       influencerId,
-      fileUrl,
+      submissionData,
     );
   }
 
