@@ -5,6 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-irish-grover: 'Irish Grover', cursive;
+  --font-joti-one: 'Joti One', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,5 +19,9 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-joti-one);
+}
+
+h1 {
+  font-family: var(--font-irish-grover);
 }
