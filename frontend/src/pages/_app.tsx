@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { Irish_Grover, Joti_One } from '@next/font/google'
+import { Irish_Grover, Joti_One } from "next/font/google"
 
 const irishGrover = Irish_Grover({
     weight: '400',
