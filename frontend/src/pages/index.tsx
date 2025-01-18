@@ -1,7 +1,9 @@
 import React from 'react';
  const HomePage: React.FC = () => { 
   return ( 
-    <div> <h1>Welcome to My Next.js App!</h1> 
-    </div> ); 
+    <div className="bg-[#FF2C2C] h-screen flex justify-center items-center"> 
+      <h1 className="text-white text-4xl font-bold">Welcome to My Next.js App!</h1> 
+    </div> 
+    ); 
     }; 
 export default HomePage;
