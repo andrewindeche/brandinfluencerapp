@@ -7,6 +7,7 @@
   --foreground: #171717;
   --font-irish-grover: 'Irish Grover', cursive;
   --font-joti-one: 'Joti One', sans-serif;
+  --font-kaushan-script: 'Kaushan Script', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,7 +31,7 @@ body {
   content: ''; 
   position: absolute; 
   bottom: -8px;
-  left: 30; 
+  left: 10; 
   width: 85%;
   height: 5px;
   background-color: currentColor;
@@ -38,5 +39,9 @@ body {
 
 h1 {
   font-family: var(--font-irish-grover);
+}
+
+h2 {
+  font-family: var(--font-kaushan-script);
 }
 
