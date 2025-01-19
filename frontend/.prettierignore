@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "format": "prettier --write .",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    }
+}
