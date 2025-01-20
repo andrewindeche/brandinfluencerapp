@@ -23,34 +23,6 @@ body {
   font-family: var(--font-joti-one);
 }
 
-.custom-underline { 
-  position: relative; 
-}
-
-.custom-underline::after { 
-  content: ''; 
-  position: absolute; 
-  bottom: -8px;
-  left: 6; 
-  width: 85%;
-  height: 4px;
-  background-color: currentColor;
- }
-
- .custom-underline2 {
-  position: relative; 
-}
-
-.custom-underline2::after { 
-  content: ''; 
-  position: absolute; 
-  bottom: 2px;
-  left: 8; 
-  width: 90%;
-  height: 1.4px;
-  background-color: currentColor;
- }
-
 h1 {
   font-family: var(--font-irish-grover);
 }
