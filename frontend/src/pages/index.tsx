@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
       <div className="mt-6">
         <h3 className="text-2xl text-[#FFFF00] underline">Our Influencers</h3>
       </div>
-      <div className="mt-6 flex flex-row justify-center items-center space-x-12">
+      <div className="mt-10 flex flex-row justify-center items-center space-x-12">
         <div
           className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6"
           style={{ borderColor: '#023EBA' }}
