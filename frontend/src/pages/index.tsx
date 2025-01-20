@@ -16,7 +16,10 @@ const HomePage: React.FC = () => {
         <h3 className="text-2xl text-[#FFFF00] underline">Our Influencers</h3>
       </div>
       <div className="mt-6 flex flex-row justify-center items-center space-x-12">
-        <div className="bg-[#023EBA] relative w-70 h-80 rounded-xl overflow-hidden shadow-lg">
+        <div
+          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-3"
+          style={{ borderColor: '#023EBA' }}
+        >
           <Image
             src="/images/woman2.png"
             alt="Amy - TikTok"
@@ -28,7 +31,10 @@ const HomePage: React.FC = () => {
             AMY - TIK TOK
           </p>
         </div>
-        <div className="bg-[#023EBA] relative w-70 h-80 rounded-xl overflow-hidden shadow-lg">
+        <div
+          className="relative w-70 h-80 rounded-xl overflow-hidden shadow-lg border-4"
+          style={{ borderColor: '#023EBA' }}
+        >
           <Image
             src="/images/man.png"
             alt="Amy - TikTok"
@@ -40,7 +46,10 @@ const HomePage: React.FC = () => {
             BRAD - YOU TUBER
           </p>
         </div>
-        <div className="bg-[#023EBA] relative w-70 h-80 rounded-xl overflow-hidden shadow-lg">
+        <div
+          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-3"
+          style={{ borderColor: '#023EBA' }}
+        >
           <Image
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
