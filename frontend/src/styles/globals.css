@@ -31,9 +31,9 @@ body {
   content: ''; 
   position: absolute; 
   bottom: -8px;
-  left: 0; 
-  width: 85%;
-  height: 3px;
+  left: 20; 
+  width: 80%;
+  height: 4px;
   background-color: currentColor;
  }
 
@@ -44,10 +44,10 @@ body {
 .custom-underline2::after { 
   content: ''; 
   position: absolute; 
-  bottom: -4px;
-  left: 0; 
-  width: 85%;
-  height: 2px;
+  bottom: 2px;
+  left: 18; 
+  width: 90%;
+  height: 1.4px;
   background-color: currentColor;
  }
 
