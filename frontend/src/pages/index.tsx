@@ -13,7 +13,9 @@ const HomePage: React.FC = () => {
         </h2>
       </div>
       <div className="mt-6">
-        <h3 className="text-2xl text-[#FFFF00] underline">Our Influencers</h3>
+        <h3 className="text-2xl text-[#FFFF00] underline flicker-text">
+          Our Influencers
+        </h3>
       </div>
       <div className="mt-10 flex flex-row justify-center items-center space-x-12">
         <div

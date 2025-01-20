@@ -40,13 +40,25 @@ h2 {
 }
 
 .bg-transition {
-  background: linear-gradient(90deg, #FF2C2C, #FF7A2C, #FFEE2C);
+  background: linear-gradient(90deg, #FF2C2C, #FF7A2C, #005B96);
   background-size: 400% 400%;
-  animation: gradientBackground 8s ease infinite;
+  animation: gradientBackground 20s ease infinite;
 }
 
 @keyframes gradientBackground {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+.flicker-text {
+  font-size: 2rem;
+  color: #FFFF00;
+  text-shadow: 0 0 10px #005B96, 0 0 20px #FF2C2C, 0 0 30px #FF2C2C;
+  animation: flickerAnimation 20s infinite alternate;
+}
+
+@keyframes flickerAnimation {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
