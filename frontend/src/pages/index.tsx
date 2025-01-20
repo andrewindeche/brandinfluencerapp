@@ -11,6 +11,9 @@ const HomePage: React.FC = () => {
           Influencer MarketPlace
         </h2>
       </div>
+      <div className="mt-4">
+        <h3 className="text-2xl custom-underline2">Our Influencers</h3>
+      </div>
     </div>
   );
 };

@@ -31,8 +31,8 @@ body {
   content: ''; 
   position: absolute; 
   bottom: -8px;
-  left: 20; 
-  width: 80%;
+  left: 6; 
+  width: 85%;
   height: 4px;
   background-color: currentColor;
  }
@@ -45,7 +45,7 @@ body {
   content: ''; 
   position: absolute; 
   bottom: 2px;
-  left: 18; 
+  left: 8; 
   width: 90%;
   height: 1.4px;
   background-color: currentColor;
