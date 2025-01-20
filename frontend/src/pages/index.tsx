@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const HomePage: React.FC = () => {
   return (
-    <div className="bg-[#FF2C2C] h-screen flex flex-col justify-start items-center">
+    <div className="bg-[#FF2C2C] bg-transition h-screen flex flex-col justify-start items-center">
       <div className="flex flex-row justify-center items-center w-full mt-4 space-x-4">
         <h1 className="text-white text-5xl font-bold custom-underline">
           AFFLUENCER

@@ -38,3 +38,15 @@ h2 {
 .hover-effect:hover {
   transform: scale(1.1) rotate(0);
 }
+
+.bg-transition {
+  background: linear-gradient(90deg, #FF2C2C, #FF7A2C, #FFEE2C);
+  background-size: 400% 400%;
+  animation: gradientBackground 8s ease infinite;
+}
+
+@keyframes gradientBackground {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
