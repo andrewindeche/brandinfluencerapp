@@ -15,8 +15,8 @@ const HomePage: React.FC = () => {
       <div className="mt-6">
         <h3 className="text-2xl text-[#FFFF00] underline">Our Influencers</h3>
       </div>
-      <div className="mt-6 flex flex-row justify-center items-center space-x-8">
-        <div className="bg-white p-4 rounded-xl shadow-lg">
+      <div className="mt-6 flex flex-row justify-center items-center space-x-12">
+        <div className="bg-[#023EBA] p-1 rounded-xl shadow-lg">
           <Image
             src="/images/woman2.png"
             alt="Amy - TikTok"
@@ -27,7 +27,7 @@ const HomePage: React.FC = () => {
           />
           <p className="text-black text-center mt-2 font-bold">AMY - TIK TOK</p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-lg">
+        <div className="bg-[#023EBA] p-1 rounded-xl shadow-lg">
           <Image
             src="/images/man.png"
             alt="Brad - YouTube"
@@ -40,7 +40,7 @@ const HomePage: React.FC = () => {
             BRAD - YOU TUBER
           </p>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-lg">
+        <div className="bg-[#023EBA] p-1 rounded-xl shadow-lg">
           <Image
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
