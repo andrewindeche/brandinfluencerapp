@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
       </div>
       <div className="mt-6 flex flex-row justify-center items-center space-x-12">
         <div
-          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-3"
+          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
           </p>
         </div>
         <div
-          className="relative w-70 h-80 rounded-xl overflow-hidden shadow-lg border-4"
+          className="relative w-70 h-80 rounded-xl overflow-hidden shadow-lg border-4 rotate-12"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
@@ -47,7 +47,7 @@ const HomePage: React.FC = () => {
           </p>
         </div>
         <div
-          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-3"
+          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-2"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
