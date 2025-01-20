@@ -16,40 +16,39 @@ const HomePage: React.FC = () => {
         <h3 className="text-2xl text-[#FFFF00] underline">Our Influencers</h3>
       </div>
       <div className="mt-6 flex flex-row justify-center items-center space-x-12">
-        <div className="bg-[#023EBA] p-1 rounded-xl shadow-lg">
+        <div className="bg-[#023EBA] relative w-70 h-80 rounded-xl overflow-hidden shadow-lg">
           <Image
             src="/images/woman2.png"
             alt="Amy - TikTok"
-            className="rounded-lg"
             width={200}
             height={200}
-            style={{ width: '100%', height: 'auto' }}
+            className="w-full h-full object-cover"
           />
-          <p className="text-black text-center mt-2 font-bold">AMY - TIK TOK</p>
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white text-center px-2 py-1 rounded-lg font-bold">
+            AMY - TIK TOK
+          </p>
         </div>
-        <div className="bg-[#023EBA] p-1 rounded-xl shadow-lg">
+        <div className="bg-[#023EBA] relative w-70 h-80 rounded-xl overflow-hidden shadow-lg">
           <Image
             src="/images/man.png"
-            alt="Brad - YouTube"
-            className="rounded-lg"
+            alt="Amy - TikTok"
             width={200}
             height={200}
-            style={{ width: '100%', height: 'auto' }}
+            className="w-full h-full object-cover"
           />
-          <p className="text-black text-center mt-2 font-bold">
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white text-center px-2 py-1 rounded-lg font-bold">
             BRAD - YOU TUBER
           </p>
         </div>
-        <div className="bg-[#023EBA] p-1 rounded-xl shadow-lg">
+        <div className="bg-[#023EBA] relative w-70 h-80 rounded-xl overflow-hidden shadow-lg">
           <Image
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
-            className="rounded-lg"
             width={200}
             height={200}
-            style={{ width: '100%', height: 'auto' }}
+            className="w-full h-full object-cover"
           />
-          <p className="text-black text-center mt-2 font-bold">
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white text-center px-2 py-1 rounded-lg font-bold">
             LIZZIE - INSTAGRAM
           </p>
         </div>
