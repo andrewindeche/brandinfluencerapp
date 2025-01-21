@@ -3,8 +3,8 @@ import Image from 'next/image';
 
 const HomePage: React.FC = () => {
   return (
-    <div className="bg-[#FF2C2C] bg-transition h-screen flex flex-col justify-start items-center">
-      <div className="flex flex-row justify-center items-center w-full mt-4 space-x-4">
+    <div className="bg-[#FF2C2C] bg-transition min-h-screen flex flex-col justify-start items-center p-4">
+      <div className="flex flex-col md:flex-row justify-center items-center w-full mt-4 space-y-4 md:space-y-0 md:space-x-4 text-center">
         <h1 className="text-white text-5xl font-bold custom-underline">
           AFFLUENCER
         </h1>
@@ -12,54 +12,61 @@ const HomePage: React.FC = () => {
           Influencer MarketPlace
         </h2>
       </div>
+
       <div className="mt-6">
         <h3 className="text-2xl text-[#FFFF00] underline flicker-text">
           Our Influencers
         </h3>
       </div>
-      <div className="mt-10 flex flex-row justify-center items-center space-x-12">
+
+      <div className="mt-10 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-16 w-full px-4">
         <div
-          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6 transition-transform hover-effect"
+          className="relative w-full max-w-xs sm:w-[18rem]  h-96 sm:h-[21rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6 transition-transform hover:scale-105 md:-ml-8"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
             src="/images/woman2.png"
             alt="Amy - TikTok"
-            width={200}
-            height={200}
-            className="w-full h-full object-cover"
+            layout="fill"
+            style={{ objectFit: 'contain' }}
+            className="object-cover"
           />
-          <p className="absolute bottom-4 left-1/2 transform -rotate-6 -translate-x-1/2 bg-black bg-opacity-50 text-white text-center px-2 py-1 rounded-lg font-bold">
+          <p className="absolute bottom-4 left-1/2 transform -rotate-6 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
             AMY - TIK TOK
           </p>
         </div>
+
         <div
-          className="relative w-70 h-80 rounded-xl overflow-hidden shadow-lg border-4 rotate-12 transition-transform hover-effect"
+          className="relative w-full max-w-xs sm:w-[21rem]  h-96 sm:h-[20rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-12 transition-transform hover:scale-105"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
             src="/images/man.png"
-            alt="Amy - TikTok"
-            width={200}
-            height={200}
-            className="w-full h-full object-cover"
+            alt="Brad - YouTuber"
+            layout="fill"
+            style={{ objectFit: 'contain' }}
+            sizes="(max-width: 900px) 100vw, 50vw"
+            priority
+            className="object-cover"
           />
-          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white text-center px-2 py-1 rounded-lg font-bold">
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
             BRAD - YOU TUBER
           </p>
         </div>
+
         <div
-          className="relative w-60 h-80 rounded-xl overflow-hidden shadow-lg border-4 transform rotate-2 transition-transform hover-effect"
+          className="relative w-full max-w-xs sm:w-[20rem] h-96 sm:h-[20rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-2 transition-transform hover:scale-105"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
-            width={200}
-            height={200}
-            className="w-full h-full object-cover"
+            layout="fill"
+            style={{ objectFit: 'contain' }}
+            sizes="(max-width: 100px) 100vw, 50vw"
+            className="object-cover"
           />
-          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white text-center px-2 py-1 rounded-lg font-bold">
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
             LIZZIE - INSTAGRAM
           </p>
         </div>
