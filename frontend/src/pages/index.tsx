@@ -37,7 +37,7 @@ const HomePage: React.FC = () => {
         </div>
 
         <div
-          className="relative w-full max-w-xs sm:w-[20rem]  h-96 sm:h-[16rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-12 transition-transform hover:scale-105"
+          className="relative w-full max-w-xs sm:w-[20rem]  h-96 sm:h-[16rem] rounded-xl overflow-hidden shadow-lg border-4 transform -rotate-12 transition-transform hover:scale-105"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
