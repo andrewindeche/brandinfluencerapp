@@ -28,7 +28,7 @@ const HomePage: React.FC = () => {
             src="/images/woman2.png"
             alt="Amy - TikTok"
             layout="fill"
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: 'cover' }}
             className="object-cover"
           />
           <p className="absolute bottom-4 left-1/2 transform -rotate-6 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
@@ -62,7 +62,7 @@ const HomePage: React.FC = () => {
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
             layout="fill"
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: 'cover' }}
             sizes="(max-width: 100px) 100vw, 50vw"
             className="object-cover"
           />
