@@ -33,7 +33,7 @@ const BrandPage: React.FC = () => {
 
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center">
-      <div className="flex justify-center space-x-4 mt-8">
+      <div className="flex justify-center space-x-4 mt-4">
         <button className="bg-[#FFFF00] text-black py-2 px-14 rounded-full border-2 border-black">
           Influencers
         </button>
@@ -41,14 +41,14 @@ const BrandPage: React.FC = () => {
           campaigns
         </button>
       </div>
-      <div className="mt-10">
+      <div className="mt-6">
         <h3 className="text-2xl text-[#FFFF00] underline">Submissions</h3>
       </div>
       <div className="mt-10 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-16 w-full px-4">
         {influencers.map((influencer, index) => (
           <div
             key={index}
-            className={`relative w-full max-w-xs sm:w-[14rem] h-[28rem] rounded-xl overflow-hidden shadow-lg border-4 transform ${influencer.rotate} transition-transform hover:scale-105`}
+            className={`relative w-full max-w-xs sm:w-[14rem] h-[26rem] rounded-xl overflow-hidden shadow-lg border-4 transform ${influencer.rotate} transition-transform hover:scale-105`}
             style={{ borderColor: '#023EBA', backgroundColor: 'white' }}
           >
             <div className="absolute top-2 left-2 bg-[#F5F5F5] text-black text-sm font-semibold rounded-full w-10 h-10 flex justify-center items-center border-2 border-black">
