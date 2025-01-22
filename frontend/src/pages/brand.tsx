@@ -44,35 +44,37 @@ const BrandPage: React.FC = () => {
       <div className="mt-6">
         <h3 className="text-2xl text-[#FFFF00] underline">Submissions</h3>
       </div>
-      <div className="mt-10 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-16 w-full px-4">
+      <div className="mt-4 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-20 w-full px-4">
         {influencers.map((influencer, index) => (
           <div
             key={index}
-            className={`relative w-full max-w-xs sm:w-[14rem] h-[26rem] rounded-xl overflow-hidden shadow-lg border-4 transform ${influencer.rotate} transition-transform hover:scale-105`}
-            style={{ borderColor: '#023EBA', backgroundColor: 'white' }}
+            className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform ${influencer.rotate} transition-transform hover:scale-105`}
+            style={{ borderColor: '#023EBA', backgroundColor: 'black' }}
           >
-            <div className="absolute top-2 left-2 bg-[#F5F5F5] text-black text-sm font-semibold rounded-full w-10 h-10 flex justify-center items-center border-2 border-black">
+            <div className="absolute top-2 left-8 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-sm sm:text-[7px]">
               {influencer.likes} likes
             </div>
             <Image
               src={influencer.image}
               alt={influencer.alt}
-              layout="fill"
+              layout="responsive"
+              width={150}
+              height={200}
               style={{ objectFit: 'cover' }}
               className="object-cover"
             />
             <div className="absolute bottom-20 w-full text-center">
               <p className="text-white text-2xl font-bold">{influencer.name}</p>
             </div>
-            <div className="absolute bottom-0 w-full bg-black text-white text-xs py-4 px-4 rounded-t-lg">
+            <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-4 px-4 rounded-t-lg">
               <p className="font-bold mb-1">
                 {influencer.message.split('\n')[0]}
               </p>
+              <p className="text-right text-gray-300 mt-2">16/01/2025</p>
               <p className="text-gray-300 mb-2">
                 {influencer.message.split('\n')[1]}
               </p>
               <p>{influencer.message.split('\n').slice(2).join(' ')}</p>
-              <p className="text-right text-gray-300 mt-2">16/01/2025</p>
             </div>
           </div>
         ))}
