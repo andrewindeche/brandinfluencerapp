@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import Image from 'next/image';
 
@@ -24,13 +25,15 @@ const HomePage: React.FC = () => {
           className="relative w-full max-w-xs sm:w-[18rem]  h-96 sm:h-[21rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6 transition-transform hover:scale-105 md:-ml-8"
           style={{ borderColor: '#023EBA' }}
         >
-          <Image
-            src="/images/woman2.png"
-            alt="Amy - TikTok"
-            layout="fill"
-            style={{ objectFit: 'cover' }}
-            className="object-cover"
-          />
+          <Link href="/brand">
+            <Image
+              src="/images/woman2.png"
+              alt="Amy - TikTok"
+              layout="fill"
+              style={{ objectFit: 'cover' }}
+              className="object-cover"
+            />
+          </Link>
           <p className="absolute bottom-4 left-1/2 transform -rotate-6 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
             AMY - TIK TOK
           </p>
