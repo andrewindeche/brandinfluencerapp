@@ -64,7 +64,7 @@ const BrandPage: React.FC = () => {
             <div className="absolute bottom-20 w-full text-center">
               <p className="text-white text-2xl font-bold">{influencer.name}</p>
             </div>
-            <div className="absolute bottom-0 w-full bg-black text-white text-sm py-4 px-4 rounded-t-lg">
+            <div className="absolute bottom-0 w-full bg-black text-white text-xs py-4 px-4 rounded-t-lg">
               <p className="font-bold mb-1">
                 {influencer.message.split('\n')[0]}
               </p>
