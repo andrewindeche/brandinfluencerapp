@@ -79,8 +79,10 @@ const InfluencerCard: React.FC<{ influencer: any }> = ({ influencer }) => {
         style={{ objectFit: 'cover' }}
         className="object-cover"
       />
-      <div className="absolute bottom-40 w-full text-center">
-        <p className="text-white text-2xl font-bold">{influencer.name}</p>
+      <div className="absolute bottom-40 left-5 rotate-12 bg-black bg-opacity-60 w-3/4  px-2 py-2 rounded-2xl text-center">
+        <p className="text-white text-xs font-bold transform -rotate-12">
+          {influencer.name}
+        </p>
       </div>
       <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-2 px-4 rounded-t-lg">
         <div className=" border-t border-b border-white py-1 px-1">
