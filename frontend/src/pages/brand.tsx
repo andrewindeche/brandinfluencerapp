@@ -66,8 +66,10 @@ const InfluencerCard: React.FC<{ influencer: any }> = ({ influencer }) => {
       className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform ${influencer.rotate} transition-transform hover:scale-105`}
       style={{ borderColor: '#023EBA', backgroundColor: 'black' }}
     >
-      <div className="absolute top-2 left-8 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-sm sm:text-[7px]">
-        {influencer.likes} likes
+      <div className="absolute top-2 left-8 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-40 text-white text-center px-2 py-0.5 rounded-2xl font-bold text-sm sm:text-[7px]">
+        <span className="inline-block transform -rotate-12 text-white">
+          {influencer.likes} likes
+        </span>
       </div>
       <Image
         src={influencer.image}
