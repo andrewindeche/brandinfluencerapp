@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 
 const BrandPage: React.FC = () => {
-  const influencers = [
+  const influencers: Influencer[] = [
     {
       name: 'APRIL',
       likes: 100,
@@ -61,7 +61,17 @@ const BrandPage: React.FC = () => {
 
 const MAX_CHAR_COUNT = 70;
 
-const InfluencerCard: React.FC<{ influencer: any }> = ({ influencer }) => {
+interface Influencer {
+  alt: string;
+  likes: number;
+  image: string;
+  name: string;
+  message: string;
+}
+
+const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
+  influencer,
+}) => {
   const [expanded, setExpanded] = useState(false);
   const fullMessage = influencer.message.split('\n').slice(2).join(' ');
   const displayedMessage = expanded
