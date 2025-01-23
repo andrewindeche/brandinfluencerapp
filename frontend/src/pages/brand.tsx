@@ -27,6 +27,14 @@ const BrandPage: React.FC = () => {
       image: '/images/image2.png',
       alt: 'kate - Instagram',
     },
+    {
+      name: 'BRAD',
+      likes: 20,
+      message:
+        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      image: '/images/image4.png',
+      alt: 'kate - Instagram',
+    },
   ];
 
   return (
