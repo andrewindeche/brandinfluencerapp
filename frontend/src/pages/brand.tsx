@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 
 const BrandPage: React.FC = () => {
@@ -25,7 +25,7 @@ const BrandPage: React.FC = () => {
       likes: 20,
       message:
         "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
-      image: '/images/image1.png',
+      image: '/images/image2.png',
       alt: 'Lizzie - Instagram',
     },
   ];
@@ -37,7 +37,7 @@ const BrandPage: React.FC = () => {
           Influencers
         </button>
         <button className="bg-red-500 text-white py-2 px-14 rounded-full border-2 border-white relative">
-          campaigns
+          Campaigns
         </button>
       </div>
       <div className="mt-6">
@@ -45,40 +45,61 @@ const BrandPage: React.FC = () => {
       </div>
       <div className="mt-4 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-20 w-full px-4">
         {influencers.map((influencer, index) => (
-          <div
-            key={index}
-            className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform ${influencer.rotate} transition-transform hover:scale-105`}
-            style={{ borderColor: '#023EBA', backgroundColor: 'black' }}
-          >
-            <div className="absolute top-2 left-8 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-sm sm:text-[7px]">
-              {influencer.likes} likes
-            </div>
-            <Image
-              src={influencer.image}
-              alt={influencer.alt}
-              layout="responsive"
-              width={150}
-              height={200}
-              style={{ objectFit: 'cover' }}
-              className="object-cover"
-            />
-            <div className="absolute bottom-20 w-full text-center">
-              <p className="text-white text-2xl font-bold">{influencer.name}</p>
-            </div>
-            <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-4 px-4 rounded-t-lg">
-              <p className="font-bold mb-1">
-                {influencer.message.split('\n')[0]}
-              </p>
-              <p className="text-right text-gray-300 mt-2">16/01/2025</p>
-              <p className="text-gray-300 mb-2">
-                {influencer.message.split('\n')[1]}
-              </p>
-              <p>{influencer.message.split('\n').slice(2).join(' ')}</p>
-            </div>
-          </div>
+          <InfluencerCard key={index} influencer={influencer} />
         ))}
       </div>
     </div>
   );
 };
+
+const MAX_CHAR_COUNT = 70;
+
+const InfluencerCard: React.FC<{ influencer: any }> = ({ influencer }) => {
+  const [expanded, setExpanded] = useState(false);
+  const fullMessage = influencer.message.split('\n').slice(2).join(' ');
+  const displayedMessage = expanded
+    ? fullMessage
+    : `${fullMessage.slice(0, MAX_CHAR_COUNT)}${fullMessage.length > MAX_CHAR_COUNT ? '...' : ''}`;
+
+  return (
+    <div
+      className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform ${influencer.rotate} transition-transform hover:scale-105`}
+      style={{ borderColor: '#023EBA', backgroundColor: 'black' }}
+    >
+      <div className="absolute top-2 left-8 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-sm sm:text-[7px]">
+        {influencer.likes} likes
+      </div>
+      <Image
+        src={influencer.image}
+        alt={influencer.alt}
+        layout="responsive"
+        width={150}
+        height={200}
+        style={{ objectFit: 'cover' }}
+        className="object-cover"
+      />
+      <div className="absolute bottom-20 w-full text-center">
+        <p className="text-white text-2xl font-bold">{influencer.name}</p>
+      </div>
+      <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-4 px-4 rounded-t-lg">
+        <p className="font-bold mb-1">{influencer.message.split('\n')[0]}</p>
+        <p className="text-right text-gray-300 mt-2">16/01/2025</p>
+        <p className="text-gray-300 mb-2">
+          {influencer.message.split('\n')[1]}
+        </p>
+
+        <p>{displayedMessage}</p>
+        {fullMessage.length > MAX_CHAR_COUNT && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-blue-400 hover:underline"
+          >
+            {expanded ? 'Read Less' : 'Read More'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default BrandPage;
