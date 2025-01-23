@@ -9,8 +9,7 @@ const BrandPage: React.FC = () => {
       message:
         "Influencer Network\nJoin our Influencer Network Today!\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image3.png',
-      alt: 'Amy - TikTok',
-      rotate: 'rotate-6',
+      alt: 'April - TikTok',
     },
     {
       name: 'JESY',
@@ -18,7 +17,7 @@ const BrandPage: React.FC = () => {
       message:
         "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image2.png',
-      alt: 'Brad - YouTuber',
+      alt: 'Jesy - YouTuber',
     },
     {
       name: 'KATE',
@@ -26,7 +25,7 @@ const BrandPage: React.FC = () => {
       message:
         "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image2.png',
-      alt: 'Lizzie - Instagram',
+      alt: 'kate - Instagram',
     },
   ];
 
@@ -80,25 +79,31 @@ const InfluencerCard: React.FC<{ influencer: any }> = ({ influencer }) => {
         style={{ objectFit: 'cover' }}
         className="object-cover"
       />
-      <div className="absolute bottom-20 w-full text-center">
+      <div className="absolute bottom-40 w-full text-center">
         <p className="text-white text-2xl font-bold">{influencer.name}</p>
       </div>
-      <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-4 px-4 rounded-t-lg">
-        <p className="font-bold mb-1">{influencer.message.split('\n')[0]}</p>
-        <p className="text-right text-gray-300 mt-2">16/01/2025</p>
-        <p className="text-gray-300 mb-2">
-          {influencer.message.split('\n')[1]}
-        </p>
+      <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-2 px-4 rounded-t-lg">
+        <div className=" border-t border-b border-white py-1 px-1">
+          <div className="flex justify-between items-center mb-1">
+            <p className="font-bold mb-1">
+              {influencer.message.split('\n')[0]}
+            </p>
+            <p className="text-right text-gray-300 text-xxs">16/01/2025</p>
+          </div>
+          <p className="text-gray-300 mb-2">
+            {influencer.message.split('\n')[1]}
+          </p>
 
-        <p>{displayedMessage}</p>
-        {fullMessage.length > MAX_CHAR_COUNT && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-blue-400 hover:underline"
-          >
-            {expanded ? 'Read Less' : 'Read More'}
-          </button>
-        )}
+          <p>{displayedMessage}</p>
+          {fullMessage.length > MAX_CHAR_COUNT && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-yellow-400 hover:underline"
+            >
+              {expanded ? 'Read Less' : 'Read More'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
