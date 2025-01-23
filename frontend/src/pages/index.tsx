@@ -34,8 +34,13 @@ const HomePage: React.FC = () => {
               className="object-cover"
             />
           </Link>
-          <p className="absolute bottom-4 left-1/2 transform -rotate-6 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
-            AMY - TIK TOK
+          <p
+            className="absolute bottom-4 left-1/2 transform -rotate-2 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm"
+            style={{ width: '200px', height: '40px' }}
+          >
+            <span className="inline-block transform text-white">
+              AMY - TIK TOK
+            </span>
           </p>
         </div>
 
@@ -52,8 +57,13 @@ const HomePage: React.FC = () => {
             priority
             className="object-cover"
           />
-          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
-            BRAD - YOU TUBER
+          <p
+            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm"
+            style={{ width: '180px', height: '40px' }}
+          >
+            <span className="inline-block transform -rotate-2 text-white">
+              BRAD - YOU TUBER
+            </span>
           </p>
         </div>
 
@@ -69,8 +79,13 @@ const HomePage: React.FC = () => {
             sizes="(max-width: 100px) 100vw, 50vw"
             className="object-cover"
           />
-          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-lg font-bold text-base sm:text-sm">
-            LIZZIE - INSTAGRAM
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm">
+            <span
+              className="inline-block transform -rotate-20 text-white"
+              style={{ width: '180px', height: '40px' }}
+            >
+              LIZZIE - INSTAGRAM
+            </span>
           </p>
         </div>
       </div>
