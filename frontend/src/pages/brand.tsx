@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
-import InfluencerList from '../app/components/InfluencerList';
+import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
-
-interface Influencer {
-  alt: string;
-  likes: number;
-  image: string;
-  name: string;
-  message: string;
-}
+import { Influencer } from '../types';
 
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
     'influencers',
   );
-
   const influencers: Influencer[] = [
     {
       name: 'APRIL',
@@ -68,15 +60,22 @@ const BrandPage: React.FC = () => {
       </div>
 
       <div className="mt-6">
-        <h3 className="text-2xl text-[#FFFF00] underline">Submissions</h3>
+        <h3 className="text-2xl text-[#FFFF00] underline">
+          {activeTab === 'influencers' ? 'Submissions' : 'Campaign Metrics'}
+        </h3>
       </div>
 
-      {/* Conditional rendering based on the activeTab */}
-      {activeTab === 'influencers' ? (
-        <InfluencerList influencers={influencers} />
-      ) : (
-        <CampaignsContent />
-      )}
+      <div
+        className={`mt-4 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-20 w-full px-4 fade-in ${activeTab === 'influencers' ? 'show' : ''}`}
+      >
+        {activeTab === 'influencers' ? (
+          influencers.map((influencer, index) => (
+            <InfluencerCard key={index} influencer={influencer} />
+          ))
+        ) : (
+          <CampaignsContent />
+        )}
+      </div>
     </div>
   );
 };

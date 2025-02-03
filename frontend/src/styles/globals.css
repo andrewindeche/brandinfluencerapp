@@ -53,6 +53,16 @@ h3 {
   animation: gradientBackground 18s ease infinite;
 }
 
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-in.show {
+  opacity: 1;
+}
+
+
 @keyframes gradientBackground {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
