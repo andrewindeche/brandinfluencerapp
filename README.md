@@ -99,7 +99,8 @@ https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bw
 
 ## <h1> Sample Designs </h1>
 ![Landing Page](<frontend/screenshots/Screenshot 2025-01-23 175801.png>)
-![Brand Dashboard](<frontend/screenshots/Screenshot 2025-01-17 205240.png>)
+![Brand Dashboard - influencers](<frontend/screenshots/Screenshot 2025-01-17 205240.png>)
+![Brand Dashboard - campaigns](<frontend/screenshots/Screenshot 2025-02-03 154431.png>)
 ![Influencer Dashboard](<frontend/screenshots/Screenshot 2025-01-17 231458.png>)
 
 ## <h1> Author </h1>
