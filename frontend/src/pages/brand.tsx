@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import InfluencerList from '../app/components/InfluencerList';
 import CampaignsContent from '../app/components/CampaignsContent';
 
+interface Influencer {
+  alt: string;
+  likes: number;
+  image: string;
+  name: string;
+  message: string;
+}
+
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
     'influencers',
