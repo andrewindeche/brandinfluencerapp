@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
           className="relative w-full max-w-xs sm:w-[18rem]  h-96 sm:h-[21rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6 transition-transform hover:scale-105 md:-ml-8"
           style={{ borderColor: '#023EBA' }}
         >
-          <Link href="/brand">
+          <Link href="/campaigns">
             <Image
               src="/images/woman2.png"
               alt="Amy - TikTok"
