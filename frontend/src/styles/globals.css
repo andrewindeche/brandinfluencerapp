@@ -39,6 +39,10 @@ h3 {
   font-family: var(--font-irish-grover);
 }
 
+h4 {
+  font-family: var(--font-joti-one);
+}
+
 .transition-transform {
   transition: transform 0.4s ease-in-out;
 }
