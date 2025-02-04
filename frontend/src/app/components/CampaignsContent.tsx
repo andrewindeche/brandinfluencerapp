@@ -1,9 +1,13 @@
 import React from 'react';
+import ProfileCard from '../components/ProfileCard';
 
 const CampaignsContent: React.FC = () => {
   return (
-    <div className="mt-4 flex justify-center items-center space-y-4 sm:space-y-2 w-full px-16">
-      <div className="p-4 rounded-lg shadow-lg border border-white">
+    <div className="mt-4 flex justify-start items-start space-x-8 w-full px-8">
+      <div className="w-1/4">
+        <ProfileCard />
+      </div>
+      <div className="flex-1 p-4 rounded-lg shadow-lg border border-white">
         <div className="grid grid-cols-3 gap-4 text-center text-white">
           <div>
             <h4 className="text-xs">Ambassadors</h4>
