@@ -22,7 +22,7 @@ const CampaignsContent: React.FC = () => {
             ].map((stat) => (
               <div
                 key={stat.title}
-                className="text-center p-4 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
+                className="text-center p-1 rounded-lg bg-gradient-to-r from-yellow-500 to-red-600 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
               >
                 <h4 className="text-sm">{stat.title}</h4>
                 <p className="text-lg font-bold">{stat.value}</p>
