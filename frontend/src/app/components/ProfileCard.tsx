@@ -4,7 +4,7 @@ import Image from 'next/image';
 const ProfileCard: React.FC = () => {
   return (
     <>
-      <div className="bg-black text-white p-8 rounded-lg mb-10">
+      <div className="bg-black text-white p-12 rounded-lg mb-2">
         <Image
           src="/images/screenshots/HandM.jpg"
           alt="H&M Logo"
@@ -21,7 +21,7 @@ const ProfileCard: React.FC = () => {
           </p>
         </div>
       </div>
-      <div className="flex shadow-lg border border-white bg-black text-white p-2 rounded-lg mb-2 justify-center items-center">
+      <div className="flex shadow-lg border border-white bg-black text-white rounded-lg mb-2 justify-center items-center">
         <div className="p-2 mx-1">
           <p className="text-l font-bold text-white">30k</p>
           <p className="text-xs text-gray-400">Posts</p>
