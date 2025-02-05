@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
 import { Influencer } from '../types';
+import UserMenu from '../app/components/UserMenu';
 
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
@@ -45,6 +46,9 @@ const BrandPage: React.FC = () => {
 
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center">
+      <div className="absolute top-2 right-36 z-50">
+        <UserMenu />
+      </div>
       <div className="flex justify-center space-x-4 mt-4">
         <button
           onClick={() => setActiveTab('influencers')}
