@@ -4,7 +4,7 @@ import Image from 'next/image';
 const ProfileCard: React.FC = () => {
   return (
     <div className="bg-black text-white rounded-2xl overflow-hidden shadow-lg w-full max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
-      <div className="relative w-full h-40">
+      <div className="relative w-full h-60">
         <Image
           src="/images/screenshots/HandM.jpg"
           alt="H&M Logo"
