@@ -16,7 +16,9 @@ const ProfileCard: React.FC = () => {
 
       <div className="text-center p-4">
         <h3 className="text-sm font-bold mb-2">H & M Brands</h3>
-        <h4 className="text-sm custom-underline font-medium mb-2">About</h4>
+        <h4 className="text-sm underline underline-offset-8 font-medium mb-2">
+          About
+        </h4>
 
         <div className="relative max-h-28 overflow-hidden hover:overflow-auto hover:scrollbar-thin hover:scrollbar-thumb-yellow-500 hover:scrollbar-track-gray-800 transition-all duration-300">
           <p className="text-xs leading-relaxed">

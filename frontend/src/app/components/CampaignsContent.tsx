@@ -35,7 +35,7 @@ const CampaignsContent: React.FC = () => {
               New Campaigns
             </h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 h-60 overflow-y-hidden hover:overflow-y-auto">
+            <div className="grid underline underline-offset-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 h-60 overflow-y-hidden hover:overflow-y-auto">
               {[
                 { title: 'Title 1', src: '/images/fit.jpg' },
                 { title: 'Title 2', src: '/images/images.jpg' },
