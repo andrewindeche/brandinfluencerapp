@@ -53,9 +53,10 @@ const CampaignsContent: React.FC = () => {
                   <Image
                     src={campaign.src}
                     alt={campaign.title}
-                    width={50}
-                    height={70}
-                    className="rounded-t-lg transition duration-300 ease-in-out transform hover:scale-110"
+                    width={200}
+                    height={150}
+                    layout="responsive"
+                    className="rounded-t-lg object-cover"
                   />
                   <p className="text-center mt-2">{campaign.title}</p>
                 </div>
