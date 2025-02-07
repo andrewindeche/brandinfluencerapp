@@ -31,7 +31,9 @@ const CampaignsContent: React.FC = () => {
           </div>
 
           <div>
-            <h3 className="text-white text-sm font-bold mb-2">New Campaigns</h3>
+            <h3 className="text-white text-lg font-bold mb-2 text-center py-2">
+              New Campaigns
+            </h3>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 h-60 overflow-y-hidden hover:overflow-y-auto">
               {[

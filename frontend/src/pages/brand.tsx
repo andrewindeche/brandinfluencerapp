@@ -5,40 +5,34 @@ import { Influencer } from '../types';
 import UserMenu from '../app/components/UserMenu';
 
 const BrandPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
-    'influencers',
-  );
+  const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>('influencers');
 
   const influencers: Influencer[] = [
     {
       name: 'APRIL',
       likes: 100,
-      message:
-        "Influencer Network\nJoin our Influencer Network Today!\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: "Influencer Network\nJoin our Influencer Network Today!\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image3.png',
       alt: 'April - TikTok',
     },
     {
       name: 'JESY',
       likes: 50,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image2.png',
       alt: 'Jesy - YouTuber',
     },
     {
       name: 'KATE',
       likes: 20,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image2.png',
       alt: 'kate - Instagram',
     },
     {
       name: 'BRAD',
       likes: 20,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
       image: '/images/image4.png',
       alt: 'kate - Instagram',
     },
@@ -52,13 +46,13 @@ const BrandPage: React.FC = () => {
       <div className="flex justify-center space-x-4 mt-4">
         <button
           onClick={() => setActiveTab('influencers')}
-          className={`bg-[#FFFF00] hover:scale-105 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
+          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
         >
           Influencers
         </button>
         <button
           onClick={() => setActiveTab('campaigns')}
-          className={`bg-red-500 hover:scale-105 text-white py-2 px-14 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
+          className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-14 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
         >
           Campaigns
         </button>
