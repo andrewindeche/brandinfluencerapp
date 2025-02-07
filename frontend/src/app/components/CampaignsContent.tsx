@@ -35,6 +35,14 @@ const CampaignsContent: React.FC = () => {
               New Campaigns
             </h3>
 
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search for new campaigns..."
+                className="w-full px-4 py-2 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 h-60 overflow-y-hidden hover:overflow-y-auto">
               {[
                 { title: 'Title 1', src: '/images/fit.jpg' },
@@ -71,9 +79,10 @@ const CampaignsContent: React.FC = () => {
 
         <div className="w-1/5">
           <div className="bg-[#E8BB5B] text-white p-6 rounded-2xl text-center hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-            <h4 className="text-4xl font-bold">2</h4>
+            <h4 className="text-xl font-bold">Notifications</h4>
+            <h4 className="text-4xl text-red-600 font-bold">2</h4>
+            <p className="text-xs ml-2 inline-block align-top">New</p>
             <p className="text-sm mt-2">Sport Campaign</p>
-            <p className="text-xs mt-4">New</p>
             <p className="text-xs">16/01/2025</p>
           </div>
 
