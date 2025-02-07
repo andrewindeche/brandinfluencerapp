@@ -3,19 +3,22 @@ import Image from 'next/image';
 
 const ProfileCard: React.FC = () => {
   return (
-    <div className="bg-black text-white rounded-lg overflow-hidden shadow-lg w-full max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
+    <div className="bg-black text-white rounded-2xl overflow-hidden shadow-lg w-full max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
       <div className="relative w-full h-40">
         <Image
           src="/images/screenshots/HandM.jpg"
           alt="H&M Logo"
           layout="fill"
           objectFit="cover"
-          className="rounded-t-lg"
+          className="w-full h-auto rounded-b-2xl"
         />
       </div>
 
       <div className="text-center p-4">
-        <h3 className="text-sm font-bold mb-2">H & M Brands</h3>
+        <div className="relative w-full my-2">
+          <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 opacity-100 bg-transparent"></div>
+        </div>
+        <h3 className="text-sm font-bold mb-0">H & M Brands</h3>
         <h4 className="text-sm underline underline-offset-8 font-medium mb-2">
           About
         </h4>
@@ -31,6 +34,10 @@ const ProfileCard: React.FC = () => {
             culpa qui officia deserunt mollit anim id est laborum.
           </p>
         </div>
+
+        <div className="relative w-full my-2">
+          <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 opacity-100 bg-transparent"></div>
+        </div>
       </div>
     </div>
   );
@@ -38,17 +45,17 @@ const ProfileCard: React.FC = () => {
 
 const StatsCard: React.FC = () => {
   return (
-    <div className="border border-white bg-black text-white rounded-lg shadow-lg w-full max-w-xl mx-auto mt-2 p-2 flex justify-around">
+    <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-2 p-2 flex justify-around">
       <div className="text-center">
-        <p className="text-sm font-bold">30k</p>
+        <p className="text-xs font-bold">30k</p>
         <p className="text-xs text-gray-400">Posts</p>
       </div>
       <div className="text-center">
-        <p className="text-sm font-bold">5k</p>
+        <p className="text-xs font-bold">5k</p>
         <p className="text-xs text-gray-400">Likes</p>
       </div>
       <div className="text-center">
-        <p className="text-sm font-bold">60.2k</p>
+        <p className="text-xs font-bold">60.2k</p>
         <p className="text-xs text-gray-400">Comments</p>
       </div>
     </div>
