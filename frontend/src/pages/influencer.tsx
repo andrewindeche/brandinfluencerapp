@@ -11,13 +11,13 @@ const InfluencerPage: React.FC = () => {
         <UserMenu />
       </div>
 
-      <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-[underline] decoration-2 underline-offset-2 text-center ml-2 -mt-2">
+      <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-2 underline-offset-2 text-center ml-2 -mt-2">
         My Profile
       </h1>
 
       <div className="flex justify-center items-start mb-8 space-x-4">
         <div className="w-1/5 space-y-12 self-start mt-8">
-          <div className="p-1 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg">
+          <div className="p-1 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg hover:overflow-y-auto">
             <div className="relative">
               <Image
                 src="/images/image4.png"
@@ -26,7 +26,7 @@ const InfluencerPage: React.FC = () => {
                 height={150}
                 className="w-full h-auto rounded-lg"
               />
-              <div className="absolute transform -translate-x-1/2 rotate-12 bg-opacity-30 px-20 py-3 bottom-6 left-1/2 transform -translate-x-1/2 text-lg bg-[#333333] text-white p-2 rounded-full z-10">
+              <div className="absolute transform -translate-x-1/2 rotate-12 bg-opacity-30 px-20 py-3 bottom-6 left-1/2 text-lg bg-[#333333] text-white p-2 rounded-full z-10">
                 <span className="inline-block transform -rotate-12 text-white">
                   BRAD
                 </span>
@@ -44,7 +44,7 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="border-t border-b border-white py-6 px-2 mb-6 mt-4">
+            <div className="border-t border-b border-white py-6 px-2 mb-6 mt-4 h-48 overflow-y-auto"> {/* Added scrollbar */}
               <div className="flex justify-center text-xs mt-2">
                 <p>Influencer Network</p>
                 <p className="text-gray-400 ml-6">16/01/2025</p>
@@ -140,9 +140,9 @@ const InfluencerPage: React.FC = () => {
                   </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we&lsquo;re excited to invite you to
-                    join our influencer network. We&lsquo;ve been following your
-                    content on [Platform] and love how it aligns with our brand!
+                    from [Your Brand], and we're excited to invite you to join
+                    our influencer network. We've been following your content on
+                    [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
@@ -165,9 +165,9 @@ const InfluencerPage: React.FC = () => {
                   </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we&lsquo;re excited to invite you to
-                    join our influencer network. We&lsquo;ve been following your
-                    content on [Platform] and love how it aligns with our brand!
+                    from [Your Brand], and we're excited to invite you to join
+                    our influencer network. We've been following your content on
+                    [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
