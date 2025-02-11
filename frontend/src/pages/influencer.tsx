@@ -44,7 +44,9 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="border-t border-b border-white py-6 px-1 mb-6 mt-4"> {/* Added margin-top and margin-bottom */}
+            <div className="border-t border-b border-white py-6 px-1 mb-6 mt-4">
+              {' '}
+              {/* Added margin-top and margin-bottom */}
               <div className="flex justify-center text-xs mt-2">
                 <p>Influencer Network</p>
                 <p className="text-gray-400 ml-6">16/01/2025</p>
@@ -138,9 +140,9 @@ const InfluencerPage: React.FC = () => {
                   <p className="text-gray-500">16/01/2025</p>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we're excited to invite you to join
-                    our influencer network. We've been following your content on
-                    [Platform] and love how it aligns with our brand!
+                    from [Your Brand], and we&lsquo;re excited to invite you to
+                    join our influencer network. We&lsquo;ve been following your
+                    content on [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
@@ -161,9 +163,9 @@ const InfluencerPage: React.FC = () => {
                   <p className="text-gray-500">15/01/2025</p>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we're excited to invite you to join
-                    our influencer network. We've been following your content on
-                    [Platform] and love how it aligns with our brand!
+                    from [Your Brand], and we&apos;re excited to invite you to
+                    join our influencer network. We&lsquo;ve been following your
+                    content on [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
