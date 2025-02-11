@@ -4,6 +4,7 @@ import UserMenu from '../app/components/UserMenu';
 
 const InfluencerPage: React.FC = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   return (
     <div className="bg-[#E8BB5B] p-12 min-h-screen">
@@ -17,7 +18,11 @@ const InfluencerPage: React.FC = () => {
 
       <div className="flex justify-center items-start mb-8 space-x-4">
         <div className="w-1/5 space-y-12 self-start mt-8">
-          <div className="p-1 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg hover:overflow-y-auto">
+          <div
+            className="p-1 bg-black text-white rounded-2xl relative shadow-lg"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <div className="relative">
               <Image
                 src="/images/image4.png"
@@ -44,21 +49,30 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="border-t border-b border-white py-6 px-2 mb-6 mt-4 h-48 overflow-y-auto"> {/* Added scrollbar */}
+
+            <div className="border-t border-b border-white py-4 px-2">
               <div className="flex justify-center text-xs mt-2">
                 <p>Influencer Network</p>
                 <p className="text-gray-400 ml-6">16/01/2025</p>
               </div>
-              <p className="text-center text-xs mt-6 px-18 max-w-full">
-                <span className="block mb-2 mt-6 px-1">
-                  Join our Influencer Network today!
-                </span>
+            </div>
+
+            <div
+              className={`h-24 px-2 mt-2 ${isHovered ? 'overflow-y-auto' : 'overflow-hidden'}`}
+            >
+              <p className="text-center text-xs max-w-full">
                 My name is [Your Name] from [Your Brand], and we would love to
                 have you onboard. We love how your content aligns with our
-                brand!
+                brand! Your engagement metrics are phenomenal, and we believe
+                our partnership will bring great value to both sides.
               </p>
             </div>
+
+            <div className="px-2 pb-4">
+              <hr className="border-t border-white my-2" />
+            </div>
           </div>
+
           <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-8 p-1 flex justify-around">
             <div className="text-center">
               <p className="text-3xl font-bold">10</p>
@@ -140,9 +154,9 @@ const InfluencerPage: React.FC = () => {
                   </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we're excited to invite you to join
-                    our influencer network. We've been following your content on
-                    [Platform] and love how it aligns with our brand!
+                    from [Your Brand], and we&lsquo;re excited to invite you to
+                    join our influencer network. We&#39;ve been following your
+                    content on [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
@@ -165,9 +179,9 @@ const InfluencerPage: React.FC = () => {
                   </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we're excited to invite you to join
-                    our influencer network. We've been following your content on
-                    [Platform] and love how it aligns with our brand!
+                    from [Your Brand], and we&lsquo;re excited to invite you to
+                    join our influencer network. We&lsquo;ve been following your
+                    content on [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
