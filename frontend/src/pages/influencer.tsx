@@ -118,24 +118,26 @@ const InfluencerPage: React.FC = () => {
           </div>
 
           <div className="bg-[#FFD700] p-4 rounded-2xl shadow-lg">
-            <h2 className="text-3xl font-bold mb-4 text-center">
+            <h4 className="text-xl font-bold mb-4 text-center">
               Notifications
-            </h2>
+            </h4>
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-xl shadow-lg flex items-start">
+              <div className="bg-white p-4 rounded-xl shadow-lg flex items-start space-x-4 text-sm">
                 <Image
                   src="/images/fit.jpg"
                   alt="Sports Campaign"
                   width={150}
                   height={200}
-                  className="w-16 h-16 rounded-lg mr-4"
+                  className="w-16 h-16 rounded-lg"
                 />
-                <div>
-                  <p className="font-bold text-blue-500">Sports Campaign</p>
-                  <p className="text-green-500 font-semibold">
-                    Submission Accepted
-                  </p>
-                  <p className="text-gray-500">16/01/2025</p>
+                <div className="w-full">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="font-bold text-blue-500">Sports Campaign</p>
+                    <p className="text-green-500 font-semibold">
+                      Submission Accepted
+                    </p>
+                    <p className="text-gray-500">16/01/2025</p>
+                  </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
                     from [Your Brand], and we&lsquo;re excited to invite you to
@@ -145,23 +147,25 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-gray-200 p-4 rounded-xl shadow-lg flex items-start">
+              <div className="bg-gray-200 p-4 rounded-xl shadow-lg flex items-start space-x-4 text-sm">
                 <Image
                   src="/images/images.jpg"
                   alt="Fashion Campaign"
                   width={150}
                   height={200}
-                  className="w-16 h-16 rounded-lg mr-4"
+                  className="w-16 h-16 rounded-lg"
                 />
-                <div>
-                  <p className="font-bold text-blue-500">Fashion Campaign</p>
-                  <p className="text-red-500 font-semibold">
-                    Submission Rejected
-                  </p>
-                  <p className="text-gray-500">15/01/2025</p>
+                <div className="w-full">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="font-bold text-blue-500">Fashion Campaign</p>
+                    <p className="text-red-500 font-semibold">
+                      Submission Rejected
+                    </p>
+                    <p className="text-gray-500">15/01/2025</p>
+                  </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we&apos;re excited to invite you to
+                    from [Your Brand], and we&lsquo;re excited to invite you to
                     join our influencer network. We&lsquo;ve been following your
                     content on [Platform] and love how it aligns with our brand!
                   </p>
