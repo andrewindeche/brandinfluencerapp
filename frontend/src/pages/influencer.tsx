@@ -16,7 +16,7 @@ const InfluencerPage: React.FC = () => {
       </h1>
 
       <div className="flex justify-center items-start mb-8 space-x-4">
-        <div className="w-1/5 space-y-1 self-start mt-8">
+        <div className="w-1/5 space-y-12 self-start mt-8">
           <div className="p-1 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg">
             <div className="relative">
               <Image
@@ -44,9 +44,7 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="border-t border-b border-white py-6 px-1 mb-6 mt-4">
-              {' '}
-              {/* Added margin-top and margin-bottom */}
+            <div className="border-t border-b border-white py-6 px-2 mb-6 mt-4">
               <div className="flex justify-center text-xs mt-2">
                 <p>Influencer Network</p>
                 <p className="text-gray-400 ml-6">16/01/2025</p>
@@ -61,7 +59,7 @@ const InfluencerPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-1 p-1 flex justify-around">
+          <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-8 p-1 flex justify-around">
             <div className="text-center">
               <p className="text-3xl font-bold">10</p>
               <p className="text-xs">Campaigns</p>
@@ -83,7 +81,7 @@ const InfluencerPage: React.FC = () => {
             {['Campaign 1', 'Campaign 2', 'Campaign 3'].map((title, index) => (
               <div
                 key={index}
-                className={`relative p-4 rounded-xl shadow-lg transform transition duration-300 border border-black ${
+                className={`relative bg-black text-white p-1 rounded-xl shadow-lg transform transition duration-300 border border-black ${
                   activeCard === title
                     ? 'scale-105 ring-4 ring-blue-500'
                     : 'hover:scale-105 hover:ring-2 hover:ring-blue-300'
@@ -94,26 +92,26 @@ const InfluencerPage: React.FC = () => {
                   src="/images/fit.jpg"
                   alt={title}
                   width={200}
-                  height={200}
-                  className="rounded-t-lg w-full h-[200px] object-cover"
+                  height={150}
+                  className="rounded-2xl w-full h-[150px] object-cover"
                 />
-                <div className="bg-[#0A74DA] text-white p-3 rounded-b-lg">
-                  <p className="font-bold">{title}</p>
-                  <p className="text-xs">16/01/2025</p>
+                <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold">{title}</p>
+                    <p className="text-xs">{'16/01/2025'}</p>
+                  </div>
                   <p className="text-xs mt-2">
                     I hope this message finds you well! My name is [Your Name]
                     from [Your Brand]...
                   </p>
-                  <p className="text-xs font-semibold mt-2">
-                    Deadline: 2 weeks
-                  </p>
-                  <p
-                    className={`text-xs font-bold mt-2 ${
-                      index % 2 === 0 ? 'text-green-400' : 'text-red-400'
-                    }`}
-                  >
-                    {index % 2 === 0 ? 'Active' : 'Inactive'}
-                  </p>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs font-semibold">Deadline: 2 weeks</p>
+                    <p
+                      className={`text-xs font-bold ${index % 2 === 0 ? 'text-green-400' : 'text-red-400'}`}
+                    >
+                      {index % 2 === 0 ? 'Active' : 'Inactive'}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
