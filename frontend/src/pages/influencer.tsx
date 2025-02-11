@@ -6,44 +6,51 @@ const InfluencerPage: React.FC = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
 
   return (
-    <div className="bg-[#E8BB5B] p-16 min-h-screen">
+    <div className="bg-[#E8BB5B] p-12 min-h-screen">
       <div className="absolute top-2 right-28 z-50">
         <UserMenu />
       </div>
 
+      <h1 className="text-3xl text-[#FFFF00] underline text-center mb-8 pb-2 decoration-[underline] decoration-2 underline-offset-2">
+        My Profile
+      </h1>
+
       <div className="flex justify-center items-start mb-8 space-x-4">
-        <div className="w-1/4 space-y-4">
-          <div className="p-4 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg">
-            <h2 className="absolute top-4 left-4 text-xl font-bold bg-[#FFD700] text-black p-2 rounded-full z-10">
-              BRAD
-            </h2>
+        <div className="w-1/5 space-y-1 self-start mt-8">
+          <div className="p-1 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg">
             <div className="relative">
               <Image
                 src="/images/image4.png"
                 alt="Brad"
-                width={300}
-                height={200}
-                className="w-full h-auto"
+                width={200}
+                height={150}
+                className="w-full h-auto rounded-lg"
               />
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-lg font-bold bg-[#333333] text-white p-2 rounded-full z-10">
+                BRAD
+              </div>
               <div className="absolute top-4 right-4 text-center z-10">
-                <div className="bg-[#FFD700] text-black text-sm font-bold p-2 rounded-full">
+                <div className="bg-[#333333] text-white text-xs font-bold p-3 rounded-full">
                   100 likes
                 </div>
-                <div className="bg-[#FFD700] text-black text-sm font-bold p-2 mt-2 rounded-full">
+                <div className="bg-[#333333] text-white text-xs font-bold p-3 mt-1 rounded-full">
                   50 shares
                 </div>
               </div>
             </div>
-            <p className="text-center text-xs mt-4">Influencer Network</p>
-            <p className="text-center text-gray-400 text-xs">16/01/2025</p>
-            <p className="text-center text-xs mt-4 px-2">
-              Join our Influencer Network today! My name is [Your Name] from
-              [Your Brand], and we would love to have you onboard. We love how
-              your content aligns with our brand!
+            <div className="flex justify-center text-xs mt-2">
+              <p>Influencer Network</p>
+              <p className="text-gray-400 ml-2">16/01/2025</p>
+            </div>
+            <p className="text-center text-xs mt-1 px-4">
+              <span className="block mb-2">
+                Join our Influencer Network today!
+              </span>
+              My name is [Your Name] from [Your Brand], and we would love to
+              have you onboard. We love how your content aligns with our brand!
             </p>
           </div>
-
-          <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-2 p-2 flex justify-around">
+          <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-1 p-1 flex justify-around">
             <div className="text-center">
               <p className="text-xl font-bold">10</p>
               <p className="text-sm">Campaigns</p>
