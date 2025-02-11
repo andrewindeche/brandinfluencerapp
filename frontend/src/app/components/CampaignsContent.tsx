@@ -4,14 +4,14 @@ import Image from 'next/image';
 
 const CampaignsContent: React.FC = () => {
   return (
-    <div className="relative w-full px-12">
-      <div className="flex flex-row space-x-4">
+    <div className="relative w-full p-8">
+      <div className="flex flex-row space-x-8">
         <div className="w-1/5">
           <ProfileCard />
         </div>
 
         <div className="flex-1 rounded-lg shadow-lg">
-          <div className="p-8 grid grid-cols-3 gap-4 text-white rounded-lg border border-white justify-between">
+          <div className="p-8 grid grid-cols-3 gap-6 text-white rounded-lg border border-white">
             {[
               { title: 'Ambassadors', value: '12' },
               { title: 'Total reach', value: '9.8K' },
@@ -22,7 +22,7 @@ const CampaignsContent: React.FC = () => {
             ].map((stat) => (
               <div
                 key={stat.title}
-                className="text-center p-1 rounded-lg bg-gradient-to-r from-yellow-500 to-red-600 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
+                className="text-center p-4 rounded-lg bg-gradient-to-r from-yellow-500 to-red-600 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
               >
                 <h4 className="text-sm">{stat.title}</h4>
                 <p className="text-lg font-bold">{stat.value}</p>
@@ -31,11 +31,11 @@ const CampaignsContent: React.FC = () => {
           </div>
 
           <div>
-            <h3 className="text-white text-lg font-bold my-4 text-center">
+            <h3 className="text-white text-lg font-bold my-8 text-center">
               New Campaigns
             </h3>
 
-            <div className="mb-4">
+            <div className="mb-6">
               <input
                 type="text"
                 placeholder="Search for new campaigns..."
@@ -43,7 +43,7 @@ const CampaignsContent: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 h-60 overflow-y-hidden hover:overflow-y-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 h-60 overflow-y-hidden hover:overflow-y-auto">
               {[
                 { title: 'Title 1', src: '/images/fit.jpg' },
                 { title: 'Title 2', src: '/images/images.jpg' },
@@ -54,7 +54,7 @@ const CampaignsContent: React.FC = () => {
               ].map((campaign) => (
                 <div
                   key={campaign.title}
-                  className="bg-black rounded-2xl text-white p-1 transition-transform transform hover:scale-105 hover:shadow-lg"
+                  className="bg-black rounded-2xl text-white p-4 transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <div className="relative w-full h-40 group">
                     <Image
@@ -77,7 +77,7 @@ const CampaignsContent: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-1/5">
+        <div className="w-1/5 space-y-8">
           <div className="bg-[#E8BB5B] text-white p-6 rounded-2xl text-center hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
             <h4 className="text-xl font-bold">Notifications</h4>
             <h4 className="text-4xl text-red-600 font-bold">2</h4>
@@ -86,7 +86,7 @@ const CampaignsContent: React.FC = () => {
             <p className="text-xs">16/01/2025</p>
           </div>
 
-          <div className="bg-black text-white mt-4 p-1 rounded-2xl text-center transition-transform transform hover:scale-105 hover:shadow-lg">
+          <div className="bg-black text-white p-4 rounded-2xl text-center transition-transform transform hover:scale-105 hover:shadow-lg">
             <div className="relative w-full h-60 group">
               <Image
                 src="/images/image1.png"

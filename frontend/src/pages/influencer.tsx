@@ -6,7 +6,7 @@ const InfluencerPage: React.FC = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
 
   return (
-    <div className="bg-[#E8BB5B] p-8 min-h-screen">
+    <div className="bg-[#E8BB5B] p-16 min-h-screen">
       <div className="absolute top-2 right-28 z-50">
         <UserMenu />
       </div>
@@ -14,15 +14,18 @@ const InfluencerPage: React.FC = () => {
       <div className="flex justify-center items-start mb-8 space-x-4">
         <div className="w-1/4 space-y-4">
           <div className="p-4 bg-black text-white rounded-2xl relative overflow-hidden shadow-lg">
+            <h2 className="absolute top-4 left-4 text-xl font-bold bg-[#FFD700] text-black p-2 rounded-full z-10">
+              BRAD
+            </h2>
             <div className="relative">
               <Image
                 src="/images/image4.png"
                 alt="Brad"
-                width={150}
+                width={300}
                 height={200}
-                className="rounded-full w-32 h-32 mx-auto mb-4"
+                className="w-full h-auto"
               />
-              <div className="absolute top-4 left-4 text-center">
+              <div className="absolute top-4 right-4 text-center z-10">
                 <div className="bg-[#FFD700] text-black text-sm font-bold p-2 rounded-full">
                   100 likes
                 </div>
@@ -31,10 +34,9 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <h2 className="text-center text-3xl font-bold mb-2">BRAD</h2>
-            <p className="text-center text-sm">Influencer Network</p>
-            <p className="text-center text-gray-400 text-sm">16/01/2025</p>
-            <p className="text-center text-sm mt-4 px-2">
+            <p className="text-center text-xs mt-4">Influencer Network</p>
+            <p className="text-center text-gray-400 text-xs">16/01/2025</p>
+            <p className="text-center text-xs mt-4 px-2">
               Join our Influencer Network today! My name is [Your Name] from
               [Your Brand], and we would love to have you onboard. We love how
               your content aligns with our brand!
@@ -58,7 +60,7 @@ const InfluencerPage: React.FC = () => {
         </div>
 
         <div className="w-2/3 space-y-4">
-          <h4 className="text-xl font-bold text-center">Campaigns</h4>
+          <h4 className="text-xl font-bold text-center underline">Campaigns</h4>
           <div className="grid grid-cols-3 gap-4">
             {['Campaign 1', 'Campaign 2', 'Campaign 3'].map((title, index) => (
               <div
@@ -79,7 +81,7 @@ const InfluencerPage: React.FC = () => {
                 />
                 <p className="font-bold">{title}</p>
                 <p className="text-gray-600">16/01/2025</p>
-                <p className="text-gray-700">
+                <p className="text-gray-300">
                   I hope this message finds you well! My name is [Your Name]
                   from [Your Brand]...
                 </p>
@@ -87,7 +89,9 @@ const InfluencerPage: React.FC = () => {
                   Deadline: 2 weeks
                 </p>
                 <p
-                  className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}
+                  className={`font-bold ${
+                    index % 2 === 0 ? 'text-green-500' : 'text-red-500'
+                  }`}
                 >
                   {index % 2 === 0 ? 'Active' : 'Inactive'}
                 </p>
@@ -124,7 +128,7 @@ const InfluencerPage: React.FC = () => {
 
               <div className="bg-gray-200 p-4 rounded-xl shadow-lg flex items-start">
                 <Image
-                  src="/images/fit.jpg"
+                  src="/images/images.jpg"
                   alt="Fashion Campaign"
                   width={150}
                   height={200}
