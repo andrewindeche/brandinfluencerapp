@@ -11,7 +11,7 @@ const InfluencerPage: React.FC = () => {
         <UserMenu />
       </div>
 
-      <h1 className="text-3xl text-[#FFFF00] underline text-center mb-8 pb-2 decoration-[underline] decoration-2 underline-offset-2">
+      <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-[underline] decoration-2 underline-offset-2 text-center ml-2 -mt-2">
         My Profile
       </h1>
 
@@ -32,29 +32,32 @@ const InfluencerPage: React.FC = () => {
                 </span>
               </div>
               <div className="absolute top-4 left-1 text-center z-10">
-                <div className="bg-[#333333] rotate-12 bg-opacity-30 text-white text-xs font-bold p-3 rounded-full">
+                <div className="bg-[#333333] rotate-12 bg-opacity-30 text-xs p-3 rounded-full">
                   <span className="inline-block transform -rotate-12 text-white">
                     100 likes
                   </span>
                 </div>
-                <div className="bg-[#333333] rotate-12 bg-opacity-30 text-white text-xs font-bold p-3 mt-1 rounded-full">
+                <div className="bg-[#333333] rotate-12 bg-opacity-30 text-xs p-3 mt-1 rounded-full">
                   <span className="inline-block transform -rotate-12 text-white">
                     50 shares
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex justify-center text-xs mt-2">
-              <p>Influencer Network</p>
-              <p className="text-gray-400 ml-2">16/01/2025</p>
+            <div className="border-t border-b border-white py-6 px-1 mb-6 mt-4"> {/* Added margin-top and margin-bottom */}
+              <div className="flex justify-center text-xs mt-2">
+                <p>Influencer Network</p>
+                <p className="text-gray-400 ml-6">16/01/2025</p>
+              </div>
+              <p className="text-center text-xs mt-6 px-18 max-w-full">
+                <span className="block mb-2 mt-6 px-1">
+                  Join our Influencer Network today!
+                </span>
+                My name is [Your Name] from [Your Brand], and we would love to
+                have you onboard. We love how your content aligns with our
+                brand!
+              </p>
             </div>
-            <p className="text-center text-xs mt-1 px-4">
-              <span className="block mb-2">
-                Join our Influencer Network today!
-              </span>
-              My name is [Your Name] from [Your Brand], and we would love to
-              have you onboard. We love how your content aligns with our brand!
-            </p>
           </div>
           <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-1 p-1 flex justify-around">
             <div className="text-center">
@@ -73,12 +76,12 @@ const InfluencerPage: React.FC = () => {
         </div>
 
         <div className="w-2/3 space-y-4">
-          <h4 className="text-xl font-bold text-center underline">Campaigns</h4>
+          <h4 className="text-xl text-center underline">Campaigns</h4>
           <div className="grid grid-cols-3 gap-4">
             {['Campaign 1', 'Campaign 2', 'Campaign 3'].map((title, index) => (
               <div
                 key={index}
-                className={`relative p-4 rounded-xl shadow-lg transform transition duration-300 ${
+                className={`relative p-4 rounded-xl shadow-lg transform transition duration-300 border border-black ${
                   activeCard === title
                     ? 'scale-105 ring-4 ring-blue-500'
                     : 'hover:scale-105 hover:ring-2 hover:ring-blue-300'
