@@ -2,9 +2,25 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import UserMenu from '../app/components/UserMenu';
 
+const MAX_CHAR_COUNT = 70;
+
 const InfluencerPage: React.FC = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [expandedCards, setExpandedCards] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
+
+  const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3'];
+
+  const handleToggleExpand = (title: string) => {
+    setExpandedCards((prevState) => ({
+      ...prevState,
+      [title]: !prevState[title],
+    }));
+  };
 
   return (
     <div className="bg-[#E8BB5B] p-12 min-h-screen">
@@ -60,12 +76,7 @@ const InfluencerPage: React.FC = () => {
             <div
               className={`h-24 px-2 mt-2 ${isHovered ? 'overflow-y-auto' : 'overflow-hidden'}`}
             >
-              <p className="text-center text-xs max-w-full">
-                My name is [Your Name] from [Your Brand], and we would love to
-                have you onboard. We love how your content aligns with our
-                brand! Your engagement metrics are phenomenal, and we believe
-                our partnership will bring great value to both sides.
-              </p>
+              <p className="text-center text-xs max-w-full">{message}</p>
             </div>
 
             <div className="px-2 pb-4">
@@ -88,51 +99,9 @@ const InfluencerPage: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="w-2/3 space-y-4">
-          <h4 className="text-xl text-center underline">Campaigns</h4>
-          <div className="grid grid-cols-3 gap-4">
-            {['Campaign 1', 'Campaign 2', 'Campaign 3'].map((title, index) => (
-              <div
-                key={index}
-                className={`relative bg-black text-white p-1 rounded-xl shadow-lg transform transition duration-300 border border-black ${
-                  activeCard === title
-                    ? 'scale-105 ring-4 ring-blue-500'
-                    : 'hover:scale-105 hover:ring-2 hover:ring-blue-300'
-                }`}
-                onClick={() => setActiveCard(title)}
-              >
-                <Image
-                  src="/images/fit.jpg"
-                  alt={title}
-                  width={200}
-                  height={150}
-                  className="rounded-2xl w-full h-[150px] object-cover"
-                />
-                <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
-                  <div className="flex justify-between items-center">
-                    <p className="font-semibold">{title}</p>
-                    <p className="text-xs">{'16/01/2025'}</p>
-                  </div>
-                  <p className="text-xs mt-2">
-                    I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand]...
-                  </p>
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-xs font-semibold">Deadline: 2 weeks</p>
-                    <p
-                      className={`text-xs font-bold ${index % 2 === 0 ? 'text-green-400' : 'text-red-400'}`}
-                    >
-                      {index % 2 === 0 ? 'Active' : 'Inactive'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-[#FFD700] p-4 rounded-2xl shadow-lg">
-            <h4 className="text-xl font-bold mb-4 text-center">
+          <div className="p-4 rounded-2xl shadow-lg">
+            <h4 className="text-xl font-bold mb-2 text-center underline">
               Notifications
             </h4>
             <div className="space-y-4">
@@ -175,16 +144,72 @@ const InfluencerPage: React.FC = () => {
                     <p className="text-red-500 font-semibold">
                       Submission Rejected
                     </p>
-                    <p className="text-gray-500">15/01/2025</p>
+                    <p className="text-gray-500">12/01/2025</p>
                   </div>
                   <p className="text-gray-700">
                     I hope this message finds you well! My name is [Your Name]
                     from [Your Brand], and we&lsquo;re excited to invite you to
-                    join our influencer network. We&lsquo;ve been following your
+                    join our influencer network. We&#39;ve been following your
                     content on [Platform] and love how it aligns with our brand!
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+          <h4 className="text-xl text-center underline">Campaigns</h4>
+          <div className="p-4 rounded-2xl shadow-lg">
+            <div className="grid grid-cols-3 gap-4">
+              {campaigns.map((title, index) => {
+                const isExpanded = expandedCards[title];
+                const displayedText = isExpanded
+                  ? message
+                  : `${message.slice(0, MAX_CHAR_COUNT)}${message.length > MAX_CHAR_COUNT ? '...' : ''}`;
+
+                return (
+                  <div
+                    key={index}
+                    className={`relative bg-black text-white p-1 rounded-xl shadow-lg transform transition duration-300 border border-black ${
+                      activeCard === title
+                        ? 'scale-105 ring-4 ring-blue-500'
+                        : 'hover:scale-105 hover:ring-2 hover:ring-blue-300'
+                    }`}
+                    onClick={() => setActiveCard(title)}
+                  >
+                    <Image
+                      src="/images/fit.jpg"
+                      alt={title}
+                      width={200}
+                      height={150}
+                      className="rounded-2xl w-full h-[150px] object-cover"
+                    />
+                    <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold">{title}</p>
+                        <p className="text-xs">{'16/01/2025'}</p>
+                      </div>
+                      <p className="text-xs mt-2">{displayedText}</p>
+                      {message.length > MAX_CHAR_COUNT && (
+                        <button
+                          onClick={() => handleToggleExpand(title)}
+                          className="text-red-400 hover:underline"
+                        >
+                          {isExpanded ? 'Read Less' : 'Read More'}
+                        </button>
+                      )}
+                      <div className="flex justify-between items-center mt-2">
+                        <p className="text-xs font-semibold">
+                          Deadline: 2 weeks
+                        </p>
+                        <p
+                          className={`text-xs font-bold ${index % 2 === 0 ? 'text-green-400' : 'text-red-400'}`}
+                        >
+                          {index % 2 === 0 ? 'Active' : 'Inactive'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
