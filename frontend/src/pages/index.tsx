@@ -24,7 +24,7 @@ const HomePage: React.FC = () => {
           onClick={handleOpenModal}
           className="bg-[var(--button-background)] text-[var(--button-foreground)] px-6 py-3 rounded-lg hover:shadow-lg transition-transform hover-effect"
         >
-          Sign In / Sign Up
+          Get Started
         </button>
 
         {showModal && (

@@ -54,10 +54,7 @@ const LoginForm: React.FC = () => {
         </p>
 
         <p className="text-white text-center mt-2">
-          <a
-            href="/forgot-password"
-            className="text-yellow-400 hover:underline"
-          >
+          <a href="/forgotpassword" className="text-yellow-400 hover:underline">
             Forgot your password?
           </a>
         </p>
