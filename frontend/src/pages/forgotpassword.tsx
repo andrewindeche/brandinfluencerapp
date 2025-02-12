@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const ForgotPasswordForm: React.FC = () => {
   const router = useRouter();
@@ -40,9 +41,9 @@ const ForgotPasswordForm: React.FC = () => {
 
         <p className="text-white text-center mt-4">
           Remember your password?{' '}
-          <a href="/login" className="text-yellow-400 hover:underline">
+          <Link href="/login" className="text-yellow-400 hover:underline">
             Log In
-          </a>
+          </Link>
         </p>
 
         <button

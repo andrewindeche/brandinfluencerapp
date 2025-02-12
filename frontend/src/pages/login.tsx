@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const LoginForm: React.FC = () => {
@@ -48,15 +49,18 @@ const LoginForm: React.FC = () => {
 
         <p className="text-white text-center mt-4">
           Don&#39;t have an account?{' '}
-          <a href="/signup" className="text-yellow-400 hover:underline">
+          <Link href="/signup" className="text-yellow-400 hover:underline">
             Sign Up
-          </a>
+          </Link>
         </p>
 
         <p className="text-white text-center mt-2">
-          <a href="/forgotpassword" className="text-yellow-400 hover:underline">
+          <Link
+            href="/forgotpassword"
+            className="text-yellow-400 hover:underline"
+          >
             Forgot your password?
-          </a>
+          </Link>
         </p>
       </div>
     </div>
