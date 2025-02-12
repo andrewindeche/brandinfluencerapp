@@ -27,11 +27,9 @@ const InfluencerPage: React.FC = () => {
       <div className="absolute top-2 right-28 z-50">
         <UserMenu />
       </div>
-
       <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-2 underline-offset-2 text-center ml-2 -mt-2">
         My Profile
       </h1>
-
       <div className="flex justify-center items-start mb-8 space-x-4">
         <div className="w-1/5 space-y-12 self-start mt-8">
           <div
@@ -65,26 +63,23 @@ const InfluencerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-
             <div className="border-t border-b border-white py-4 px-2">
               <div className="flex justify-center text-xs mt-2">
                 <p>Influencer Network</p>
                 <p className="text-gray-400 ml-6">16/01/2025</p>
               </div>
             </div>
-
             <div
               className={`h-24 px-2 mt-2 ${isHovered ? 'overflow-y-auto' : 'overflow-hidden'}`}
             >
-              <p className="text-center text-xs max-w-full">{message}</p>
+              <p className="text-center text-sm max-w-full">{message}</p>
             </div>
 
             <div className="px-2 pb-4">
               <hr className="border-t border-white my-2" />
             </div>
           </div>
-
-          <div className="border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-8 p-1 flex justify-around">
+          <div className="pb-6 px-2 py-4 border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-8 p-1 flex justify-around">
             <div className="text-center">
               <p className="text-3xl font-bold">10</p>
               <p className="text-xs">Campaigns</p>
@@ -121,7 +116,7 @@ const InfluencerPage: React.FC = () => {
                     </p>
                     <p className="text-gray-500">16/01/2025</p>
                   </div>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 text-[12px]">
                     I hope this message finds you well! My name is [Your Name]
                     from [Your Brand], and we&lsquo;re excited to invite you to
                     join our influencer network. We&#39;ve been following your
@@ -146,7 +141,7 @@ const InfluencerPage: React.FC = () => {
                     </p>
                     <p className="text-gray-500">12/01/2025</p>
                   </div>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 text-[12px]">
                     I hope this message finds you well! My name is [Your Name]
                     from [Your Brand], and we&lsquo;re excited to invite you to
                     join our influencer network. We&#39;ve been following your
@@ -156,8 +151,8 @@ const InfluencerPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <h4 className="text-xl text-center underline">Campaigns</h4>
-          <div className="p-4 rounded-2xl shadow-lg">
+          <div className="p-2 rounded-2xl shadow-lg">
+            <h4 className="p-3 text-xl text-center underline">Campaigns</h4>
             <div className="grid grid-cols-3 gap-4">
               {campaigns.map((title, index) => {
                 const isExpanded = expandedCards[title];
