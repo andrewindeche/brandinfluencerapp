@@ -8,12 +8,16 @@
   --font-irish-grover: 'Irish Grover', cursive;
   --font-joti-one: 'Joti One', sans-serif;
   --font-kaushan-script: 'Kaushan Script', sans-serif;
+  --button-background: #171717;
+  --button-foreground: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --button-background: #ededed;
+    --button-foreground: #0a0a0a; 
   }
 }
 
@@ -26,6 +30,20 @@ body {
   background: var(--background);
   font-family: var(--font-joti-one);
 }
+
+
+button {
+  background: linear-gradient(90deg, #FF2C2C, #FF7A2C, #005B96);
+  background-size: 400% 400%;
+  animation: gradientButton 18s ease infinite;
+  transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out, transform 0.4s ease-in-out;
+}
+
+button:hover {
+  transform: scale(1.05);
+  background-position: 100% 0%;
+}
+
 
 h1 {
   font-family: var(--font-irish-grover);
@@ -84,3 +102,5 @@ h4 {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+

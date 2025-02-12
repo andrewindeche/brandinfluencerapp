@@ -1,10 +1,54 @@
-import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 const HomePage: React.FC = () => {
+  const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
+
+  const handleOpenModal = () => setShowModal(!showModal);
+  const handleLoginRedirect = () => {
+    router.push('/login');
+    setShowModal(false);
+  };
+
+  const handleSignUpRedirect = () => {
+    router.push('/signup');
+    setShowModal(false);
+  };
+
   return (
-    <div className="bg-[#FF2C2C] bg-transition min-h-screen flex flex-col justify-start items-center p-4">
+    <div className="bg-transition min-h-screen flex flex-col justify-start items-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={handleOpenModal}
+          className="bg-[var(--button-background)] text-[var(--button-foreground)] px-6 py-3 rounded-lg hover:shadow-lg transition-transform hover-effect"
+        >
+          Sign In / Sign Up
+        </button>
+
+        {showModal && (
+          <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg py-4 px-6 z-50 transform origin-top-right transition-opacity duration-300 ease-in-out">
+            <div className="flex flex-col space-y-4">
+              <button
+                onClick={handleLoginRedirect}
+                className="bg-gradient-to-r from-yellow-400 to-red-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+              >
+                Log In
+              </button>
+              <button
+                onClick={handleSignUpRedirect}
+                className="bg-gradient-to-r from-blue-400 to-teal-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <div className="absolute top-[-0.4rem] right-4 w-4 h-4 bg-white rotate-45 transform"></div>
+          </div>
+        )}
+      </div>
+
       <div className="flex flex-col md:flex-row justify-center items-center w-full mt-4 space-y-4 md:space-y-0 md:space-x-4 text-center">
         <h1 className="text-white text-5xl font-bold custom-underline">
           AFFLUENCER
@@ -22,37 +66,33 @@ const HomePage: React.FC = () => {
 
       <div className="mt-10 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-16 w-full px-4">
         <div
-          className="relative w-full max-w-xs sm:w-[18rem]  h-96 sm:h-[21rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6 transition-transform hover:scale-105 md:-ml-8"
+          className="relative w-full max-w-xs sm:w-[18rem] h-96 sm:h-[21rem] rounded-xl overflow-hidden shadow-lg border-4 transform rotate-6 transition-transform hover:scale-105 md:-ml-8"
           style={{ borderColor: '#023EBA' }}
         >
-          <Link href="/influencer">
-            <Image
-              src="/images/woman2.png"
-              alt="Amy - TikTok"
-              layout="fill"
-              style={{ objectFit: 'cover' }}
-              className="object-cover"
-            />
-          </Link>
+          <Image
+            src="/images/woman2.png"
+            alt="Amy - TikTok"
+            layout="fill"
+            objectFit="cover"
+            className="object-cover"
+          />
           <p
             className="absolute bottom-4 left-1/2 transform -rotate-2 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm"
             style={{ width: '200px', height: '40px' }}
           >
-            <span className="inline-block transform text-white">
-              AMY - TIK TOK
-            </span>
+            AMY - TIK TOK
           </p>
         </div>
 
         <div
-          className="relative w-full max-w-xs sm:w-[20rem]  h-96 sm:h-[16rem] rounded-xl overflow-hidden shadow-lg border-4 transform -rotate-12 transition-transform hover:scale-105"
+          className="relative w-full max-w-xs sm:w-[20rem] h-96 sm:h-[16rem] rounded-xl overflow-hidden shadow-lg border-4 transform -rotate-12 transition-transform hover:scale-105"
           style={{ borderColor: '#023EBA' }}
         >
           <Image
             src="/images/man.png"
             alt="Brad - YouTuber"
             layout="fill"
-            style={{ objectFit: 'cover' }}
+            objectFit="cover"
             sizes="(max-width: 900px) 100vw, 50vw"
             priority
             className="object-cover"
@@ -61,9 +101,7 @@ const HomePage: React.FC = () => {
             className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm"
             style={{ width: '180px', height: '40px' }}
           >
-            <span className="inline-block transform -rotate-2 text-white">
-              BRAD - YOU TUBER
-            </span>
+            BRAD - YOU TUBER
           </p>
         </div>
 
@@ -75,17 +113,12 @@ const HomePage: React.FC = () => {
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
             layout="fill"
-            style={{ objectFit: 'cover' }}
+            objectFit="cover"
             sizes="(max-width: 100px) 100vw, 50vw"
             className="object-cover"
           />
           <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm">
-            <span
-              className="inline-block transform -rotate-20 text-white"
-              style={{ width: '180px', height: '40px' }}
-            >
-              LIZZIE - INSTAGRAM
-            </span>
+            LIZZIE - INSTAGRAM
           </p>
         </div>
       </div>
