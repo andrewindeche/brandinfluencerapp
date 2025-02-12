@@ -9,9 +9,8 @@ const CampaignsContent: React.FC = () => {
         <div className="w-1/5">
           <ProfileCard />
         </div>
-
         <div className="flex-1 rounded-lg shadow-lg">
-          <div className="p-8 grid grid-cols-3 gap-6 text-white rounded-lg border border-white">
+          <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white">
             {[
               { title: 'Ambassadors', value: '12' },
               { title: 'Total reach', value: '9.8K' },
@@ -22,16 +21,16 @@ const CampaignsContent: React.FC = () => {
             ].map((stat) => (
               <div
                 key={stat.title}
-                className="text-center p-4 rounded-lg bg-gradient-to-r from-yellow-500 to-red-600 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
+                className="text-center rounded-lg bg-gradient-to-r transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
               >
-                <h4 className="text-sm">{stat.title}</h4>
+                <h4 className="text-lg">{stat.title}</h4>
                 <p className="text-lg font-bold">{stat.value}</p>
               </div>
             ))}
           </div>
 
           <div>
-            <h3 className="text-white text-lg font-bold my-8 text-center">
+            <h3 className="text-white text-lg font-bold my-4 text-center">
               New Campaigns
             </h3>
 
@@ -56,13 +55,15 @@ const CampaignsContent: React.FC = () => {
                   key={campaign.title}
                   className="bg-black rounded-2xl text-white p-4 transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
-                  <div className="relative w-full h-40 group">
+                  <div className="relative h-20 w-full group">
                     <Image
                       src={campaign.src}
                       alt={campaign.title}
-                      layout="fill"
+                      layout="fit"
+                      width="300"
+                      height="200"
                       objectFit="cover"
-                      className="w-full h-auto rounded-2xl transition duration-300 ease-in-out transform group-hover:scale-110"
+                      className="w-30 h-20 rounded-2xl transition duration-300 ease-in-out transform group-hover:scale-110"
                     />
                     {campaign.title === 'Social Media' && (
                       <p className="absolute bottom-0 left-0 w-full text-xs text-white bg-black bg-opacity-75 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
