@@ -8,7 +8,7 @@ import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/nest_campaigns'),
+    MongooseModule.forRoot('mongodb://localhost/nestjs-dashboard'),
     CampaignsModule,AuthModule, AdminModule],
   controllers: [AppController],
   providers: [AppService],
