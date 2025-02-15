@@ -27,6 +27,10 @@ export class AuthService {
     return null;
   }
 
+  async findallinfluencers(): Promise<Influencer[]> {
+    return this.influencerModel.find().exec();
+  }
+
   async register(
     username: string,
     email: string,
