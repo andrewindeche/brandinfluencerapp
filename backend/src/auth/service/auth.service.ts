@@ -3,17 +3,32 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Influencer } from '../schema/influencer.schema';
+import { Brand } from '../schema/brand.schema';
 import * as bcrypt from 'bcryptjs';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel('Influencer') private influencerModel: Model<Influencer>,
+    @InjectModel('Brand') private brandModel: Model<Brand>,
     private jwtService: JwtService,
+    private userService: UserService,
   ) {}
 
-  async login(influencer: Influencer) {
-    const payload = { username: influencer.username, sub: influencer.id };
+  async loginInfluencer(influencer: Influencer) {
+    const payload = {
+      username: influencer.username,
+      sub: influencer.id,
+      type: 'influencer',
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async loginBrand(brand: Brand) {
+    const payload = { username: brand.username, sub: brand.id, type: 'brand' };
     return {
       access_token: this.jwtService.sign(payload),
     };
