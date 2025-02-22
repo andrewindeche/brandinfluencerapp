@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthService } from './auth/service/auth.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import AdminJS from 'adminjs';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MongooseAdapter } from '@adminjs/mongoose';
-import { CampaignsModule } from './campaigns/campaigns.module';
+import { CampaignsModule } from './campaigns/campaigns.module.js';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { JwtStrategy } from './auth/jwt.strategy';
+import * as crypto from 'crypto';
 
-AdminJS.registerAdapter(MongooseAdapter);
+const secretKey = crypto.randomBytes(64).toString('hex');
 
 @Module({
   imports: [
@@ -18,8 +21,13 @@ AdminJS.registerAdapter(MongooseAdapter);
     AuthModule,
     AdminModule,
     UserModule,
+    PassportModule,
+    JwtModule.register({
+      secret: secretKey,
+      signOptions: { expiresIn: '60s' },
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthService, JwtStrategy],
 })
 export class AppModule {}
