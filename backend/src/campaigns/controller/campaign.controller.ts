@@ -76,22 +76,26 @@ export class CampaignController {
     );
   }
 
-  @Get()
+  @Get('campaigns')
+  @UseGuards(JwtAuthGuard)
   getAllCampaigns() {
     return this.campaignService.getCampaigns();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   getCampaign(@Param('id') id: string) {
     return this.campaignService.getCampaignById(id);
   }
 
   @Get(':id/influencers')
+  @UseGuards(JwtAuthGuard)
   async getInfluencersByCampaign(@Param('id') campaignId: string) {
     return this.campaignService.getInfluencersByCampaign(campaignId);
   }
 
   @Get('influencer/:influencerId')
+  @UseGuards(JwtAuthGuard)
   async getCampaignsByInfluencer(@Param('influencerId') influencerId: string) {
     return this.campaignService.getCampaignsByInfluencer(influencerId);
   }

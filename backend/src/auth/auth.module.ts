@@ -6,6 +6,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { InfluencerSchema } from './schema/influencer.schema';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+
+let secretKey: string;
+
+if (process.env.JWT_SECRET) {
+  secretKey = process.env.JWT_SECRET;
+} else if (fs.existsSync('.jwt_secret')) {
+  secretKey = fs.readFileSync('.jwt_secret', 'utf8');
+} else {
+  secretKey = crypto.randomBytes(64).toString('hex');
+  fs.writeFileSync('.jwt_secret', secretKey);
+}
 
 @Module({
   imports: [
@@ -14,7 +27,7 @@ import { InfluencerSchema } from './schema/influencer.schema';
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'yourSecretKey',
+      secret: secretKey,
       signOptions: { expiresIn: '60m' },
     }),
   ],

@@ -5,8 +5,8 @@ import { AuthService } from '../auth/service/auth.service';
 @Controller('admin')
 export class AdminController {
   constructor(
-    private readonly userService: UserService,      
-    private readonly authService: AuthService       
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   @Get('users')
@@ -16,6 +16,6 @@ export class AdminController {
 
   @Get('influencers')
   async getAllInfluencers() {
-    return this.authService.findallinfluencers(); 
+    return this.authService.findallinfluencers();
   }
 }

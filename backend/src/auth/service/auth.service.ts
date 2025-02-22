@@ -34,23 +34,20 @@ export class AuthService {
     };
   }
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const influencer = await this.influencerModel.findOne({ username });
-    if (influencer && (await bcrypt.compare(pass, influencer.password))) {
-      return influencer;
+  async validateUser(username: string, pass: string, , userType: 'influencer' | 'brand'): Promise<any> {
+    let user;
+    if (userType === 'influencer') {
+      user = await this.influencerModel.findOne({ username });
+    } else if (userType === 'brand') {
+      user = await this.brandModel.findOne({ username });
+    }
+
+    if (user && (await bcrypt.compare(pass, user.password))) {
+      return user;
     }
     return null;
   }
-
-  async findallinfluencers(): Promise<Influencer[]> {
-    return this.influencerModel.find().exec();
-  }
-
-  async register(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<Influencer> {
+  async registerInfluencer(username: string, email: string, password: string): Promise<Influencer> {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newInfluencer = new this.influencerModel({
       username,
@@ -58,5 +55,19 @@ export class AuthService {
       password: hashedPassword,
     });
     return newInfluencer.save();
+  }
+
+  async registerBrand(username: string, email: string, password: string): Promise<Brand> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newBrand = new this.brandModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
+    return newBrand.save();
+  }
+
+  async findallinfluencers(): Promise<Influencer[]> {
+    return this.influencerModel.find().exec();
   }
 }

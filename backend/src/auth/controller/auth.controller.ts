@@ -1,32 +1,59 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
-import { InfluencerLoginDto } from '../../campaigns/dto/influencer-login.dto';
-import { Influencer } from '../schema/influencer.schema';
+import { JwtService } from '@nestjs/jwt';
+import { LocalAuthGuard } from '../local-auth.guard';
+import { JwtAuthGuard} from '../jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private jwtService: JwtService,
+  ) {}
 
-  @Post('register')
-  async register(
-    @Body() body: { username: string; email: string; password: string },
-  ): Promise<Influencer> {
-    const { username, email, password } = body;
-    return this.authService.register(username, email, password);
+  @Post('influencer/login')
+  async loginInfluencer(@Body() loginDto: any) {
+    const user = await this.authService.validateUser(
+      loginDto.username,
+      loginDto.password,
+      'influencer',
+    );
+    if (user) {
+      return this.authService.loginInfluencer(user);
+    }
+    return { message: 'Invalid credentials' };
   }
 
-  @Post('login')
-  async login(
-    @Body() influencerLoginDto: InfluencerLoginDto,
-  ): Promise<{ access_token: string }> {
-    const influencer = await this.authService.validateUser(
-      influencerLoginDto.username,
-      influencerLoginDto.password,
+  @Post('brand/login')
+  async loginBrand(@Body() loginDto: any) {
+    const user = await this.authService.validateUser(
+      loginDto.username,
+      loginDto.password,
+      'brand',
     );
-
-    if (!influencer) {
-      throw new UnauthorizedException('Invalid username or password');
+    if (user) {
+      return this.authService.loginBrand(user);
     }
-    return this.authService.login(influencer);
+    return { message: 'Invalid credentials' };
+  }
+
+  @Post('influencer/register')
+  async registerInfluencer(@Body() registerDto: any) {
+    const newInfluencer = await this.authService.registerInfluencer(
+      registerDto.username,
+      registerDto.email,
+      registerDto.password,
+    );
+    return newInfluencer;
+  }
+
+  @Post('brand/register')
+  async registerBrand(@Body() registerDto: any) {
+    const newBrand = await this.authService.registerBrand(
+      registerDto.username,
+      registerDto.email,
+      registerDto.password,
+    );
+    return newBrand;
   }
 }
