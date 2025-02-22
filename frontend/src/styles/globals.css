@@ -33,7 +33,7 @@ body {
 
 
 button {
-  background: linear-gradient(90deg, #FF2C2C, #FF7A2C, #005B96);
+  background: linear-gradient(90deg, #FFB3B3, #FFC7B3, #A3C4DC);
   background-size: 400% 400%;
   animation: gradientButton 18s ease infinite;
   transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out, transform 0.4s ease-in-out;
@@ -70,10 +70,11 @@ h4 {
 }
 
 .bg-transition {
-  background: linear-gradient(90deg, #FF2C2C, #FF7A2C, #005B96);
+  background: linear-gradient(90deg, #FFD194, #FF7E5F, #FF3C3C);
   background-size: 400% 400%;
   animation: gradientBackground 18s ease infinite;
 }
+
 
 .fade-in {
   opacity: 0;
