@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Influencer } from '../schema/influencer.schema';
-import { Brand } from '../schema/brand.schema';
+import { Brand } from '../../user/brand/schema/brand.schema';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from '../../user/user.service';
 
@@ -34,7 +34,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(username: string, pass: string, , userType: 'influencer' | 'brand'): Promise<any> {
+  async validateUser(username: string, pass: string, userType: 'influencer' | 'brand'): Promise<any> {
     let user;
     if (userType === 'influencer') {
       user = await this.influencerModel.findOne({ username });
