@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Brand } from './schema/brand.schema';
+import * as bcryptjs from 'bcryptjs';
 import { Campaign } from '../../campaigns/schemas/campaign.schema';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class BrandService {
 
   async login(username: string, password: string): Promise<any> {
     const brand = await this.brandModel.findOne({ username });
-    if (brand && (await bcrypt.compare(password, brand.password))) {
+    if (brand && (await bcryptjs.compare(password, brand.password))) {
       return brand;
     }
     return null;

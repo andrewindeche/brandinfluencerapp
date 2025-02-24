@@ -1,1 +1,2 @@
 backend/uploads
+backend/.jwt_secret
