@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { InfluencerSchema } from './schema/influencer.schema';
 import { BrandModule } from '../user/brand/brand.module';
+import { UserModule } from '../user/user.module';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 
@@ -26,13 +27,15 @@ if (process.env.JWT_SECRET) {
     MongooseModule.forFeature([
       { name: 'Influencer', schema: InfluencerSchema },
     ]),
+    UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: secretKey,
       signOptions: { expiresIn: '60m' },
     }),
+    BrandModule,
   ],
-  providers: [AuthService, BrandModule, JwtStrategy],
+  providers: [AuthService, BrandModule, UserModule, JwtStrategy],
   controllers: [AuthController],
   exports: [JwtStrategy, BrandModule, PassportModule],
 })

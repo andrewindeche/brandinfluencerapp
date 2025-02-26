@@ -1,5 +1,4 @@
 import { Schema, Document } from 'mongoose';
-import { Submission } from '../auth/schema/submission.schema';
 
 export interface User extends Document {
   username: string;
