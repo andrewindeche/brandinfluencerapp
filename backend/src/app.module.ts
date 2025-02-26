@@ -16,7 +16,7 @@ const secretKey = crypto.randomBytes(64).toString('hex');
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/nest_campaigns'),
+    MongooseModule.forRoot('mongodb://localhost:27017/nest_campaigns'),
     CampaignsModule,
     AuthModule,
     AdminModule,
