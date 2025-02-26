@@ -16,5 +16,6 @@ import { InfluencerSchema } from '../auth/schema/influencer.schema';
   ],
   providers: [CampaignsService],
   controllers: [CampaignController],
+  exports: [MongooseModule, CampaignsService],
 })
 export class CampaignsModule {}

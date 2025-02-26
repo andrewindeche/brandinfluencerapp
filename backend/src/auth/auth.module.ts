@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { InfluencerSchema } from './schema/influencer.schema';
+import { BrandModule } from '../user/brand/brand.module';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 
@@ -31,8 +32,8 @@ if (process.env.JWT_SECRET) {
       signOptions: { expiresIn: '60m' },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, BrandModule, JwtStrategy],
   controllers: [AuthController],
-  exports: [JwtStrategy, PassportModule],
+  exports: [JwtStrategy, BrandModule, PassportModule],
 })
 export class AuthModule {}
