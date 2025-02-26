@@ -46,14 +46,14 @@ npm install
 
 ## <h1> Endpoints </h1>
 
-1. Register User: POST: http://localhost:3000/auth/register
+1. Register User: POST: http://localhost:3000/auth/influencer/register
     {
     "username": "john_doe",
     "email": "john@example.com",
     "password": "your_password"
     }
 
-2. Login user: POST: http://localhost:3000/auth/login
+2. Login user: POST: http://localhost:3000/auth/influencer/login
     {
     "username": "john_doe",
     "email": "john@example.com",
