@@ -37,6 +37,6 @@ if (process.env.JWT_SECRET) {
   ],
   providers: [AuthService, BrandModule, UserModule, JwtStrategy],
   controllers: [AuthController],
-  exports: [JwtStrategy, BrandModule, PassportModule],
+  exports: [AuthService, JwtStrategy, JwtModule, BrandModule, PassportModule],
 })
 export class AuthModule {}
