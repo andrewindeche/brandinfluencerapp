@@ -17,6 +17,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('campaign')
+@UseGuards(JwtAuthGuard)
 export class CampaignController {
   constructor(private readonly campaignService: CampaignsService) {}
 
