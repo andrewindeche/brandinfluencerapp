@@ -6,10 +6,12 @@ import { UserModule } from 'src/user/user.module';
 import { BrandModule } from '../user/brand/brand.module';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { UserService } from '../user/user.service';
+import { BrandService } from 'src/user/brand/brand.service';
 
 @Module({
   imports: [AuthModule, UserModule, CampaignsModule, BrandModule],
   controllers: [AdminController],
-  providers: [AdminService, AuthService],
+  providers: [AdminService, BrandService, AuthService, UserService],
 })
 export class AdminModule {}
