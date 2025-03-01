@@ -1,14 +1,47 @@
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { formState$, setEmail } from '../rxjs/store';
 
 const LoginForm: React.FC = () => {
+  const [userType, setUserType] = useState<'brand' | 'influencer' | 'unknown'>(
+    'unknown',
+  );
+  const [email, setEmailState] = useState('');
+
+  useEffect(() => {
+    const subscription = formState$.subscribe((state) => {
+      setEmailState(state.email);
+      setUserType(state.userType);
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+  };
+
+  const backgroundColor =
+    userType === 'brand'
+      ? 'bg-purple-500'
+      : userType === 'influencer'
+        ? 'bg-green-500'
+        : 'bg-gradient-to-r from-purple-600 to-red-500';
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
+    <div
+      className={`min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500 transition-colors duration-500 ${backgroundColor}`}
+    >
       <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-gray-200 w-96">
         <h2 className="text-3xl font-bold text-center text-white mb-6">
           Log In
         </h2>
         <form>
+          <p className="text-xl font-bold text-center text-white mb-6">
+            {userType === 'brand' ? 'Brand Log In' : 'Log In'}
+          </p>
           <div className="mb-4">
             <label
               className="block text-white text-sm font-semibold mb-2"
@@ -19,6 +52,8 @@ const LoginForm: React.FC = () => {
             <input
               type="email"
               id="email"
+              value={email}
+              onChange={handleEmailChange}
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
               placeholder="Enter your email"
             />
