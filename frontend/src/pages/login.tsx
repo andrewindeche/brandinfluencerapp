@@ -28,7 +28,7 @@ const LoginForm: React.FC = () => {
       ? 'bg-purple-500'
       : userType === 'influencer'
         ? 'bg-green-500'
-        : 'bg-gradient-to-r from-purple-600 to-red-500';
+        : 'bg-gradient-to-r from-purple-600 to-blue-500';
 
   return (
     <div

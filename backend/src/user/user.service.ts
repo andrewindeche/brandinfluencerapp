@@ -15,4 +15,8 @@ export class UserService {
     const newUser = new this.userModel(userData);
     return newUser.save();
   }
+
+  async findUserByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
+  }
 }

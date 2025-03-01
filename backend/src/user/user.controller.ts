@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.schema';
 
@@ -14,5 +14,16 @@ export class UserController {
   @Post()
   async create(@Body() userData): Promise<User> {
     return this.userService.createUser(userData);
+  }
+
+  @Get('user-type')
+  async getUserType(@Query('email') email: string): Promise<{ type: string }> {
+    const user = await this.userService.findUserByEmail(email);
+    if (user) {
+      const userType =
+        user.role === 'admin' ? 'brand' : user.role === 'influencer' ? 'influencer' : 'unknown';
+      return { type: userType };
+    }
+    return { type: 'unknown' };
   }
 }
