@@ -47,22 +47,44 @@ npm install
 
 ## <h1> Endpoints </h1>
 
-1. Register User POST: http://localhost:3000/auth/influencer/register
-            Admin User POST: http://localhost:3000/admin/create-admin             
+1. Register User POST: http://localhost:4000/auth/influencer/register
+            Admin User POST: http://localhost:4000/admin/create-admin             
     {
     "username": "john_doe",
     "email": "john@example.com",
     "password": "your_password"
     }
 
-2. Login user: POST: http://localhost:3000/auth/influencer/login
+2. Login user: POST: http://localhost:4000/auth/influencer/login
     {
     "username": "john_doe",
     "email": "john@example.com",
     "password": "your_password"
     }
 
-2. Create Campaign: POST: http://localhost:3000/campaign
+3. Brand registration: POST:http://localhost:4000/auth/brand/login
+    {
+    "username": "example corp",
+    "email": "examplecorp@example.com",
+    "password": "securepassword123",
+    "name": "ecorp",
+    "description": "An example of a corp",
+        "website": "www.example.com",
+        "logoUrl": "www.example.com",
+        "contactInfo": {
+            "phone": "+254798472473423",
+            "address": "Kilimani,Nairobi"
+            }
+        }
+
+4. Brand login: POST: http://localhost:4000/auth/brand/login
+    {
+    "username": "example corp",
+    "email": "examplecorp@example.com",
+    "password": "securepassword123",
+    }
+
+2. Create Campaign: POST: http://localhost:4000/campaign
     Make sure campaigns are within the correct range in relation to the current date
     for the campaign tp be active.
     {
