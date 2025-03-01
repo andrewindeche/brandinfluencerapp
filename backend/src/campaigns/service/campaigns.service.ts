@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { Campaign } from '../schemas/campaign.schema';
 import { Submission } from '../../auth/schema/submission.schema';
@@ -19,6 +19,14 @@ export class CampaignsService {
     const currentDate = new Date();
     const startDate = new Date(createCampaignDto.startDate);
     const endDate = new Date(createCampaignDto.endDate);
+
+    if (startDate < currentDate || endDate < currentDate) {
+      throw new BadRequestException('Start date and end date must be in the future.');
+    }
+
+    if (endDate < startDate) {
+      throw new BadRequestException('End date must be after start date.');
+    }
 
     let status: 'active' | 'inactive' = createCampaignDto.status || 'active';
 
