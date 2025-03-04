@@ -4,6 +4,7 @@ import axiosInstance from './axiosInstance';
 import { debounce } from 'lodash';
 
 type FormState = {
+  confirmPassword: any;
   email: string;
   userType: 'brand' | 'influencer' | 'unknown';
   name: string;
@@ -23,6 +24,7 @@ export const initialState: FormState = {
   category: '',
   bio: '',
   location: '',
+  confirmPassword: '',
 };
 
 const stateSubject = new BehaviorSubject<FormState>(initialState);
@@ -68,6 +70,7 @@ export const submitSignUpForm = async (navigateToLogin: () => void) => {
     name: formState.name,
     username: formState.username,
     password: formState.password,
+    confirmPassword: formState.confirmPassword,
     category: formState.category,
     bio: formState.bio,
     location: formState.location,

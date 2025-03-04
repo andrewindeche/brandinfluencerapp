@@ -7,6 +7,7 @@ const LoginForm: React.FC = () => {
     'unknown',
   );
   const [email, setEmailState] = useState('');
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
@@ -21,6 +22,15 @@ const LoginForm: React.FC = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowSuccessDialog(true);
+  };
+
+  const closeDialog = () => {
+    setShowSuccessDialog(false);
   };
 
   const backgroundColor =
@@ -38,7 +48,7 @@ const LoginForm: React.FC = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-6">
           Log In
         </h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <p className="text-xl font-bold text-center text-white mb-6">
             {userType === 'brand' ? 'Brand Log In' : 'Log In'}
           </p>
@@ -98,6 +108,23 @@ const LoginForm: React.FC = () => {
           </Link>
         </p>
       </div>
+
+      {showSuccessDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 shadow-lg text-center">
+            <h3 className="text-xl font-bold mb-4">
+              User Created Successfully!
+            </h3>
+            <p className="mb-4">You can now log in with your new account.</p>
+            <button
+              onClick={closeDialog}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

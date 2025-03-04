@@ -53,7 +53,8 @@ const SignUpForm: React.FC = () => {
     });
   };
 
-  const { email, userType, username, password, category, bio, location } = formState;
+  const { email, userType, username, password, category, bio, location } =
+    formState;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
