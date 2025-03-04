@@ -3,7 +3,6 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { Submission } from '../../auth/schema/submission.schema';
 
 export interface Influencer extends Document {
-  name: string;
   username: string;
   password: string;
   email: string;
@@ -21,7 +20,6 @@ export interface Influencer extends Document {
 }
 
 export const InfluencerSchema = new Schema<Influencer>({
-  name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true },

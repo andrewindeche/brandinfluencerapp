@@ -4,7 +4,6 @@ export const BrandSchema = new Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  name: { type: String, required: true },
   description: { type: String },
   website: { type: String },
   logoUrl: { type: String },
@@ -20,7 +19,6 @@ export interface Brand extends Document {
   username: string;
   email: string;
   password: string;
-  name: string;
   description?: string;
   website?: string;
   logoUrl?: string;
