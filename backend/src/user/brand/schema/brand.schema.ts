@@ -12,6 +12,7 @@ export const BrandSchema = new Schema({
     phone: { type: String },
     address: { type: String },
   },
+  role: { type: String, required: true, default: 'brand' },
 }, { timestamps: true });
 
 export interface Brand extends Document {
@@ -27,6 +28,7 @@ export interface Brand extends Document {
     phone?: string;
     address?: string;
   };
+  role: 'brand';
   createdAt?: Date;
   updatedAt?: Date;
 }

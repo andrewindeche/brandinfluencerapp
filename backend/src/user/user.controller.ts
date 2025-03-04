@@ -21,7 +21,7 @@ export class UserController {
     const user = await this.userService.findUserByEmail(email);
     if (user) {
       const userType =
-        user.role === 'admin' ? 'brand' : user.role === 'influencer' ? 'influencer' : 'unknown';
+      user.role === 'influencer' ? 'influencer' : 'brand';
       return { type: userType };
     }
     return { type: 'unknown' };

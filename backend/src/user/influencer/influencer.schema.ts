@@ -17,6 +17,7 @@ export interface Influencer extends Document {
   location: string;
   submissions: Submission[];
   campaign?: MongooseSchema.Types.ObjectId;
+  role: 'influencer';
 }
 
 export const InfluencerSchema = new Schema<Influencer>({
@@ -34,4 +35,5 @@ export const InfluencerSchema = new Schema<Influencer>({
   location: { type: String, required: true },
   submissions: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }],
   campaign: { type: MongooseSchema.Types.ObjectId, ref: 'Campaign' },
+  role: { type: String, required: true, default: 'influencer' },
 });

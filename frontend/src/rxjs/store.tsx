@@ -1,28 +1,47 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import axiosInstance from './axiosInstance';
+import { debounce } from 'lodash';
 
 type FormState = {
   email: string;
   userType: 'brand' | 'influencer' | 'unknown';
+  name: string;
+  username: string;
+  password: string;
+  category?: string;
+  bio?: string;
+  location?: string;
 };
 
-const initialState: FormState = {
+export const initialState: FormState = {
   email: '',
   userType: 'unknown',
+  name: '',
+  username: '',
+  password: '',
+  category: '',
+  bio: '',
+  location: '',
 };
 
 const stateSubject = new BehaviorSubject<FormState>(initialState);
 
-const fetchUserType = async (email: string) => {
+const fetchUserType = debounce(async (email: string) => {
   try {
-    const response = await axiosInstance.get(`/user-type?email=${email}`);
-    return response.data.type;
+    if (!email) {
+      stateSubject.next({ ...stateSubject.value, userType: 'unknown' });
+      return;
+    }
+
+    const response = await axiosInstance.get(`/users/user-type?email=${email}`);
+    const userType = response.data.type;
+    stateSubject.next({ ...stateSubject.value, userType });
   } catch (error) {
     console.error('Error fetching user type:', error);
-    return 'unknown';
+    stateSubject.next({ ...stateSubject.value, userType: 'unknown' });
   }
-};
+}, 1000);
 
 export const setEmail = (email: string) => {
   stateSubject.next({
@@ -30,12 +49,43 @@ export const setEmail = (email: string) => {
     email,
   });
 
-  fetchUserType(email).then((userType) => {
-    stateSubject.next({
-      ...stateSubject.value,
-      userType,
-    });
+  fetchUserType(email);
+};
+
+export const setFormField = (field: keyof FormState, value: string) => {
+  stateSubject.next({
+    ...stateSubject.value,
+    [field]: value,
   });
+};
+
+export const submitSignUpForm = async (navigateToLogin: () => void) => {
+  const formState = stateSubject.value;
+
+  const signUpData = {
+    email: formState.email,
+    userType: formState.userType,
+    name: formState.name,
+    username: formState.username,
+    password: formState.password,
+    category: formState.category,
+    bio: formState.bio,
+    location: formState.location,
+  };
+
+  const apiEndpoint =
+    formState.userType === 'influencer'
+      ? 'http://localhost:4000/auth/influencer/register'
+      : 'http://localhost:4000/auth/brand/register';
+
+  try {
+    const response = await axiosInstance.post(apiEndpoint, signUpData);
+    console.log('Sign up successful:', response.data);
+    stateSubject.next(initialState);
+    navigateToLogin();
+  } catch (error) {
+    console.error('Error during sign-up:', error);
+  }
 };
 
 export const formState$: Observable<FormState> = stateSubject
