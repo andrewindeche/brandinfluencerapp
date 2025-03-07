@@ -1,32 +1,68 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { formState$, setEmail } from '../rxjs/store';
 
 const LoginForm: React.FC = () => {
-  const [userType, setUserType] = useState<'brand' | 'influencer' | 'unknown'>(
-    'unknown',
-  );
+  const [userType, setUserType] = useState<
+    'brand' | 'influencer' | 'admin' | 'user' | 'unknown'
+  >('unknown');
+
   const [email, setEmailState] = useState('');
+  const [password, setPassword] = useState('');
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setEmailState(state.email);
       setUserType(state.userType);
     });
+
+    if (router.query.signup === 'success') {
+      setShowSuccessDialog(true);
+    }
+
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [router.query]);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
   };
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSuccessDialog(true);
+    if (email && password) {
+      setEmailState('');
+      setPassword('');
+
+      switch (userType) {
+        case 'brand':
+          router.push('/brand');
+          break;
+        case 'influencer':
+          router.push('/influencer');
+          break;
+        case 'admin':
+          router.push('/admin');
+          break;
+        case 'user':
+          router.push('/dashboard');
+          break;
+        default:
+          alert('Unknown user type');
+      }
+    } else {
+      alert('Please enter both email and password');
+    }
   };
 
   const closeDialog = () => {
@@ -79,6 +115,8 @@ const LoginForm: React.FC = () => {
             <input
               type="password"
               id="password"
+              value={password}
+              onChange={handlePasswordChange}
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
               placeholder="Enter your password"
             />
@@ -112,10 +150,12 @@ const LoginForm: React.FC = () => {
       {showSuccessDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-8 shadow-lg text-center">
-            <h3 className="text-xl font-bold mb-4">
+            <h3 className="text-xl text-black font-bold mb-4">
               User Created Successfully!
             </h3>
-            <p className="mb-4">You can now log in with your new account.</p>
+            <p className="mb-4 text-black">
+              You can now log in with your new account.
+            </p>
             <button
               onClick={closeDialog}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"

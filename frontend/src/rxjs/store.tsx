@@ -61,7 +61,10 @@ export const setFormField = (field: keyof FormState, value: string) => {
   });
 };
 
-export const submitSignUpForm = async (navigateToLogin: () => void) => {
+export const submitSignUpForm = async (
+  navigateToLogin: () => void,
+  setShowErrorDialog: unknown,
+) => {
   const formState = stateSubject.value;
 
   const signUpData = {

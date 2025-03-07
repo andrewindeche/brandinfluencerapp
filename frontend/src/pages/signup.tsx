@@ -13,6 +13,7 @@ const SignUpForm: React.FC = () => {
   const [formState, setFormState] = useState(initialState);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
@@ -49,12 +50,15 @@ const SignUpForm: React.FC = () => {
     await submitSignUpForm(() => {
       setFormState(initialState);
       setConfirmPassword('');
-      router.push('/login');
-    });
+      router.push('/login?signup=success');
+    }, setShowErrorDialog);
   };
 
-  const { email, userType, username, password, category, bio, location } =
-    formState;
+  const closeErrorDialog = () => {
+    setShowErrorDialog(false);
+  };
+
+  const { email, userType, username, password } = formState;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
@@ -156,99 +160,6 @@ const SignUpForm: React.FC = () => {
             )}
           </div>
 
-          {userType === 'influencer' && (
-            <>
-              <div className="mb-4">
-                <label
-                  className="block text-white text-sm font-semibold mb-2"
-                  htmlFor="category"
-                >
-                  Category
-                </label>
-                <input
-                  type="text"
-                  id="category"
-                  className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
-                  placeholder="Enter your category"
-                  value={category}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-white text-sm font-semibold mb-2"
-                  htmlFor="bio"
-                >
-                  Bio
-                </label>
-                <input
-                  type="text"
-                  id="bio"
-                  className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
-                  placeholder="Enter your bio"
-                  value={bio}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-white text-sm font-semibold mb-2"
-                  htmlFor="location"
-                >
-                  Location
-                </label>
-                <input
-                  type="text"
-                  id="location"
-                  className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
-                  placeholder="Enter your location"
-                  value={location}
-                  onChange={handleChange}
-                />
-              </div>
-            </>
-          )}
-
-          {userType === 'brand' && (
-            <>
-              <div className="mb-4">
-                <label
-                  className="block text-white text-sm font-semibold mb-2"
-                  htmlFor="description"
-                >
-                  Description
-                </label>
-                <input
-                  type="text"
-                  id="description"
-                  className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
-                  placeholder="Enter your company description"
-                  value={formState.description || ''}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-white text-sm font-semibold mb-2"
-                  htmlFor="website"
-                >
-                  Website
-                </label>
-                <input
-                  type="text"
-                  id="website"
-                  className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
-                  placeholder="Enter your website URL"
-                  value={formState.website || ''}
-                  onChange={handleChange}
-                />
-              </div>
-            </>
-          )}
-
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-yellow-400 to-red-600 text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
@@ -264,6 +175,22 @@ const SignUpForm: React.FC = () => {
           </Link>
         </p>
       </div>
+      {showErrorDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 shadow-lg text-center">
+            <h3 className="text-xl font-bold mb-4">Sign Up Failed!</h3>
+            <p className="mb-4">
+              There was an error during registration. Please try again.
+            </p>
+            <button
+              onClick={closeErrorDialog}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
