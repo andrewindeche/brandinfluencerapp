@@ -46,24 +46,29 @@ export class AuthService {
       user = await this.brandModel.findOne({ username });
     }
 
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      return user;
+    if (!user) {
+      console.log('User not found');
+      return null;
+  }
+
+    const isMatch = await bcrypt.compare(pass, user.password);
+    console.log(`Password comparison result: ${isMatch}`);
+    
+    if (isMatch) {
+        return user;
     }
     return null;
   }
-  async registerInfluencer(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<Influencer> {
+  async registerInfluencer(username: string, email: string, password: string): Promise<Influencer> {
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(`Registering influencer with hashed password: ${hashedPassword}`);
     const newInfluencer = new this.influencerModel({
-      username,
-      email,
-      password: hashedPassword,
+        username,
+        email,
+        password: hashedPassword,
     });
     return newInfluencer.save();
-  }
+}
 
   async registerBrand(
     username: string,
