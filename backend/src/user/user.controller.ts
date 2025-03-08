@@ -20,8 +20,7 @@ export class UserController {
   async getUserType(@Query('email') email: string): Promise<{ type: string }> {
     const user = await this.userService.findUserByEmail(email);
     if (user) {
-      const userType =
-      user.role === 'influencer' ? 'influencer' : 'brand';
+      const userType = user.role === 'influencer' ? 'influencer' : 'brand';
       return { type: userType };
     }
     return { type: 'unknown' };

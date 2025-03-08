@@ -1,18 +1,21 @@
 import { Schema, Document } from 'mongoose';
 
-export const BrandSchema = new Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  description: { type: String },
-  website: { type: String },
-  logoUrl: { type: String },
-  contactInfo: {
-    phone: { type: String },
-    address: { type: String },
+export const BrandSchema = new Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    description: { type: String },
+    website: { type: String },
+    logoUrl: { type: String },
+    contactInfo: {
+      phone: { type: String },
+      address: { type: String },
+    },
+    role: { type: String, required: true, default: 'brand' },
   },
-  role: { type: String, required: true, default: 'brand' },
-}, { timestamps: true });
+  { timestamps: true },
+);
 
 export interface Brand extends Document {
   id: string;
@@ -30,4 +33,3 @@ export interface Brand extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-

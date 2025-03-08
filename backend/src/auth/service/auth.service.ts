@@ -39,7 +39,7 @@ export class AuthService {
     pass: string,
     userType: 'influencer' | 'brand',
   ): Promise<any> {
-    let user;
+    let user: any;
     if (userType === 'influencer') {
       user = await this.influencerModel.findOne({ username });
     } else if (userType === 'brand') {
@@ -49,26 +49,29 @@ export class AuthService {
     if (!user) {
       console.log('User not found');
       return null;
-  }
+    }
 
     const isMatch = await bcrypt.compare(pass, user.password);
     console.log(`Password comparison result: ${isMatch}`);
-    
+
     if (isMatch) {
-        return user;
+      return user;
     }
     return null;
   }
-  async registerInfluencer(username: string, email: string, password: string): Promise<Influencer> {
+  async registerInfluencer(
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<Influencer> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(`Registering influencer with hashed password: ${hashedPassword}`);
     const newInfluencer = new this.influencerModel({
-        username,
-        email,
-        password: hashedPassword,
+      username,
+      email,
+      password: hashedPassword,
     });
     return newInfluencer.save();
-}
+  }
 
   async registerBrand(
     username: string,

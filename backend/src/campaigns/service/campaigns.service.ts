@@ -21,7 +21,9 @@ export class CampaignsService {
     const endDate = new Date(createCampaignDto.endDate);
 
     if (startDate < currentDate || endDate < currentDate) {
-      throw new BadRequestException('Start date and end date must be in the future.');
+      throw new BadRequestException(
+        'Start date and end date must be in the future.',
+      );
     }
 
     if (endDate < startDate) {
