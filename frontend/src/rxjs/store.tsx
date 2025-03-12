@@ -63,7 +63,7 @@ export const setFormField = (field: keyof FormState, value: string) => {
 
 export const submitSignUpForm = async (
   navigateToLogin: () => void,
-  setShowErrorDialog: unknown,
+  setShowErrorDialog: (show: boolean) => void,
 ) => {
   const formState = stateSubject.value;
 
@@ -89,8 +89,19 @@ export const submitSignUpForm = async (
     console.log('Sign up successful:', response.data);
     stateSubject.next(initialState);
     navigateToLogin();
-  } catch (error) {
-    console.error('Error during sign-up:', error);
+  } catch (error: any) {
+    stateSubject.next(initialState);
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+      console.error('Error status:', error.response.status);
+      console.error('Error headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('Error request:', error.request);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    console.error('Error during sign-up:', error.config);
+    setShowErrorDialog(true);
   }
 };
 

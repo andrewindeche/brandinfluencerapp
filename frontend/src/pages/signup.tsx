@@ -18,6 +18,8 @@ const SignUpForm: React.FC = () => {
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setFormState(state);
+      // Clear confirmPassword whenever formState changes
+      setConfirmPassword('');
     });
 
     return () => {
@@ -47,11 +49,23 @@ const SignUpForm: React.FC = () => {
       return;
     }
 
-    await submitSignUpForm(() => {
+    try {
+      await submitSignUpForm(() => {
+        setFormState(initialState);
+        setConfirmPassword('');
+        setPasswordsMatch(true);
+        router.push('/login?signup=success');
+      }, setShowErrorDialog);
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        alert('Email or username already exists.');
+      } else {
+        alert('There was an error during registration. Please try again.');
+      }
       setFormState(initialState);
       setConfirmPassword('');
-      router.push('/login?signup=success');
-    }, setShowErrorDialog);
+      setPasswordsMatch(true);
+    }
   };
 
   const closeErrorDialog = () => {

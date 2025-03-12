@@ -8,9 +8,32 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class AdminService {
   constructor(
-    @InjectModel('Admin') private userModel: Model<User>,
+    @InjectModel('User') private userModel: Model<User>,
     private readonly userService: UserService,
   ) {}
+
+  async onModuleInit() {
+    await this.createSuperUser();
+  }
+
+  async createSuperUser() {
+    const superUserExists = await this.userModel.findOne({ role: 'admin' }).exec();
+
+    if (!superUserExists) {
+      const hashedPassword = await bcrypt.hash('superpassword', 10); 
+      const superUser = new this.userModel({
+        username: 'superadmin',
+        email: 'superadmin@example.com',
+        password: hashedPassword,
+        role: 'admin',
+      });
+
+      await superUser.save();
+      console.log('Superuser created: superadmin');
+    } else {
+      console.log('Superuser already exists.');
+    }
+  }
 
   async createAdmin(
     username: string,
