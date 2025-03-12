@@ -32,7 +32,7 @@ const SignUpForm: React.FC = () => {
     if (Object.keys(errors).length > 0) {
       const timer = setTimeout(() => {
         setErrors({});
-      }, 10000);
+      }, 4000);
 
       return () => clearTimeout(timer);
     }
@@ -96,7 +96,6 @@ const SignUpForm: React.FC = () => {
         router.push('/login?signup=success');
       }, setShowErrorDialog);
     } catch (error) {
-      // Handle AxiosError with type assertion
       if (error instanceof AxiosError) {
         if (error.response && error.response.status === 409) {
           alert('Email or username already exists.');
