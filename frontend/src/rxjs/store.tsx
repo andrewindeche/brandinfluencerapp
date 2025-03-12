@@ -2,9 +2,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import axiosInstance from './axiosInstance';
 import { debounce } from 'lodash';
+import { AxiosError } from 'axios';
 
 type FormState = {
-  confirmPassword: any;
+  confirmPassword: string;
   email: string;
   userType: 'brand' | 'influencer' | 'unknown';
   name: string;
@@ -89,18 +90,24 @@ export const submitSignUpForm = async (
     console.log('Sign up successful:', response.data);
     stateSubject.next(initialState);
     navigateToLogin();
-  } catch (error: any) {
+  } catch (error: unknown) {
     stateSubject.next(initialState);
-    if (error.response) {
-      console.error('Error response:', error.response.data);
-      console.error('Error status:', error.response.status);
-      console.error('Error headers:', error.response.headers);
-    } else if (error.request) {
-      console.error('Error request:', error.request);
+
+    if (error instanceof AxiosError) {
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+        console.error('Error headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      console.error('Error during sign-up:', error.config);
     } else {
-      console.error('Error message:', error.message);
+      console.error('Unexpected error:', error);
     }
-    console.error('Error during sign-up:', error.config);
+
     setShowErrorDialog(true);
   }
 };

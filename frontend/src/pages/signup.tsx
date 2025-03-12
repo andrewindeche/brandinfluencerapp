@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { AxiosError } from 'axios';
 import {
   formState$,
   setFormField,
@@ -31,7 +32,7 @@ const SignUpForm: React.FC = () => {
     if (Object.keys(errors).length > 0) {
       const timer = setTimeout(() => {
         setErrors({});
-      }, 5000);
+      }, 10000);
 
       return () => clearTimeout(timer);
     }
@@ -42,7 +43,7 @@ const SignUpForm: React.FC = () => {
   ) => {
     const { id, value } = e.target;
     setFormField(id as keyof typeof formState, value);
-    setErrors((prevErrors) => ({ ...prevErrors, [id]: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, [id]: '' })); // Clear errors on change
   };
 
   const handleConfirmPasswordChange = (
@@ -50,7 +51,7 @@ const SignUpForm: React.FC = () => {
   ) => {
     setConfirmPassword(e.target.value);
     setPasswordsMatch(formState.password === e.target.value);
-    setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: '' }));
+    setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: '' })); // Clear errors on change
   };
 
   const validateForm = () => {
@@ -94,12 +95,18 @@ const SignUpForm: React.FC = () => {
         setPasswordsMatch(true);
         router.push('/login?signup=success');
       }, setShowErrorDialog);
-    } catch (error: any) {
-      if (error.response && error.response.status === 409) {
-        alert('Email or username already exists.');
+    } catch (error) {
+      // Handle AxiosError with type assertion
+      if (error instanceof AxiosError) {
+        if (error.response && error.response.status === 409) {
+          alert('Email or username already exists.');
+        } else {
+          alert('There was an error during registration. Please try again.');
+        }
       } else {
-        alert('There was an error during registration. Please try again.');
+        alert('Unexpected error occurred.');
       }
+
       setFormState(initialState);
       setConfirmPassword('');
       setPasswordsMatch(true);
