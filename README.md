@@ -9,6 +9,7 @@
 | 5.MongoDB | Not Only Relational Database| [Not Only relational Integrity]; [Database];|
 | 6.TailWind | Open Css Framework| [Css]; [Style Sheet];|
 | 7.Passport | Authentication Middleware| [Authentication]; [Middleware];|
+| 8.RxJs | State Management Library| [state];|
 
 ## <h1> Description</h1>
 <p>The aim of the project is to build a brand-influencer app that allow brands to connect to influencers to monitor active campaigns so that an influencer can view ongoing campaigns, track submission statuses, and monitor their performance while brands/SMEs to monitor influencers' participation in campaigns and approve/reject submissions..</p>
