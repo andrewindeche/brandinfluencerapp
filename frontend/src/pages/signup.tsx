@@ -14,11 +14,11 @@ const SignUpForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setFormState(state);
-      // Clear confirmPassword whenever formState changes
       setConfirmPassword('');
     });
 
@@ -27,11 +27,22 @@ const SignUpForm: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const timer = setTimeout(() => {
+        setErrors({});
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { id, value } = e.target;
     setFormField(id as keyof typeof formState, value);
+    setErrors((prevErrors) => ({ ...prevErrors, [id]: '' }));
   };
 
   const handleConfirmPasswordChange = (
@@ -39,13 +50,40 @@ const SignUpForm: React.FC = () => {
   ) => {
     setConfirmPassword(e.target.value);
     setPasswordsMatch(formState.password === e.target.value);
+    setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: '' }));
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formState.email) {
+      newErrors.email = 'Email is required';
+    }
+    if (!formState.userType || formState.userType === 'unknown') {
+      newErrors.userType = 'User type is required';
+    }
+    if (!formState.username) {
+      newErrors.username = 'Username is required';
+    }
+    if (!formState.password) {
+      newErrors.password = 'Password is required';
+    }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required';
+    }
+    if (!passwordsMatch) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!passwordsMatch) {
-      alert('Passwords do not match!');
+    if (!validateForm()) {
       return;
     }
 
@@ -96,6 +134,9 @@ const SignUpForm: React.FC = () => {
               value={email}
               onChange={handleChange}
             />
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -111,9 +152,13 @@ const SignUpForm: React.FC = () => {
               value={userType}
               onChange={handleChange}
             >
+              <option value="unknown">Select User Type</option>
               <option value="influencer">Influencer</option>
               <option value="brand">Brand</option>
             </select>
+            {errors.userType && (
+              <p className="text-red-400 text-sm mt-1">{errors.userType}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -131,6 +176,9 @@ const SignUpForm: React.FC = () => {
               value={username}
               onChange={handleChange}
             />
+            {errors.username && (
+              <p className="text-red-400 text-sm mt-1">{errors.username}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -148,6 +196,9 @@ const SignUpForm: React.FC = () => {
               value={password}
               onChange={handleChange}
             />
+            {errors.password && (
+              <p className="text-red-400 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -167,9 +218,9 @@ const SignUpForm: React.FC = () => {
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
             />
-            {!passwordsMatch && (
+            {errors.confirmPassword && (
               <p className="text-red-400 text-sm mt-1">
-                Passwords do not match
+                {errors.confirmPassword}
               </p>
             )}
           </div>
