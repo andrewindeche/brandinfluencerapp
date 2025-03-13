@@ -5,7 +5,7 @@ import { AuthController } from './controller/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { InfluencerSchema } from './schema/influencer.schema';
+import { InfluencerSchema } from '../user/influencer/influencer.schema';
 import { BrandModule } from '../user/brand/brand.module';
 import { UserModule } from '../user/user.module';
 import * as crypto from 'crypto';
