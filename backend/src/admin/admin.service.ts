@@ -17,10 +17,12 @@ export class AdminService {
   }
 
   async createSuperUser() {
-    const superUserExists = await this.userModel.findOne({ role: 'admin' }).exec();
+    const superUserExists = await this.userModel
+      .findOne({ role: 'admin' })
+      .exec();
 
     if (!superUserExists) {
-      const hashedPassword = await bcrypt.hash('superpassword', 10); 
+      const hashedPassword = await bcrypt.hash('superpassword', 10);
       const superUser = new this.userModel({
         username: 'superadmin',
         email: 'superadmin@example.com',

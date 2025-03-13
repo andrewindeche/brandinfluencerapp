@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  BadRequestException,
   UnauthorizedException,
   InternalServerErrorException,
   ConflictException,
@@ -62,14 +61,10 @@ export class AuthController {
   @Post('influencer/register')
   async registerInfluencer(@Body() registerDto: CreateUserDto) {
     try {
-      const newInfluencer = await this.authService.registerInfluencer(
-        registerDto.username,
-        registerDto.email,
-        registerDto.password,
-      );
-      return newInfluencer;
+      const newUser = await this.authService.createUser(registerDto);
+      return newUser;
     } catch (error) {
-      if (error.code === 11000) {
+      if (error.message === 'Email or username already exists.') {
         throw new ConflictException('Email or username already exists.');
       }
       throw new InternalServerErrorException('An error occurred during registration.');
@@ -79,14 +74,10 @@ export class AuthController {
   @Post('brand/register')
   async registerBrand(@Body() registerDto: CreateUserDto) {
     try {
-      const newBrand = await this.authService.registerBrand(
-        registerDto.username,
-        registerDto.email,
-        registerDto.password,
-      );
-      return newBrand;
+      const newUser = await this.authService.createUser(registerDto);
+      return newUser;
     } catch (error) {
-      if (error.code === 11000) {
+      if (error.message === 'Email or username already exists.') {
         throw new ConflictException('Email or username already exists.');
       }
       throw new InternalServerErrorException('An error occurred during registration.');

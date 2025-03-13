@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
-import { Influencer } from '../user/influencer/influencer.schema';
-import { Brand } from '../user/brand/schema/brand.schema';
+import {
+  Influencer,
+  InfluencerModel,
+} from '../user/influencer/influencer.schema';
+import { Brand, BrandModel } from '../user/brand/schema/brand.schema';
 
 @Injectable()
 export class UserService {
@@ -23,17 +26,17 @@ export class UserService {
 
   async createUser(userData: User): Promise<User> {
     try {
+      let user: User | PromiseLike<User>;
+
       if (userData.role === 'influencer') {
-        const influencer = new this.influencerModel(userData);
-        return await influencer.save();
+        user = new InfluencerModel(userData);
+      } else if (userData.role === 'brand') {
+        user = new BrandModel(userData);
+      } else {
+        throw new Error('Invalid role');
       }
 
-      if (userData.role === 'brand') {
-        const brand = new this.brandModel(userData);
-        return await brand.save();
-      }
-
-      throw new Error('Invalid role');
+      return await user.save();
     } catch (error) {
       throw new Error('Error creating user: ' + error.message);
     }

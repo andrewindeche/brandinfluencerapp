@@ -6,12 +6,16 @@ import { Influencer } from '../schema/influencer.schema';
 import { Brand } from '../../user/brand/schema/brand.schema';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from '../../user/user.service';
+import * as bcryptjs from 'bcryptjs';
+import { User } from '../../user/user.schema';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel('Influencer') private influencerModel: Model<Influencer>,
     @InjectModel('Brand') private brandModel: Model<Brand>,
+    @InjectModel('User') private userModel: Model<User>,
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
@@ -93,5 +97,48 @@ export class AuthService {
 
   async findAllBrands(): Promise<Brand[]> {
     return this.brandModel.find().exec();
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const { username, email, password, role, category, bio, location } =
+      createUserDto;
+    const existingUser = await this.userModel
+      .findOne({ $or: [{ username }, { email }] })
+      .exec();
+    if (existingUser) {
+      throw new Error('Email or username already exists.');
+    }
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+
+    const newUser = new this.userModel({
+      username,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    await newUser.save();
+
+    if (role === 'influencer') {
+      const newInfluencer = new this.influencerModel({
+        userId: newUser._id,
+        username,
+        email,
+        category,
+        bio,
+        location,
+      });
+      await newInfluencer.save();
+    } else if (role === 'brand') {
+      const newBrand = new this.brandModel({
+        userId: newUser._id,
+        username,
+        email,
+      });
+      await newBrand.save();
+    }
+
+    return newUser;
   }
 }

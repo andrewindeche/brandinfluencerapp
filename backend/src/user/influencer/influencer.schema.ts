@@ -1,11 +1,9 @@
-import { Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { Submission } from '../../auth/schema/submission.schema';
+import { User, UserModel } from '../user.schema';
 
-export interface Influencer extends Document {
-  username: string;
-  password: string;
-  email: string;
+export interface Influencer extends User {
   socialMediaHandles: {
     instagram?: string;
     youtube?: string;
@@ -20,9 +18,6 @@ export interface Influencer extends Document {
 }
 
 export const InfluencerSchema = new Schema<Influencer>({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
   socialMediaHandles: {
     instagram: { type: String },
     youtube: { type: String },
@@ -33,5 +28,9 @@ export const InfluencerSchema = new Schema<Influencer>({
   location: { type: String, required: true },
   submissions: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }],
   campaign: { type: MongooseSchema.Types.ObjectId, ref: 'Campaign' },
-  role: { type: String, required: true, default: 'influencer' },
 });
+
+export const InfluencerModel = UserModel.discriminator<Influencer>(
+  'Influencer',
+  InfluencerSchema,
+);

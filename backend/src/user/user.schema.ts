@@ -1,4 +1,4 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 
 export interface User extends Document {
   username: string;
@@ -7,13 +7,18 @@ export interface User extends Document {
   role: 'brand' | 'influencer';
 }
 
-export const UserSchema = new Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  role: {
-    type: String,
-    enum: ['brand', 'admin', 'influencer'],
-    default: 'user',
+export const UserSchema = new Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    role: {
+      type: String,
+      enum: ['brand', 'admin', 'influencer'],
+      default: 'user',
+    },
   },
-});
+  { timestamps: true },
+);
+
+export const UserModel = model<User>('User', UserSchema);

@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -15,5 +21,17 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  role: string;
+  role: 'influencer' | 'brand';
+
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsString()
+  bio?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
 }
