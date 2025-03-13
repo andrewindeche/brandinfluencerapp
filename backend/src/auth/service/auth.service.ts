@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { Influencer } from '../schema/influencer.schema';
-import { Brand } from '../../user/brand/schema/brand.schema';
-import * as bcrypt from 'bcryptjs';
-import { UserService } from '../../user/user.service';
+import { Influencer } from '../../user/influencer/influencer.schema';
 import * as bcryptjs from 'bcryptjs';
 import { User } from '../../user/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -13,11 +10,8 @@ import { CreateUserDto } from '../dto/create-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel('Influencer') private influencerModel: Model<Influencer>,
-    @InjectModel('Brand') private brandModel: Model<Brand>,
     @InjectModel('User') private userModel: Model<User>,
     private jwtService: JwtService,
-    private userService: UserService,
   ) {}
 
   async loginInfluencer(influencer: Influencer) {
@@ -31,8 +25,8 @@ export class AuthService {
     };
   }
 
-  async loginBrand(brand: Brand) {
-    const payload = { username: brand.username, sub: brand.id, type: 'brand' };
+  async loginBrand(brand: User) {
+    const payload = { username: brand.username, sub: brand._id, role: 'brand' };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -40,73 +34,25 @@ export class AuthService {
 
   async validateUser(
     username: string,
-    pass: string,
-    userType: 'influencer' | 'brand',
+    password: string,
+    role: string,
   ): Promise<any> {
-    let user: any;
-    if (userType === 'influencer') {
-      user = await this.influencerModel.findOne({ username });
-    } else if (userType === 'brand') {
-      user = await this.brandModel.findOne({ username });
-    }
-
-    if (!user) {
-      console.log('User not found');
-      return null;
-    }
-
-    const isMatch = await bcrypt.compare(pass, user.password);
-    console.log(`Password comparison result: ${isMatch}`);
-
-    if (isMatch) {
+    const user = await this.userModel.findOne({ username, role }).exec();
+    if (user && (await bcryptjs.compare(password, user.password))) {
       return user;
     }
     return null;
   }
-  async registerInfluencer(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<Influencer> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newInfluencer = new this.influencerModel({
-      username,
-      email,
-      password: hashedPassword,
-    });
-    return newInfluencer.save();
-  }
 
-  async registerBrand(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<Brand> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newBrand = new this.brandModel({
-      username,
-      email,
-      password: hashedPassword,
-    });
-    return newBrand.save();
-  }
-
-  async findallinfluencers(): Promise<Influencer[]> {
-    return this.influencerModel.find().exec();
-  }
-
-  async findAllBrands(): Promise<Brand[]> {
-    return this.brandModel.find().exec();
-  }
-
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { username, email, password, role, category, bio, location } =
+  async registerInfluencer(createUserDto: CreateUserDto): Promise<User> {
+    const { username, email, password, category, bio, location } =
       createUserDto;
+
     const existingUser = await this.userModel
       .findOne({ $or: [{ username }, { email }] })
       .exec();
     if (existingUser) {
-      throw new Error('Email or username already exists.');
+      throw new Error('Username or email already exists.');
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
@@ -115,30 +61,32 @@ export class AuthService {
       username,
       email,
       password: hashedPassword,
-      role,
+      role: 'influencer',
+      category,
+      bio,
+      location,
     });
 
-    await newUser.save();
+    return newUser.save();
+  }
 
-    if (role === 'influencer') {
-      const newInfluencer = new this.influencerModel({
-        userId: newUser._id,
-        username,
-        email,
-        category,
-        bio,
-        location,
-      });
-      await newInfluencer.save();
-    } else if (role === 'brand') {
-      const newBrand = new this.brandModel({
-        userId: newUser._id,
-        username,
-        email,
-      });
-      await newBrand.save();
+  async registerBrand(createUserDto: CreateUserDto): Promise<User> {
+    const { username, email, password } = createUserDto;
+    const existingUser = await this.userModel
+      .findOne({ $or: [{ username }, { email }] })
+      .exec();
+    if (existingUser) {
+      throw new Error('Username or email already exists.');
     }
 
-    return newUser;
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    const newUser = new this.userModel({
+      username,
+      email,
+      password: hashedPassword,
+      role: 'brand',
+    });
+
+    return newUser.save();
   }
 }

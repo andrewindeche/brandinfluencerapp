@@ -4,7 +4,7 @@ import { CampaignsService } from './service/campaigns.service';
 import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
-import { InfluencerSchema } from '../auth/schema/influencer.schema';
+import { InfluencerSchema } from '../user/influencer/influencer.schema';
 
 @Module({
   imports: [

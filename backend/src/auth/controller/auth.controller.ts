@@ -30,10 +30,7 @@ export class AuthController {
         throw new UnauthorizedException('Invalid credentials');
       }
       return this.authService.loginInfluencer(user);
-    } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
+    } catch {
       throw new InternalServerErrorException('An error occurred during login.');
     }
   }
@@ -50,10 +47,7 @@ export class AuthController {
         throw new UnauthorizedException('Invalid credentials');
       }
       return this.authService.loginBrand(user);
-    } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
+    } catch {
       throw new InternalServerErrorException('An error occurred during login.');
     }
   }
@@ -61,26 +55,30 @@ export class AuthController {
   @Post('influencer/register')
   async registerInfluencer(@Body() registerDto: CreateUserDto) {
     try {
-      const newUser = await this.authService.createUser(registerDto);
+      const newUser = await this.authService.registerInfluencer(registerDto);
       return newUser;
     } catch (error) {
       if (error.message === 'Email or username already exists.') {
         throw new ConflictException('Email or username already exists.');
       }
-      throw new InternalServerErrorException('An error occurred during registration.');
+      throw new InternalServerErrorException(
+        'An error occurred during registration.',
+      );
     }
   }
 
   @Post('brand/register')
   async registerBrand(@Body() registerDto: CreateUserDto) {
     try {
-      const newUser = await this.authService.createUser(registerDto);
+      const newUser = await this.authService.registerBrand(registerDto);
       return newUser;
     } catch (error) {
       if (error.message === 'Email or username already exists.') {
         throw new ConflictException('Email or username already exists.');
       }
-      throw new InternalServerErrorException('An error occurred during registration.');
+      throw new InternalServerErrorException(
+        'An error occurred during registration.',
+      );
     }
   }
 }
