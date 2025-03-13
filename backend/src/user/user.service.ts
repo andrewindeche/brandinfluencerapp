@@ -1,20 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
-import {
-  Influencer,
-  InfluencerModel,
-} from '../user/influencer/influencer.schema';
-import { Brand, BrandModel } from '../user/brand/schema/brand.schema';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel('User') private userModel: Model<User>,
-    @InjectModel('Influencer') private influencerModel: Model<Influencer>,
-    @InjectModel('Brand') private brandModel: Model<Brand>,
-  ) {}
+  constructor(@InjectModel('User') private userModel: Model<User>) {}
 
   async findAll(): Promise<User[]> {
     try {
@@ -25,19 +16,21 @@ export class UserService {
   }
 
   async createUser(userData: User): Promise<User> {
+    const existingUser = await this.userModel
+      .findOne({
+        $or: [{ email: userData.email }, { username: userData.username }],
+      })
+      .exec();
+
+    if (existingUser) {
+      throw new ConflictException('Email or username already exists.');
+    }
+
     try {
-      let user: User | PromiseLike<User>;
-
-      if (userData.role === 'influencer') {
-        user = new InfluencerModel(userData);
-      } else if (userData.role === 'brand') {
-        user = new BrandModel(userData);
-      } else {
-        throw new Error('Invalid role');
-      }
-
+      const user = new this.userModel(userData);
       return await user.save();
     } catch (error) {
+      console.error('Error creating user:', error);
       throw new Error('Error creating user: ' + error.message);
     }
   }
