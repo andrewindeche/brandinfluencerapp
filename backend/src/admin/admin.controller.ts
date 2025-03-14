@@ -1,25 +1,55 @@
-import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
+import { PromoteUserDto } from '../auth/dto/promoteUserToAdmin';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post('create-admin')
+  @Post('promote')
   @Roles('admin')
-  async createAdmin(@Body() createUserDto: CreateUserDto) {
-    const { username, email, password } = createUserDto;
-    return this.adminService.createAdmin(username, email, password);
+  async promoteUserToAdmin(@Body() promoteUserDto: PromoteUserDto) {
+    const { superUserId, userId } = promoteUserDto;
+    return this.adminService.promoteUserToAdmin(superUserId, userId);
   }
 
   @Get('users')
   @Roles('admin')
   async getAllUsers() {
     return this.adminService.findAllUsers();
+  }
+
+  @Post('create-superuser')
+  async createSuperUser(@Body() createUserDto: CreateUserDto) {
+    const { username, email, password } = createUserDto;
+    try {
+      const superUser = await this.adminService.createSuperUser(
+        username,
+        email,
+        password,
+      );
+      return superUser;
+    } catch (error) {
+      if (error.message === 'Superuser already exists.') {
+        throw new ConflictException('Superuser already exists.');
+      } else {
+        throw new InternalServerErrorException(
+          'An error occurred during superuser creation.',
+        );
+      }
+    }
   }
 }

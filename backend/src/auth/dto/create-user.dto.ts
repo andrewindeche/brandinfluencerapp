@@ -4,6 +4,7 @@ import {
   IsString,
   IsOptional,
   MinLength,
+  IsEnum,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -21,7 +22,10 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  role: 'influencer' | 'brand';
+  @IsEnum(['brand', 'influencer', 'admin', 'superuser'], {
+    message: 'Invalid role',
+  })
+  role: 'influencer' | 'brand' | 'admin' | 'superuser';
 
   @IsOptional()
   @IsString()

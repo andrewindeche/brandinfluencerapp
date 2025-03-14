@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -35,13 +35,18 @@ export class AuthService {
   async validateUser(
     username: string,
     password: string,
-    role: string,
+    role: 'brand' | 'influencer' | 'admin' | 'superuser',
   ): Promise<any> {
     const user = await this.userModel.findOne({ username, role }).exec();
-    if (user && (await bcryptjs.compare(password, user.password))) {
-      return user;
+    if (!user) {
+      throw new UnauthorizedException('User not found or role mismatch');
     }
-    return null;
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    return user;
   }
 
   async registerInfluencer(createUserDto: CreateUserDto): Promise<User> {
