@@ -25,7 +25,7 @@ const InfluencerPage: React.FC = () => {
   return (
     <div className="bg-[#E8BB5B] p-12 min-h-screen">
       <div className="absolute top-2 right-28 z-50">
-        <UserMenu />
+        <UserMenu userName={''} imageSrc={''} />
       </div>
       <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-2 underline-offset-2 text-center ml-2 -mt-2">
         My Profile

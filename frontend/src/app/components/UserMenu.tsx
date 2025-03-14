@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-const UserMenu: React.FC = () => {
+interface UserMenuProps {
+  userName: string;
+  imageSrc: string;
+}
+
+const UserMenu: React.FC<UserMenuProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
