@@ -49,7 +49,7 @@ npm install
 ## <h1> Endpoints </h1>
 
 1. Register User POST: http://localhost:4000/auth/influencer/register
-            Admin User POST: http://localhost:4000/admin/create-admin             
+            Super User POST: http://localhost:4000/admin/create-superuser           
     {
     "username": "john_doe",
     "email": "john@example.com",
