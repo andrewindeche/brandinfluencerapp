@@ -95,36 +95,36 @@ const LoginForm: React.FC = () => {
           Log In
         </h2>
         <form onSubmit={handleSubmit}>
-          <p className="text-xxl font-bold text-center text-yellow-400 mb-6">
+          <p className="text-2xl font-bold text-center text-yellow-400 mb-6">
             {userType === 'brand' ? (
               <div>
-                <h2 className="text-center text-sm font-bold mb-4">
+                <h3 className="text-center text-xl font-bold mb-4">
                   Welcome, Log in as Brand!
-                </h2>
+                </h3>
               </div>
             ) : userType === 'influencer' ? (
               <div>
-                <h2 className="text-center text-sm font-bold mb-4">
+                <h3 className="text-center text-xl font-bold mb-4">
                   Welcome, Log in as Influencer!
-                </h2>
+                </h3>
               </div>
             ) : userType === 'admin' ? (
               <div>
-                <h2 className="text-center text-sm font-bold mb-4">
+                <h2 className="text-center text-xl font-bold mb-4">
                   Admin Dashboard
                 </h2>
               </div>
             ) : userType === 'user' ? (
               <div>
-                <h2 className="text-center text-sm font-bold mb-4">
-                  Welcome, Log in asUser!
-                </h2>
+                <h3 className="text-center text-xl font-bold mb-4">
+                  Welcome, Log in as User!
+                </h3>
               </div>
             ) : (
               <div>
-                <h2 className="text-center text-sm font-bold mb-4">
+                <h3 className="text-center text-xl font-bold mb-4">
                   &ldquo; &quot;
-                </h2>
+                </h3>
               </div>
             )}
           </p>
