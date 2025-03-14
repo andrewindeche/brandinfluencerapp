@@ -99,13 +99,13 @@ const LoginForm: React.FC = () => {
             {userType === 'brand' ? (
               <div>
                 <h3 className="text-center text-xl font-bold mb-4">
-                  Welcome, Log in as Brand!
+                  Log in as a Brand!
                 </h3>
               </div>
             ) : userType === 'influencer' ? (
               <div>
                 <h3 className="text-center text-xl font-bold mb-4">
-                  Welcome, Log in as Influencer!
+                  Log in as an Influencer!
                 </h3>
               </div>
             ) : userType === 'admin' ? (
@@ -117,14 +117,12 @@ const LoginForm: React.FC = () => {
             ) : userType === 'user' ? (
               <div>
                 <h3 className="text-center text-xl font-bold mb-4">
-                  Welcome, Log in as User!
+                  Log in as a User!
                 </h3>
               </div>
             ) : (
               <div>
-                <h3 className="text-center text-xl font-bold mb-4">
-                  &ldquo; &quot;
-                </h3>
+                <h3 className="text-center text-xl font-bold mb-4">Welcome</h3>
               </div>
             )}
           </p>
