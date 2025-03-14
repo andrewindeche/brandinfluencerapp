@@ -43,7 +43,7 @@ const SignUpForm: React.FC = () => {
   ) => {
     const { id, value } = e.target;
     setFormField(id as keyof typeof formState, value);
-    setErrors((prevErrors) => ({ ...prevErrors, [id]: '' })); // Clear errors on change
+    setErrors((prevErrors) => ({ ...prevErrors, [id]: '' }));
   };
 
   const handleConfirmPasswordChange = (
@@ -51,7 +51,7 @@ const SignUpForm: React.FC = () => {
   ) => {
     setConfirmPassword(e.target.value);
     setPasswordsMatch(formState.password === e.target.value);
-    setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: '' })); // Clear errors on change
+    setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: '' }));
   };
 
   const validateForm = () => {
