@@ -10,6 +10,8 @@ const LoginForm: React.FC = () => {
 
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const router = useRouter();
@@ -38,11 +40,19 @@ const LoginForm: React.FC = () => {
     setPassword(e.target.value);
   };
 
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setConfirmPassword(e.target.value);
+    setPasswordsMatch(password === e.target.value);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && password) {
       setEmailState('');
       setPassword('');
+      setConfirmPassword('');
 
       switch (userType) {
         case 'brand':
@@ -85,8 +95,38 @@ const LoginForm: React.FC = () => {
           Log In
         </h2>
         <form onSubmit={handleSubmit}>
-          <p className="text-xl font-bold text-center text-white mb-6">
-            {userType === 'brand' ? 'Brand Log In' : 'Log In'}
+          <p className="text-xxl font-bold text-center text-yellow-400 mb-6">
+            {userType === 'brand' ? (
+              <div>
+                <h2 className="text-center text-sm font-bold mb-4">
+                  Welcome, Log in as Brand!
+                </h2>
+              </div>
+            ) : userType === 'influencer' ? (
+              <div>
+                <h2 className="text-center text-sm font-bold mb-4">
+                  Welcome, Log in as Influencer!
+                </h2>
+              </div>
+            ) : userType === 'admin' ? (
+              <div>
+                <h2 className="text-center text-sm font-bold mb-4">
+                  Admin Dashboard
+                </h2>
+              </div>
+            ) : userType === 'user' ? (
+              <div>
+                <h2 className="text-center text-sm font-bold mb-4">
+                  Welcome, Log in asUser!
+                </h2>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-center text-sm font-bold mb-4">
+                  &ldquo; &quot;
+                </h2>
+              </div>
+            )}
           </p>
           <div className="mb-4">
             <label
@@ -121,10 +161,34 @@ const LoginForm: React.FC = () => {
               placeholder="Enter your password"
             />
           </div>
+          <div className="mb-4">
+            <label
+              className="block text-white text-sm font-semibold mb-2"
+              htmlFor="confirmPassword"
+            >
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 ${
+                passwordsMatch ? 'focus:ring-yellow-400' : 'focus:ring-red-400'
+              } shadow-lg`}
+              placeholder="Confirm your password"
+            />
+            {!passwordsMatch && (
+              <p className="text-red-400 text-sm mt-1">
+                Passwords do not match
+              </p>
+            )}
+          </div>
 
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-yellow-400 to-red-600 text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+            disabled={!passwordsMatch}
           >
             Log In
           </button>
