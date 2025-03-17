@@ -7,7 +7,7 @@ import { AxiosError } from 'axios';
 type FormState = {
   confirmPassword: string;
   email: string;
-  userType: 'brand' | 'influencer' | 'unknown';
+  role: 'brand' | 'influencer' | 'admin' | 'unknown';
   name: string;
   username: string;
   password: string;
@@ -18,7 +18,7 @@ type FormState = {
 
 export const initialState: FormState = {
   email: '',
-  userType: 'unknown',
+  role: 'unknown',
   name: '',
   username: '',
   password: '',
@@ -33,16 +33,16 @@ const stateSubject = new BehaviorSubject<FormState>(initialState);
 const fetchUserType = debounce(async (email: string) => {
   try {
     if (!email) {
-      stateSubject.next({ ...stateSubject.value, userType: 'unknown' });
+      stateSubject.next({ ...stateSubject.value, role: 'unknown' });
       return;
     }
 
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    const userType = response.data.type;
-    stateSubject.next({ ...stateSubject.value, userType });
+    const role = response.data.type;
+    stateSubject.next({ ...stateSubject.value, role });
   } catch (error) {
     console.error('Error fetching user type:', error);
-    stateSubject.next({ ...stateSubject.value, userType: 'unknown' });
+    stateSubject.next({ ...stateSubject.value, role: 'unknown' });
   }
 }, 1000);
 
@@ -68,9 +68,14 @@ export const submitSignUpForm = async (
 ) => {
   const formState = stateSubject.value;
 
+  if (formState.password !== formState.confirmPassword) {
+    alert('Passwords do not match.');
+    return;
+  }
+
   const signUpData = {
     email: formState.email,
-    userType: formState.userType,
+    role: formState.role,
     name: formState.name,
     username: formState.username,
     password: formState.password,
@@ -80,10 +85,17 @@ export const submitSignUpForm = async (
     location: formState.location,
   };
 
+  if (formState.role === 'unknown') {
+    alert('Please select a valid user type.');
+    return;
+  }
+
   const apiEndpoint =
-    formState.userType === 'influencer'
+    formState.role === 'influencer'
       ? 'http://localhost:4000/auth/influencer/register'
-      : 'http://localhost:4000/auth/brand/register';
+      : formState.role === 'brand'
+        ? 'http://localhost:4000/auth/brand/register'
+        : 'http://localhost:4000/auth/other/register';
 
   try {
     const response = await axiosInstance.post(apiEndpoint, signUpData);
@@ -96,15 +108,22 @@ export const submitSignUpForm = async (
     if (error instanceof AxiosError) {
       if (error.response) {
         console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-        console.error('Error headers:', error.response.headers);
+        if (error.response.status === 409) {
+          alert('The email or username already exists.');
+        } else {
+          alert(
+            'Failed to sign up. Please check your information and try again.',
+          );
+        }
       } else if (error.request) {
+        alert('No response from server. Please try again later.');
         console.error('Error request:', error.request);
       } else {
+        alert('Unexpected error occurred. Please try again.');
         console.error('Error message:', error.message);
       }
-      console.error('Error during sign-up:', error.config);
     } else {
+      alert('Unexpected error occurred. Please try again.');
       console.error('Unexpected error:', error);
     }
 
