@@ -12,15 +12,12 @@ import {
 const SignUpForm: React.FC = () => {
   const router = useRouter();
   const [formState, setFormState] = useState(initialState);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setFormState(state);
-      setConfirmPassword('');
     });
 
     return () => {
@@ -46,22 +43,14 @@ const SignUpForm: React.FC = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [id]: '' }));
   };
 
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setConfirmPassword(e.target.value);
-    setPasswordsMatch(formState.password === e.target.value);
-    setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: '' }));
-  };
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formState.email) {
       newErrors.email = 'Email is required';
     }
-    if (!formState.userType || formState.userType === 'unknown') {
-      newErrors.userType = 'User type is required';
+    if (!formState.role || formState.role === 'unknown') {
+      newErrors.role = 'User type is required';
     }
     if (!formState.username) {
       newErrors.username = 'Username is required';
@@ -69,10 +58,10 @@ const SignUpForm: React.FC = () => {
     if (!formState.password) {
       newErrors.password = 'Password is required';
     }
-    if (!confirmPassword) {
+    if (!formState.confirmPassword) {
       newErrors.confirmPassword = 'Confirm password is required';
     }
-    if (!passwordsMatch) {
+    if (formState.password !== formState.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -91,8 +80,6 @@ const SignUpForm: React.FC = () => {
     try {
       await submitSignUpForm(() => {
         setFormState(initialState);
-        setConfirmPassword('');
-        setPasswordsMatch(true);
         router.push('/login?signup=success');
       }, setShowErrorDialog);
     } catch (error) {
@@ -105,10 +92,6 @@ const SignUpForm: React.FC = () => {
       } else {
         alert('Unexpected error occurred.');
       }
-
-      setFormState(initialState);
-      setConfirmPassword('');
-      setPasswordsMatch(true);
     }
   };
 
@@ -116,7 +99,7 @@ const SignUpForm: React.FC = () => {
     setShowErrorDialog(false);
   };
 
-  const { email, userType, username, password } = formState;
+  const { email, role, username, password, confirmPassword } = formState;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
@@ -148,22 +131,22 @@ const SignUpForm: React.FC = () => {
           <div className="mb-4">
             <label
               className="block text-white text-sm font-semibold mb-2"
-              htmlFor="userType"
+              htmlFor="role"
             >
               User Type
             </label>
             <select
-              id="userType"
+              id="role"
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
-              value={userType}
+              value={role}
               onChange={handleChange}
             >
               <option value="unknown">Select User Type</option>
               <option value="influencer">Influencer</option>
               <option value="brand">Brand</option>
             </select>
-            {errors.userType && (
-              <p className="text-red-400 text-sm mt-1">{errors.userType}</p>
+            {errors.role && (
+              <p className="text-red-400 text-sm mt-1">{errors.role}</p>
             )}
           </div>
 
@@ -218,11 +201,13 @@ const SignUpForm: React.FC = () => {
               type="password"
               id="confirmPassword"
               className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 ${
-                passwordsMatch ? 'focus:ring-yellow-400' : 'focus:ring-red-400'
+                formState.password === confirmPassword
+                  ? 'focus:ring-yellow-400'
+                  : 'focus:ring-red-400'
               } shadow-lg`}
               placeholder="Confirm your password"
               value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
+              onChange={handleChange}
             />
             {errors.confirmPassword && (
               <p className="text-red-400 text-sm mt-1">
@@ -248,8 +233,8 @@ const SignUpForm: React.FC = () => {
       </div>
       {showErrorDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-8 shadow-lg text-center">
-            <h3 className="text-xl font-bold mb-4">Sign Up Failed!</h3>
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm text-center">
+            <h3 className="text-2xl font-bold mb-4">Sign Up Failed!</h3>
             <p className="mb-4">
               There was an error during registration. Please try again.
             </p>
