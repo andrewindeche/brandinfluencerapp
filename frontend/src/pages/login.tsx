@@ -19,7 +19,7 @@ const LoginForm: React.FC = () => {
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setEmailState(state.email);
-      setUserType(state.userType);
+      setUserType(state.role);
     });
 
     if (router.query.signup === 'success') {
