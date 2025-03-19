@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import * as crypto from 'crypto';
 
 const secretKey = crypto.randomBytes(64).toString('hex');
@@ -28,6 +29,6 @@ const secretKey = crypto.randomBytes(64).toString('hex');
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, JwtStrategy],
+  providers: [AppService, AuthService, JwtStrategy, SendForgotPasswordEmailService],
 })
 export class AppModule {}
