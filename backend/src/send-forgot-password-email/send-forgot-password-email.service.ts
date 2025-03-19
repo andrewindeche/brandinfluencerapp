@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
+import { SentMessageInfo, Options } from 'nodemailer/lib/smtp-transport';
 
 @Injectable()
 export class SendForgotPasswordEmailService {
-  private transporter;
+  private transporter: nodemailer.Transporter<SentMessageInfo, Options>;
 
   constructor() {
-    this.initializeTransporter(); // Initialize transporter on service creation
+    this.initializeTransporter();
   }
 
   private async initializeTransporter() {
