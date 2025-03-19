@@ -50,6 +50,7 @@
     "@types/jest": "^29.5.14",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.13.10",
+    "@types/nodemailer": "^6.4.17",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
