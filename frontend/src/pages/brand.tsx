@@ -51,16 +51,16 @@ const BrandPage: React.FC = () => {
       </div>
       <div className="flex justify-center space-x-4 mt-4">
         <button
-          onClick={() => setActiveTab('influencers')}
-          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
-        >
-          Influencers
-        </button>
-        <button
           onClick={() => setActiveTab('campaigns')}
           className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-14 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
         >
           Campaigns
+        </button>
+        <button
+          onClick={() => setActiveTab('influencers')}
+          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
+        >
+          Influencers
         </button>
       </div>
 
@@ -73,7 +73,7 @@ const BrandPage: React.FC = () => {
       <div
         className={`mt-4 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-20 w-full px-4 fade-in ${activeTab === 'influencers' ? 'show' : 'show'}`}
       >
-        {activeTab === 'influencers' ? (
+        {activeTab === 'campaigns' ? (
           influencers.map((influencer, index) => (
             <InfluencerCard key={index} influencer={influencer} />
           ))
