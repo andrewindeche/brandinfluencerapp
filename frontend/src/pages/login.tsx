@@ -138,7 +138,7 @@ const LoginForm: React.FC = () => {
               id="email"
               value={email}
               onChange={handleEmailChange}
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your email"
             />
           </div>
@@ -155,7 +155,7 @@ const LoginForm: React.FC = () => {
               id="password"
               value={password}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your password"
             />
           </div>
@@ -173,7 +173,7 @@ const LoginForm: React.FC = () => {
               onChange={handleConfirmPasswordChange}
               className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 ${
                 passwordsMatch ? 'focus:ring-yellow-400' : 'focus:ring-red-400'
-              } shadow-lg`}
+              } shadow-lg bg-white`}
               placeholder="Confirm your password"
             />
             {!passwordsMatch && (

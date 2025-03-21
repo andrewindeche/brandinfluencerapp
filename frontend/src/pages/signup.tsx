@@ -118,7 +118,7 @@ const SignUpForm: React.FC = () => {
             <input
               type="email"
               id="email"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your email"
               value={email}
               onChange={handleChange}
@@ -137,7 +137,7 @@ const SignUpForm: React.FC = () => {
             </label>
             <select
               id="role"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               value={role}
               onChange={handleChange}
             >
@@ -160,7 +160,7 @@ const SignUpForm: React.FC = () => {
             <input
               type="text"
               id="username"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your username"
               value={username}
               onChange={handleChange}
@@ -180,7 +180,7 @@ const SignUpForm: React.FC = () => {
             <input
               type="password"
               id="password"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your password"
               value={password}
               onChange={handleChange}
@@ -204,7 +204,7 @@ const SignUpForm: React.FC = () => {
                 formState.password === confirmPassword
                   ? 'focus:ring-yellow-400'
                   : 'focus:ring-red-400'
-              } shadow-lg`}
+              } shadow-lg bg-white`}
               placeholder="Confirm your password"
               value={confirmPassword}
               onChange={handleChange}
