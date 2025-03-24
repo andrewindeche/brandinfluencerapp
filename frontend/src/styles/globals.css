@@ -44,6 +44,20 @@ button:hover {
   background-position: 100% 0%;
 }
 
+.custom-signup-button {
+  background-color:  #4299e1;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  transform: scale(1);
+}
+
+.custom-signup-button:hover {
+  background-color: #48bb78;
+  transform: scale(1.05);
+}
+
 .custom-gradient-button {
   background: linear-gradient(90deg, #FFB3B3, #FFC7B3, #A3C4DC);
   background-size: 400% 400%;

@@ -38,7 +38,7 @@ const HomePage: React.FC = () => {
               </button>
               <button
                 onClick={handleSignUpRedirect}
-                className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors duration-300 transform hover:scale-105"
+                className="custom-signup-button text-white px-4 py-2 rounded-lg"
               >
                 Sign Up
               </button>
