@@ -22,7 +22,7 @@ const HomePage: React.FC = () => {
       <div className="absolute top-4 right-4">
         <button
           onClick={handleOpenModal}
-          className="bg-[var(--button-background)] text-[var(--button-foreground)] px-6 py-3 rounded-lg hover:shadow-lg transition-transform hover-effect"
+          className="custom-gradient-button bg-[var(--button-background)] text-[var(--button-foreground)] px-6 py-3 rounded-lg hover:shadow-lg transition-transform hover-effect"
         >
           Get Started
         </button>
@@ -32,13 +32,13 @@ const HomePage: React.FC = () => {
             <div className="flex flex-col space-y-4">
               <button
                 onClick={handleLoginRedirect}
-                className="bg-gradient-to-r from-yellow-400 to-red-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+                className="text-white px-4 py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
               >
                 Log In
               </button>
               <button
                 onClick={handleSignUpRedirect}
-                className="bg-gradient-to-r from-blue-400 to-teal-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+                className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors duration-300 transform hover:scale-105"
               >
                 Sign Up
               </button>

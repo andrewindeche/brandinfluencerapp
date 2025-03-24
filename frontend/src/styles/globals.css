@@ -31,13 +31,27 @@ body {
 
 
 button {
+  background-color: #FBBF24;
+  color: black;
+  transition: background-color 0.3s ease-in-out;
+  animation: gradientButton 18s ease infinite;
+  transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out, transform 0.4s ease-in-out;
+}
+
+button:hover {
+  background-color: #DC2626;
+  transform: scale(1.05);
+  background-position: 100% 0%;
+}
+
+.custom-gradient-button {
   background: linear-gradient(90deg, #FFB3B3, #FFC7B3, #A3C4DC);
   background-size: 400% 400%;
   animation: gradientButton 18s ease infinite;
   transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out, transform 0.4s ease-in-out;
 }
 
-button:hover {
+.custom-gradient-button:hover {
   transform: scale(1.05);
   background-position: 100% 0%;
 }
