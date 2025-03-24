@@ -33,7 +33,7 @@ const ForgotPasswordForm: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-yellow-400 to-red-600 text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+            className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
           >
             Reset Password
           </button>
