@@ -32,7 +32,7 @@ body {
 
 button {
   background-color: #FBBF24;
-  color: black;
+  color: white;
   transition: background-color 0.3s ease-in-out;
   animation: gradientButton 18s ease infinite;
   transition: background-color 0.6s ease-in-out, color 0.6s ease-in-out, transform 0.4s ease-in-out;
