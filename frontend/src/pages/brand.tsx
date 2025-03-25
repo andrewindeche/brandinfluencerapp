@@ -47,7 +47,7 @@ const BrandPage: React.FC = () => {
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center">
       <div className="absolute top-2 right-36 z-50">
-        <UserMenu />
+        <UserMenu userName="John Doe" imageSrc={''} />
       </div>
       <div className="flex justify-center space-x-4 mt-4">
         <button
