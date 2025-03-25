@@ -88,7 +88,7 @@ npm install
 
 2. Create Campaign: POST: http://localhost:4000/campaign
     Make sure campaigns are within the correct range in relation to the current date
-    for the campaign tp be active.
+    for the campaign to be active.
     {
     "title": "Sample Campaign",
     "instructions": "Upload your content.",
