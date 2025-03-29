@@ -88,11 +88,13 @@ npm install
     "username": "example corp",
     "email": "examplecorp@example.com",
     "password": "securepassword123",
+    "confirmPassword": "securepassword123",
     }
 
 2. Create Campaign: POST: http://localhost:4000/campaign
     Make sure campaigns are within the correct range in relation to the current date
     for the campaign to be active.
+    Only brand users can create campaigns
     {
     "title": "Sample Campaign",
     "instructions": "Upload your content.",
@@ -102,7 +104,7 @@ npm install
     "status": "active"
     }
 
-3. Join submission by influencer:
+3. Join Campaign by influencer:
     POST: http://localhost:3000/campaign/{campaignId}/join
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
     Body (Form-data):
