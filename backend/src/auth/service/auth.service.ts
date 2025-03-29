@@ -18,7 +18,7 @@ export class AuthService {
     const payload = {
       username: influencer.username,
       sub: influencer.id,
-      type: 'influencer',
+      role: 'influencer',
     };
     return {
       access_token: this.jwtService.sign(payload),
@@ -31,6 +31,7 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+  
 
   async validateUser(
     username: string,
@@ -41,11 +42,23 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found or role mismatch');
     }
-    const isPasswordValid = await bcryptjs.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
+    if (password) {
+      const isPasswordValid = await bcryptjs.compare(password, user.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid password');
+      }
     }
+    return user;
+  }
 
+  async validateUserByJwt(
+    username: string,
+    role: 'brand' | 'influencer' | 'admin' | 'superuser',
+  ): Promise<any> {
+    const user = await this.userModel.findOne({ username, role }).exec();
+    if (!user) {
+      throw new UnauthorizedException('User not found or role mismatch');
+    }
     return user;
   }
 

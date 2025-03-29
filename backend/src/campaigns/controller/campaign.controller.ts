@@ -22,7 +22,7 @@ export class CampaignController {
   constructor(private readonly campaignService: CampaignsService) {}
 
   @Post()
-  async createCampaign(@Body() createCampaignDto: CreateCampaignDto) {
+  async createCampaign(@Body() createCampaignDto: CreateCampaignDto, @Req() req) {
     return this.campaignService.createCampaign(createCampaignDto);
   }
 
