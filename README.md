@@ -54,21 +54,25 @@ npm install
     {
     "username": "john_doe",
     "email": "john@example.com",
-    "password": "your_password"
+    "role": "influencer",
+    "password": "your_password",
+    "confirmPassword": "your_password"
     }
 
 2. Login user: POST: http://localhost:4000/auth/influencer/login
     {
     "username": "john_doe",
     "email": "john@example.com",
-    "password": "your_password"
+    "password": "your_password",
+    "confirmPassword": "your_password"
     }
 
-3. Brand registration: POST:http://localhost:4000/auth/brand/login
+3. Brand register: POST:http://localhost:4000/auth/brand/register
     {
     "username": "example corp",
     "email": "examplecorp@example.com",
     "password": "securepassword123",
+    "confirmPassword": "securepassword123",
     "name": "ecorp",
     "description": "An example of a corp",
         "website": "www.example.com",
