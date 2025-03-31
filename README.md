@@ -104,27 +104,27 @@ npm install
     "status": "active"
     }
 
-3. Join Campaign by influencer:
-    POST: http://localhost:3000/campaign/{campaignId}/join
+3. Join Campaign as influencer:
+    POST: http://localhost:4000/campaign/{campaignId}/join
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
     Body (Form-data):
     Key: file (upload a file)
     Key: content (write the content of the submission)
 
 3. Create submission by influencer:
-    POST: http://localhost:3000/campaign/{campaignId}/submissions
+    POST: http://localhost:4000/campaign/{campaignId}/submissions
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
     Body (Form-data):
     Key: file (upload a file)
     Key: content (write the content of the submission)
 
-3. Campaign List Page: GET: http://localhost:3000/campaign
+3. Campaign List Page: GET: http://localhost:4000/campaign
 
-4. Get Individual campaign by ID: GET: http://localhost:3000/campaign/ID
+4. Get Individual campaign by ID: GET: http://localhost:4000/campaign/ID
 
-5. Get submission: GET:http://localhost:3000/campaign/:id/submissions
+5. Get submission: GET:http://localhost:4000/campaign/:id/submissions
 
-6. Get influencer by campaign:  http://localhost:3000/campaign/:id/influencers
+6. Get influencer by campaign:  http://localhost:4000/campaign/:id/influencers
 
 ## <h1> Figma Designs </h1>
 https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bwG3VeJPii4DMXfm-1
