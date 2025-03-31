@@ -19,7 +19,7 @@ export class Campaign extends Document {
   @Prop({ type: [String], default: [] })
   images: string[];
 
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Influencer' }])
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User' }])
   influencers: MongooseSchema.Types.ObjectId[];
 
   @Prop({ default: 'active' })
