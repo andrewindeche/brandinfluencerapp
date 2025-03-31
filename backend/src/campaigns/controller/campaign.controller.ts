@@ -39,38 +39,25 @@ export class CampaignController {
   async uploadFile(@UploadedFiles() file: Express.Multer.File) {
     console.log(file);
   }
-
-  @Post(':campaignId/join')
-  @UseGuards(JwtAuthGuard)
-  async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
-    if (!req.user || !req.user.sub) {
-      throw new Error('User is not authenticated or missing sub');
-    }
-    const influencerId = req.user.sub.toString();
-    if (!isValidObjectId(influencerId)) {
-      throw new Error('Invalid influencer ID');
-    }
-   
-    let campaign = await this.campaignService.getCampaignById(campaignId);
-    if (!campaign) {
-      throw new Error('Campaign not found');
-    }
-
-    if (campaign.influencers.includes(influencerId)) {
-      throw new Error('Influencer has already joined this campaign.');
-    }
   
-    if (
-      !campaign.influencers.some(
-        (influencer) => influencer.toString() === influencerId,
-      )
-    ) {
-      campaign.influencers.push(influencerId);
-      await campaign.save();
-    }
-    campaign = await this.campaignService.getCampaignById(campaignId);
+  @UseGuards(JwtAuthGuard)
+  @Post(':campaignId/join')
+  async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
+      try {
+          if (!req.user || !req.user.sub) {
+              throw new Error('User is not authenticated or missing sub');
+          }
 
-  return campaign;
+          const influencerId = req.user.sub.toString();
+          if (!isValidObjectId(influencerId)) {
+              throw new Error('Invalid influencer ID');
+          }
+
+          const campaign = await this.campaignService.joinCampaign(campaignId, influencerId);
+          return { message: 'Successfully joined the campaign', campaign };
+      } catch (error) {
+          return { error: error.message };
+      }
   }
 
   @Post(':campaignId/submissions')
