@@ -10,6 +10,7 @@ import {
   BadRequestException,
   Req,
 } from '@nestjs/common';
+import { isValidObjectId } from 'mongoose';
 import { CampaignsService } from '../service/campaigns.service';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -42,13 +43,23 @@ export class CampaignController {
   @Post(':campaignId/join')
   @UseGuards(JwtAuthGuard)
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
-    const influencerId = req.user.sub;
-
-    const campaign = await this.campaignService.getCampaignById(campaignId);
+    if (!req.user || !req.user.sub) {
+      throw new Error('User is not authenticated or missing sub');
+    }
+    const influencerId = req.user.sub.toString();
+    if (!isValidObjectId(influencerId)) {
+      throw new Error('Invalid influencer ID');
+    }
+   
+    let campaign = await this.campaignService.getCampaignById(campaignId);
     if (!campaign) {
       throw new Error('Campaign not found');
     }
 
+    if (campaign.influencers.includes(influencerId)) {
+      throw new Error('Influencer has already joined this campaign.');
+    }
+  
     if (
       !campaign.influencers.some(
         (influencer) => influencer.toString() === influencerId,
@@ -57,8 +68,9 @@ export class CampaignController {
       campaign.influencers.push(influencerId);
       await campaign.save();
     }
+    campaign = await this.campaignService.getCampaignById(campaignId);
 
-    return campaign.populate('influencers', 'username email');
+  return campaign;
   }
 
   @Post(':campaignId/submissions')
