@@ -145,9 +145,9 @@ export class CampaignsService {
     return campaigns;
   }
 
-  async getCampaignById(id: string): Promise<Campaign> {
+  async getCampaignById(campaignId: string): Promise<Campaign> {
     return this.campaignModel
-      .findById(id)
+      .findById(campaignId)
       .populate('influencers', 'username email')
       .exec();
   }
