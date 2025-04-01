@@ -88,4 +88,16 @@ export class AuthController {
       );
     }
   }
+
+  @Post('refresh')
+  async refreshToken(@Body('refreshToken') refreshToken: string) {
+    const user = await this.authService.validateRefreshToken(refreshToken);
+
+    if (!user) throw new UnauthorizedException('Invalid refresh token');
+
+    const payload = { username: user.username, sub: user.id, role: user.role };
+    const newAccessToken = this.jwtService.sign(payload, { expiresIn: '20m' });
+
+    return { access_token: newAccessToken };
+  }
 }
