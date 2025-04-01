@@ -152,23 +152,33 @@ export class CampaignsService {
       .exec();
   }
 
-  async joinCampaign(campaignId: string, influencerId: string): Promise<Campaign> {
-    const influencerObjectId = new Types.ObjectId(influencerId);
-
-    const updatedCampaign = await this.campaignModel
-        .findOneAndUpdate(
-            { _id: campaignId },
-            { $addToSet: { influencers: influencerObjectId } },
-            { new: true }
-        )
-        .populate('influencers', 'username');
-
-    if (!updatedCampaign) {
-        throw new Error('Campaign not found');
+  async joinCampaign(
+    campaignId: string,
+    influencerId: string,
+  ): Promise<Campaign> {
+    const campaign = await this.campaignModel
+      .findById(campaignId)
+      .populate('influencers', 'username');
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+    if (!campaign.influencers) {
+      campaign.influencers = [];
     }
 
-    return updatedCampaign;
-}
+    const influencerObjectId = new Types.ObjectId(influencerId);
+
+    const influencerExists = campaign.influencers.some((influencer: any) =>
+      influencer._id
+        ? influencer._id.toString() === influencerObjectId.toString()
+        : influencer.toString() === influencerObjectId.toString(),
+    );
+    if (!influencerExists) {
+      campaign.influencers.push(influencerObjectId as any);
+      await campaign.save();
+    }
+    return campaign.populate('influencers', 'username');
+  }
 
   async getCampaignsByInfluencer(influencerId: string): Promise<Campaign[]> {
     return this.campaignModel.find({ influencers: influencerId }).exec();

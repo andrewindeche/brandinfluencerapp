@@ -21,18 +21,34 @@ export class AuthService {
       role: 'influencer',
     };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, { expiresIn: '20m' }),
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' })
     };
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedToken = await bcryptjs.hash(refreshToken, 10);
+    await this.userModel.findByIdAndUpdate(userId, { refreshToken: hashedToken });
   }
 
   async loginBrand(brand: User) {
     const payload = { username: brand.username, sub: brand._id, role: 'brand' };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, { expiresIn: '20m' }),
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' })
     };
   }
-  
 
+  async validateRefreshToken(refreshToken: string): Promise<User> {
+    const user = await this.userModel.findOne({ refreshToken }).exec();
+    
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    
+    return user;
+  }
+  
   async validateUser(
     username: string,
     password: string,
