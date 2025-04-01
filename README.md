@@ -118,6 +118,11 @@ npm install
     Key: file (upload a file)
     Key: content (write the content of the submission)
 
+    payload:
+    file: your_uploaded_file.jpg
+    content: "This is the content of my submission."
+    submissionData: { "key1": "value1", "key2": "value2" }
+
 3. Campaign List Page: GET: http://localhost:4000/campaign
 
 4. Get Individual campaign by ID: GET: http://localhost:4000/campaign/ID
