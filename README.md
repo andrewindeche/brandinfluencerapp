@@ -124,6 +124,7 @@ npm install
     submissionData: { "key1": "value1", "key2": "value2" }
 
 3. Campaign List Page: GET: http://localhost:4000/campaign
+      payload: use Token.
 
 4. Get Individual campaign by ID: GET: http://localhost:4000/campaign/ID
 
