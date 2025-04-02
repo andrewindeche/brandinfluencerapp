@@ -131,7 +131,7 @@ npm install
 
 6. Get influencer by campaign:  http://localhost:4000/campaign/:id/influencers
 
-7. Refresh Token: http://localhost:3000/auth/refresh
+7. Refresh Token: http://localhost:4000/auth/refresh
 
 ## <h1> Figma Designs </h1>
 https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bwG3VeJPii4DMXfm-1
