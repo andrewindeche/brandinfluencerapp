@@ -22,7 +22,7 @@ export class Campaign extends Document {
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User' }])
   influencers: MongooseSchema.Types.ObjectId[];
 
-  @Prop({ default: 'active' })
+  @Prop({ enum: ['active', 'inactive'], default: 'active' })
   status: 'active' | 'inactive';
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] })

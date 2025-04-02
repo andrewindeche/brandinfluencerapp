@@ -162,6 +162,11 @@ export class CampaignsService {
     if (!campaign) {
       throw new Error('Campaign not found');
     }
+
+    if (campaign.status === 'inactive') {
+      throw new BadRequestException('Cannot join an inactive campaign');
+    }
+    
     if (!campaign.influencers) {
       campaign.influencers = [];
     }
