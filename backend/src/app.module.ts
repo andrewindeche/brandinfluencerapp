@@ -11,6 +11,7 @@ import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { JwtStrategy } from './auth/jwt.strategy';
 //import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
+import { RedisService } from './redis/redis.service';
 import * as fs from 'fs';
 
 function loadJwtSecret() {
@@ -37,6 +38,6 @@ function loadJwtSecret() {
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, JwtStrategy, /*SendForgotPasswordEmailService*/],
+  providers: [AppService, AuthService, JwtStrategy, RedisService, /*SendForgotPasswordEmailService*/],
 })
 export class AppModule {}
