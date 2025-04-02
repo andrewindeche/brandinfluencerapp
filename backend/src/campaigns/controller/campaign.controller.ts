@@ -83,9 +83,9 @@ export class CampaignController {
     );
   }
 
-  @Get('campaigns')
+  @Get()
   @UseGuards(JwtAuthGuard)
-  getAllCampaigns() {
+  getAllCampaigns(@Req() req) {
     return this.campaignService.getCampaigns();
   }
 
