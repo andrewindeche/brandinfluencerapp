@@ -74,15 +74,8 @@ npm install
     "email": "examplecorp@example.com",
     "password": "securepassword123",
     "confirmPassword": "securepassword123",
-    "name": "ecorp",
-    "description": "An example of a corp",
-        "website": "www.example.com",
-        "logoUrl": "www.example.com",
-        "contactInfo": {
-            "phone": "+254798472473423",
-            "address": "Kilimani,Nairobi"
-            }
-        }
+    "role": "brand",
+    }
 
 4. Brand login: POST: http://localhost:4000/auth/brand/login
     {
@@ -112,7 +105,7 @@ npm install
     Key: file (upload a file)
     Key: content (write the content of the submission)
 
-3. Create submission by influencer:
+3. Create submission:
     POST: http://localhost:4000/campaign/{campaignId}/submissions
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
     Body (Form-data):
@@ -120,9 +113,11 @@ npm install
     Key: content (write the content of the submission)
 
     payload:
-    file: your_uploaded_file.jpg
-    content: "This is the content of my submission."
-    submissionData: { "key1": "value1", "key2": "value2" }
+    {
+  "content": "This is my awesome submission for the campaign!",
+  "fileUrl": "https://example.com/my-submission-file.jpg",
+  "influencerId": "660d8f18b5e9b4a7cfd6d3f2"
+    }
 
 3. Campaign List Page: GET: http://localhost:4000/campaign
       payload: use Token.
