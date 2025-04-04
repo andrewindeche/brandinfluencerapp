@@ -13,9 +13,6 @@ export class Submission extends Document {
   content: string;
 
   @Prop({ required: true })
-  fileUrl: string;
-
-  @Prop({ required: true })
   submittedAt: Date;
 }
 

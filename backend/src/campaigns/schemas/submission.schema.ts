@@ -6,6 +6,7 @@ const SubmissionSchema = new Schema({
   content: { type: String, required: true },
   submittedAt: { type: Date, default: Date.now },
 });
+console.log('Submission Schema:', SubmissionSchema.obj);
 
 export interface Submission extends Document {
   campaign: Types.ObjectId;
