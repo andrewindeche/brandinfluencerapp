@@ -77,7 +77,7 @@ export class CampaignsService {
   
     await submission.save();
   
-    campaign.submissions.push(submission._id.toString());
+    campaign.submissions.push(submission._id as Types.ObjectId);
     await campaign.save();
   
     return submission;
@@ -140,7 +140,12 @@ export class CampaignsService {
   async getCampaigns(): Promise<Campaign[]> {
     const campaigns = await this.campaignModel
       .find()
-      .populate('influencers', 'username email');
+      .populate('influencers', 'username email')
+      .populate({
+        path: 'submissions',
+        select: 'content _id',
+      })
+      .exec();
     return campaigns;
   }
 

@@ -1,5 +1,5 @@
 import { Prop, Schema as NestSchema, SchemaFactory } from '@nestjs/mongoose';
-import { Schema as MongooseSchema } from 'mongoose';
+import { Schema as MongooseSchema, Types } from 'mongoose';
 import { Document } from 'mongoose';
 
 @NestSchema()
@@ -26,7 +26,7 @@ export class Campaign extends Document {
   status: 'active' | 'inactive';
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] })
-  submissions: string[];
+  submissions: Types.ObjectId[];
 }
 
 export const CampaignSchema = SchemaFactory.createForClass(Campaign);
