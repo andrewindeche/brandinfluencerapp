@@ -114,9 +114,9 @@ npm install
 
     payload:
     {
-  "content": "This is my awesome submission for the campaign!",
-  "fileUrl": "https://example.com/my-submission-file.jpg",
-  "influencerId": "660d8f18b5e9b4a7cfd6d3f2"
+    "content": "This is my awesome submission for the campaign!",
+    "fileUrl": "https://example.com/my-submission-file.jpg",
+    "influencerId": "660d8f18b5e9b4a7cfd6d3f2"
     }
 
 3. Campaign List Page: GET: http://localhost:4000/campaign
