@@ -12,16 +12,19 @@ async function bootstrap() {
   app.use(
     rateLimit({
       store: new RateLimitRedisStore({
-        sendCommand: async (command: string, ...args: string[]): Promise<RedisReply> => {
-          return await redisClient.call(command, ...args) as RedisReply;
-        }
+        sendCommand: async (
+          command: string,
+          ...args: string[]
+        ): Promise<RedisReply> => {
+          return (await redisClient.call(command, ...args)) as RedisReply;
+        },
       }),
       windowMs: 15 * 60 * 1000,
       max: 30,
       message: 'Too many login attempts. Please try again later.',
     }),
   );
-  
+
   app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors({

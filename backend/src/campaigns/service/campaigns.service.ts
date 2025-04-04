@@ -49,10 +49,9 @@ export class CampaignsService {
     campaignId: string,
     content: string,
     influencerId: string,
-    fileUrl: string,
   ): Promise<Submission> {
     if (!Types.ObjectId.isValid(campaignId)) {
-      throw new Error('Invalid campaignId');
+      throw new BadRequestException('Invalid campaignId');
     }
     const campaign = await this.campaignModel.findById(campaignId);
     if (!campaign) {
@@ -72,10 +71,8 @@ export class CampaignsService {
       campaign: campaign._id,
       influencer: influencerObjectId,
       content,
-      fileUrl,
       submittedAt: new Date(),
     });
-
     await submission.save();
 
     const submissionId = submission._id.toString();
@@ -166,7 +163,7 @@ export class CampaignsService {
     if (campaign.status === 'inactive') {
       throw new BadRequestException('Cannot join an inactive campaign');
     }
-    
+
     if (!campaign.influencers) {
       campaign.influencers = [];
     }

@@ -1,4 +1,5 @@
 backend/uploads
 backend/.jwt_secret
 backend/dump.rdb
+backend/dist
 .vscode

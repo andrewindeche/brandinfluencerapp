@@ -9,7 +9,9 @@ describe('SendForgotPasswordEmailService', () => {
       providers: [SendForgotPasswordEmailService],
     }).compile();
 
-    service = module.get<SendForgotPasswordEmailService>(SendForgotPasswordEmailService);
+    service = module.get<SendForgotPasswordEmailService>(
+      SendForgotPasswordEmailService,
+    );
   });
 
   it('should be defined', () => {

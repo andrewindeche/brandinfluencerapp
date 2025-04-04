@@ -30,7 +30,7 @@ if (process.env.JWT_SECRET) {
     UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET ||secretKey,
+      secret: process.env.JWT_SECRET || secretKey,
       signOptions: { expiresIn: '60m' },
     }),
     BrandModule,

@@ -20,7 +20,9 @@ function loadJwtSecret() {
     process.env.JWT_SECRET = secret;
     return secret;
   } catch (error) {
-    throw new Error('JWT secret not found, ensure the .jwt_secret file is present.');
+    throw new Error(
+      'JWT secret not found, ensure the .jwt_secret file is present.',
+    );
   }
 }
 
@@ -38,6 +40,11 @@ function loadJwtSecret() {
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, JwtStrategy, RedisService, /*SendForgotPasswordEmailService*/],
+  providers: [
+    AppService,
+    AuthService,
+    JwtStrategy,
+    RedisService /*SendForgotPasswordEmailService*/,
+  ],
 })
 export class AppModule {}

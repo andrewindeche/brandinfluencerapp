@@ -34,7 +34,9 @@ export class AuthController {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new InternalServerErrorException('An error occurred during influencer login.');
+      throw new InternalServerErrorException(
+        'An error occurred during influencer login.',
+      );
     }
   }
 
@@ -54,7 +56,9 @@ export class AuthController {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new InternalServerErrorException('An error occurred during brand login.');
+      throw new InternalServerErrorException(
+        'An error occurred during brand login.',
+      );
     }
   }
 

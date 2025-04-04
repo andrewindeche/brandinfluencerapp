@@ -25,7 +25,10 @@ export class CampaignController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createCampaign(@Body() createCampaignDto: CreateCampaignDto, @Req() req: any) {
+  async createCampaign(
+    @Body() createCampaignDto: CreateCampaignDto,
+    @Req() req: any,
+  ) {
     const user = req.user;
 
     if (user.role !== 'brand') {
@@ -39,47 +42,45 @@ export class CampaignController {
   async uploadFile(@UploadedFiles() file: Express.Multer.File) {
     console.log(file);
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Post(':campaignId/join')
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
-      try {
-          if (!req.user || !req.user.sub) {
-              throw new Error('User is not authenticated or missing sub');
-          }
-
-          const influencerId = req.user.sub.toString();
-          if (!isValidObjectId(influencerId)) {
-              throw new Error('Invalid influencer ID');
-          }
-
-          const campaign = await this.campaignService.joinCampaign(campaignId, influencerId);
-          return { message: 'Successfully joined the campaign', campaign };
-      } catch (error) {
-          return { error: error.message };
+    try {
+      if (!req.user || !req.user.sub) {
+        throw new Error('User is not authenticated or missing sub');
       }
+
+      const influencerId = req.user.sub.toString();
+      if (!isValidObjectId(influencerId)) {
+        throw new Error('Invalid influencer ID');
+      }
+
+      const campaign = await this.campaignService.joinCampaign(
+        campaignId,
+        influencerId,
+      );
+      return { message: 'Successfully joined the campaign', campaign };
+    } catch (error) {
+      return { error: error.message };
+    }
   }
 
   @Post(':campaignId/submissions')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file', { dest: './uploads' }))
   async addSubmission(
     @Param('campaignId') campaignId: string,
-    @UploadedFiles() file: Express.Multer.File,
     @Body('content') content: string,
-    @Body('submissionData') submissionData: any,
     @Req() req,
   ) {
     const influencerId = req.user.sub;
-    const fileUrl = file ? file.filename : null;
-    if (!fileUrl && !content) {
+    if (!content) {
       throw new BadRequestException('Either content or file must be provided');
     }
     return this.campaignService.addSubmission(
       campaignId,
       content,
       influencerId,
-      submissionData,
     );
   }
 
