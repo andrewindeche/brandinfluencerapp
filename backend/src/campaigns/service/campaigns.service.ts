@@ -53,11 +53,12 @@ export class CampaignsService {
     if (!Types.ObjectId.isValid(campaignId)) {
       throw new BadRequestException('Invalid campaignId');
     }
+  
     const campaign = await this.campaignModel.findById(campaignId);
     if (!campaign) {
       throw new Error('Campaign not found');
     }
-
+  
     const influencerObjectId = new Types.ObjectId(influencerId);
     if (
       !campaign.influencers.some(
@@ -66,21 +67,22 @@ export class CampaignsService {
     ) {
       throw new Error('Influencer has not joined the campaign');
     }
-
+  
     const submission = new this.submissionModel({
       campaign: campaign._id,
       influencer: influencerObjectId,
       content,
       submittedAt: new Date(),
     });
+  
     await submission.save();
-
-    const submissionId = submission._id.toString();
-    campaign.submissions.push(submissionId);
+  
+    campaign.submissions.push(submission._id.toString());
     await campaign.save();
-
+  
     return submission;
   }
+  
 
   async updateCampaignStatus(campaignId: string): Promise<Campaign> {
     const campaign = await this.campaignModel.findById(campaignId);
@@ -160,7 +162,7 @@ export class CampaignsService {
       throw new Error('Campaign not found');
     }
 
-    if (campaign.status === 'inactive') {
+    if (campaign.status !== 'active') {
       throw new BadRequestException('Cannot join an inactive campaign');
     }
 
@@ -168,6 +170,8 @@ export class CampaignsService {
       campaign.influencers = [];
     }
 
+    campaign.influencers ||= [];
+    
     const influencerObjectId = new Types.ObjectId(influencerId);
 
     const influencerExists = campaign.influencers.some((influencer: any) =>
@@ -194,7 +198,7 @@ export class CampaignsService {
         select: 'username',
         populate: {
           path: 'submissions',
-          select: 'content fileUrl submittedAt',
+          select: 'content submittedAt',
           match: { campaign: campaignId },
         },
       })

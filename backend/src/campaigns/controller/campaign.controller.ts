@@ -13,8 +13,6 @@ import {
 import { isValidObjectId } from 'mongoose';
 import { CampaignsService } from '../service/campaigns.service';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -37,12 +35,6 @@ export class CampaignController {
     return this.campaignService.createCampaign(createCampaignDto);
   }
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFiles() file: Express.Multer.File) {
-    console.log(file);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Post(':campaignId/join')
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
@@ -56,11 +48,24 @@ export class CampaignController {
         throw new Error('Invalid influencer ID');
       }
 
-      const campaign = await this.campaignService.joinCampaign(
-        campaignId,
-        influencerId,
+      const campaign = await this.campaignService.getCampaignById(campaignId);
+      if (!campaign) {
+        throw new Error('Campaign not found');
+      }
+
+      if (campaign.status !== 'active') {
+        throw new BadRequestException('Cannot join an inactive campaign');
+      }
+      const alreadyJoined = campaign.influencers.some((inf: any) =>
+        inf._id?.toString() === influencerId
       );
-      return { message: 'Successfully joined the campaign', campaign };
+
+      if (alreadyJoined) {
+        throw new BadRequestException('User has already joined the campaign');
+      }
+      const joinedCampaign = await this.campaignService.joinCampaign(campaignId, influencerId);
+      
+      return { message: 'Successfully joined the campaign', campaign: joinedCampaign };
     } catch (error) {
       return { error: error.message };
     }
@@ -73,15 +78,26 @@ export class CampaignController {
     @Body('content') content: string,
     @Req() req,
   ) {
-    const influencerId = req.user.sub;
-    if (!content) {
-      throw new BadRequestException('Either content or file must be provided');
+    try {
+      const influencerId = req.user.sub;
+
+      if (!content) {
+        throw new BadRequestException('Content is required');
+      }
+
+      const campaign = await this.campaignService.getCampaignById(campaignId);
+      if (!campaign) {
+        throw new Error('Campaign not found');
+      }
+
+      if (campaign.status !== 'active') {
+        throw new BadRequestException('Cannot submit to an inactive campaign');
+      }
+
+      return this.campaignService.addSubmission(campaignId, content, influencerId);
+    } catch (error) {
+      return { error: error.message };
     }
-    return this.campaignService.addSubmission(
-      campaignId,
-      content,
-      influencerId,
-    );
   }
 
   @Get()
