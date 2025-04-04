@@ -101,9 +101,6 @@ npm install
 3. Join Campaign as influencer:
     POST: http://localhost:4000/campaign/{campaignId}/join
     Headers: Add the Authorization header with the value Bearer your-jwt-token.
-    Body (Form-data):
-    Key: file (upload a file)
-    Key: content (write the content of the submission)
 
 3. Create submission:
     POST: http://localhost:4000/campaign/{campaignId}/submissions
