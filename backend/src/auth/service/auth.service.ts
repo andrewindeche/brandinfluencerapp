@@ -125,4 +125,18 @@ export class AuthService {
 
     return newUser.save();
   }
+
+  async loginSuperuser(username: string, password: string) {
+    const user = await this.validateUser(username, password, 'superuser');
+    const payload = {
+      username: user.username,
+      sub: user._id,
+      role: 'superuser',
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload, { expiresIn: '20m' }),
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+    };
+  }
 }
