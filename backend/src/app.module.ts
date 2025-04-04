@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module';
 import { JwtStrategy } from './auth/jwt.strategy';
 //import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { RedisService } from './redis/redis.service';
+import { SessionService } from './session/session.service';
 import * as fs from 'fs';
 
 function loadJwtSecret() {
@@ -44,7 +45,8 @@ function loadJwtSecret() {
     AppService,
     AuthService,
     JwtStrategy,
-    RedisService /*SendForgotPasswordEmailService*/,
+    RedisService,
+    SessionService /*SendForgotPasswordEmailService*/,
   ],
 })
 export class AppModule {}
