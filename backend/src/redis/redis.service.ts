@@ -23,4 +23,16 @@ export class RedisService {
   async deleteValue(key: string) {
     await this.client.del(key);
   }
+
+  async setToken(key: string, value: string, ttl: number) {
+    await this.client.set(key, value, 'EX', ttl);
+  }
+
+  async getToken(key: string): Promise<string | null> {
+    return this.client.get(key);
+  }
+
+  async deleteToken(key: string) {
+    await this.client.del(key);
+  }
 }
