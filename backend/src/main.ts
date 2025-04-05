@@ -19,8 +19,8 @@ async function bootstrap() {
           return (await redisClient.call(command, ...args)) as RedisReply;
         },
       }),
-      windowMs: 15 * 60 * 1000,
-      max: 30,
+      windowMs: 30 * 60 * 1000,
+      max: 8,
       message: 'Too many login attempts. Please try again later.',
     }),
   );

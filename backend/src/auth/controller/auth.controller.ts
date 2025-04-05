@@ -10,12 +10,15 @@ import { AuthService } from '../service/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
+import { ForgotPasswordService } from '../../forgot-password/forgot-password.service';
+import { ForgotPasswordDto } from '../../send-forgot-password-email/dto/ForgotPasswordDto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
+    private readonly forgotPasswordService: ForgotPasswordService
   ) {}
 
   @Post('influencer/login')
@@ -104,4 +107,10 @@ export class AuthController {
 
     return { access_token: newAccessToken };
   }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: ForgotPasswordDto) {
+    await this.forgotPasswordService.sendResetEmail(body.email);
+    return { message: 'Reset link sent if email exists.' };
+}
 }

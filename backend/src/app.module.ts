@@ -10,9 +10,10 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
 import { JwtStrategy } from './auth/jwt.strategy';
-//import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
+import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { RedisService } from './redis/redis.service';
 import { SessionService } from './session/session.service';
+import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import * as fs from 'fs';
 
 function loadJwtSecret() {
@@ -46,7 +47,9 @@ function loadJwtSecret() {
     AuthService,
     JwtStrategy,
     RedisService,
-    SessionService /*SendForgotPasswordEmailService*/,
+    SessionService,
+    SendForgotPasswordEmailService,
+    ForgotPasswordService,
   ],
 })
 export class AppModule {}

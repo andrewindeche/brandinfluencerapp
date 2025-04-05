@@ -10,6 +10,9 @@ import { BrandModule } from '../user/brand/brand.module';
 import { UserModule } from '../user/user.module';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { ForgotPasswordService } from '../forgot-password/forgot-password.service';
+import { RedisService } from 'src/redis/redis.service';
+import { SendForgotPasswordEmailService } from 'src/send-forgot-password-email/send-forgot-password-email.service';
 
 let secretKey: string;
 
@@ -35,7 +38,7 @@ if (process.env.JWT_SECRET) {
     }),
     BrandModule,
   ],
-  providers: [AuthService, BrandModule, UserModule, JwtStrategy],
+  providers: [AuthService, BrandModule, UserModule, JwtStrategy, ForgotPasswordService, RedisService, SendForgotPasswordEmailService],
   controllers: [AuthController],
   exports: [AuthService, JwtStrategy, JwtModule, BrandModule, PassportModule],
 })
