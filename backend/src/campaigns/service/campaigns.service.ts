@@ -51,7 +51,7 @@ export class CampaignsService {
     campaignId: string,
     content: string,
     influencerId: string,
-  ): Promise<Submission> {
+  ): Promise<{ id: string; content: string }> {
     if (!Types.ObjectId.isValid(campaignId)) {
       throw new BadRequestException('Invalid campaignId');
     }
@@ -82,7 +82,7 @@ export class CampaignsService {
     campaign.submissions.push(submission._id as Types.ObjectId);
     await campaign.save();
   
-    return submission;
+    return { id: submission._id.toString(), content: submission.content };
   }
   
   async updateCampaignStatus(campaignId: string): Promise<Campaign> {
@@ -142,16 +142,32 @@ export class CampaignsService {
     const cachedCampaigns = await this.cacheManager.get<Campaign[]>('campaigns_list');
     if (cachedCampaigns && Array.isArray(cachedCampaigns)) return cachedCampaigns;
   
-    const campaigns = await this.campaignModel.find().populate('influencers', 'username email').exec();
+    const campaigns = await this.campaignModel
+      .find()
+      .populate('influencers', 'username email')
+      .populate({
+        path: 'submissions',
+        select: 'content _id',
+      })
+      .exec();
+  
     await this.cacheManager.set('campaigns_list', campaigns, 3600);
     return campaigns;
   }
-
+  
   async getCampaignById(campaignId: string): Promise<Campaign> {
     const cachedCampaign = await this.cacheManager.get<Campaign>(`campaign_${campaignId}`);
     if (cachedCampaign && cachedCampaign.title) return cachedCampaign;
   
-    const campaign = await this.campaignModel.findById(campaignId).populate('influencers', 'username email').exec();
+    const campaign = await this.campaignModel
+      .findById(campaignId)
+      .populate('influencers', 'username email')
+      .populate({
+        path: 'submissions',
+        select: 'content _id',
+      })
+      .exec();
+  
     await this.cacheManager.set(`campaign_${campaignId}`, campaign, 3600);
     return campaign;
   }
