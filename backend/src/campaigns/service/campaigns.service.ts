@@ -1,5 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Campaign } from '../schemas/campaign.schema';
 import { Submission } from '../../auth/schema/submission.schema';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
@@ -9,8 +11,8 @@ import { InjectModel } from '@nestjs/mongoose';
 export class CampaignsService {
   constructor(
     @InjectModel(Campaign.name) private readonly campaignModel: Model<Campaign>,
-    @InjectModel(Submission.name)
-    private readonly submissionModel: Model<Submission>,
+    @InjectModel(Submission.name) private readonly submissionModel: Model<Submission>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async createCampaign(
@@ -83,7 +85,6 @@ export class CampaignsService {
     return submission;
   }
   
-
   async updateCampaignStatus(campaignId: string): Promise<Campaign> {
     const campaign = await this.campaignModel.findById(campaignId);
     const startDate = new Date(campaign.startDate);
@@ -138,22 +139,21 @@ export class CampaignsService {
   }
 
   async getCampaigns(): Promise<Campaign[]> {
-    const campaigns = await this.campaignModel
-      .find()
-      .populate('influencers', 'username email')
-      .populate({
-        path: 'submissions',
-        select: 'content _id',
-      })
-      .exec();
+    const cachedCampaigns = await this.cacheManager.get<Campaign[]>('campaigns_list');
+    if (cachedCampaigns && Array.isArray(cachedCampaigns)) return cachedCampaigns;
+  
+    const campaigns = await this.campaignModel.find().populate('influencers', 'username email').exec();
+    await this.cacheManager.set('campaigns_list', campaigns, 3600);
     return campaigns;
   }
 
   async getCampaignById(campaignId: string): Promise<Campaign> {
-    return this.campaignModel
-      .findById(campaignId)
-      .populate('influencers', 'username email')
-      .exec();
+    const cachedCampaign = await this.cacheManager.get<Campaign>(`campaign_${campaignId}`);
+    if (cachedCampaign && cachedCampaign.title) return cachedCampaign;
+  
+    const campaign = await this.campaignModel.findById(campaignId).populate('influencers', 'username email').exec();
+    await this.cacheManager.set(`campaign_${campaignId}`, campaign, 3600);
+    return campaign;
   }
 
   async joinCampaign(

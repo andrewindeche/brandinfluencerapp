@@ -22,6 +22,7 @@
   "dependencies": {
     "@adminjs/mongoose": "^4.1.0",
     "@adminjs/nestjs": "^6.1.0",
+    "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.12",
     "@nestjs/core": "^11.0.12",
     "@nestjs/jwt": "^11.0.0",
@@ -30,6 +31,8 @@
     "@nestjs/platform-express": "^11.0.12",
     "adminjs": "^7.8.15",
     "bcryptjs": "^3.0.2",
+    "cache-manager": "^6.4.2",
+    "cache-manager-redis-store": "^3.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "connect-redis": "^8.0.2",

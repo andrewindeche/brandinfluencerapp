@@ -15,6 +15,8 @@ import { RedisService } from './redis/redis.service';
 import { SessionService } from './session/session.service';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import * as fs from 'fs';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 function loadJwtSecret() {
   try {
@@ -39,6 +41,11 @@ function loadJwtSecret() {
     JwtModule.register({
       secret: loadJwtSecret(),
       signOptions: { expiresIn: '60s' },
+    }),
+    CacheModule.register({
+      store: redisStore,
+      host: 'localhost',
+      port: 6380,
     }),
   ],
   controllers: [AppController],
