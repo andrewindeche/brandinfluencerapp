@@ -18,7 +18,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
-    private readonly forgotPasswordService: ForgotPasswordService
+    private readonly forgotPasswordService: ForgotPasswordService,
   ) {}
 
   @Post('influencer/login')
@@ -112,5 +112,5 @@ export class AuthController {
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     await this.forgotPasswordService.sendResetEmail(body.email);
     return { message: 'Reset link sent if email exists.' };
-}
+  }
 }

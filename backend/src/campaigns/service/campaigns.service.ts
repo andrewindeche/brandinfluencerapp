@@ -11,7 +11,8 @@ import { InjectModel } from '@nestjs/mongoose';
 export class CampaignsService {
   constructor(
     @InjectModel(Campaign.name) private readonly campaignModel: Model<Campaign>,
-    @InjectModel(Submission.name) private readonly submissionModel: Model<Submission>,
+    @InjectModel(Submission.name)
+    private readonly submissionModel: Model<Submission>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
@@ -55,12 +56,12 @@ export class CampaignsService {
     if (!Types.ObjectId.isValid(campaignId)) {
       throw new BadRequestException('Invalid campaignId');
     }
-  
+
     const campaign = await this.campaignModel.findById(campaignId);
     if (!campaign) {
       throw new Error('Campaign not found');
     }
-  
+
     const influencerObjectId = new Types.ObjectId(influencerId);
     if (
       !campaign.influencers.some(
@@ -69,22 +70,22 @@ export class CampaignsService {
     ) {
       throw new Error('Influencer has not joined the campaign');
     }
-  
+
     const submission = new this.submissionModel({
       campaign: campaign._id,
       influencer: influencerObjectId,
       content,
       submittedAt: new Date(),
     });
-  
+
     await submission.save();
-  
+
     campaign.submissions.push(submission._id as Types.ObjectId);
     await campaign.save();
-  
+
     return { id: submission._id.toString(), content: submission.content };
   }
-  
+
   async updateCampaignStatus(campaignId: string): Promise<Campaign> {
     const campaign = await this.campaignModel.findById(campaignId);
     const startDate = new Date(campaign.startDate);
@@ -139,9 +140,11 @@ export class CampaignsService {
   }
 
   async getCampaigns(): Promise<Campaign[]> {
-    const cachedCampaigns = await this.cacheManager.get<Campaign[]>('campaigns_list');
-    if (cachedCampaigns && Array.isArray(cachedCampaigns)) return cachedCampaigns;
-  
+    const cachedCampaigns =
+      await this.cacheManager.get<Campaign[]>('campaigns_list');
+    if (cachedCampaigns && Array.isArray(cachedCampaigns))
+      return cachedCampaigns;
+
     const campaigns = await this.campaignModel
       .find()
       .populate('influencers', 'username email')
@@ -150,15 +153,17 @@ export class CampaignsService {
         select: 'content _id',
       })
       .exec();
-  
+
     await this.cacheManager.set('campaigns_list', campaigns, 3600);
     return campaigns;
   }
-  
+
   async getCampaignById(campaignId: string): Promise<Campaign> {
-    const cachedCampaign = await this.cacheManager.get<Campaign>(`campaign_${campaignId}`);
+    const cachedCampaign = await this.cacheManager.get<Campaign>(
+      `campaign_${campaignId}`,
+    );
     if (cachedCampaign && cachedCampaign.title) return cachedCampaign;
-  
+
     const campaign = await this.campaignModel
       .findById(campaignId)
       .populate('influencers', 'username email')
@@ -167,7 +172,7 @@ export class CampaignsService {
         select: 'content _id',
       })
       .exec();
-  
+
     await this.cacheManager.set(`campaign_${campaignId}`, campaign, 3600);
     return campaign;
   }
@@ -192,7 +197,7 @@ export class CampaignsService {
     }
 
     campaign.influencers ||= [];
-    
+
     const influencerObjectId = new Types.ObjectId(influencerId);
 
     const influencerExists = campaign.influencers.some((influencer: any) =>

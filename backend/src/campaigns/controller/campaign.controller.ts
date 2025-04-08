@@ -56,16 +56,22 @@ export class CampaignController {
       if (campaign.status !== 'active') {
         throw new BadRequestException('Cannot join an inactive campaign');
       }
-      const alreadyJoined = campaign.influencers.some((inf: any) =>
-        inf._id?.toString() === influencerId
+      const alreadyJoined = campaign.influencers.some(
+        (inf: any) => inf._id?.toString() === influencerId,
       );
 
       if (alreadyJoined) {
         throw new BadRequestException('User has already joined the campaign');
       }
-      const joinedCampaign = await this.campaignService.joinCampaign(campaignId, influencerId);
-      
-      return { message: 'Successfully joined the campaign', campaign: joinedCampaign };
+      const joinedCampaign = await this.campaignService.joinCampaign(
+        campaignId,
+        influencerId,
+      );
+
+      return {
+        message: 'Successfully joined the campaign',
+        campaign: joinedCampaign,
+      };
     } catch (error) {
       return { error: error.message };
     }
@@ -94,7 +100,11 @@ export class CampaignController {
         throw new BadRequestException('Cannot submit to an inactive campaign');
       }
 
-      return this.campaignService.addSubmission(campaignId, content, influencerId);
+      return this.campaignService.addSubmission(
+        campaignId,
+        content,
+        influencerId,
+      );
     } catch (error) {
       return { error: error.message };
     }

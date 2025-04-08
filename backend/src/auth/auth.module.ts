@@ -38,7 +38,15 @@ if (process.env.JWT_SECRET) {
     }),
     BrandModule,
   ],
-  providers: [AuthService, BrandModule, UserModule, JwtStrategy, ForgotPasswordService, RedisService, SendForgotPasswordEmailService],
+  providers: [
+    AuthService,
+    BrandModule,
+    UserModule,
+    JwtStrategy,
+    ForgotPasswordService,
+    RedisService,
+    SendForgotPasswordEmailService,
+  ],
   controllers: [AuthController],
   exports: [AuthService, JwtStrategy, JwtModule, BrandModule, PassportModule],
 })
