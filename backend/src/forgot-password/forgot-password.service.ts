@@ -1,4 +1,3 @@
-// forgot-password.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
@@ -18,7 +17,9 @@ export class ForgotPasswordService {
     await this.redisService.setToken(key, email, 15 * 60);
 
     const resetLink = `http://localhost:4000/reset-password?token=${token}`;
-    await this.mailService.sendEmail(email, resetLink);
+    const previewLink = await this.mailService.sendEmail(email, resetLink);
+
+  return previewLink;
   }
 
   async validateToken(token: string): Promise<string> {

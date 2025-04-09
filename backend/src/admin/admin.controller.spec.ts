@@ -1,18 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AdminController } from './admin.controller';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '../app.module';
 
-describe('AdminController', () => {
-  let controller: AdminController;
+describe('AdminController (e2e)', () => {
+  let app: INestApplication;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AdminController],
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
     }).compile();
 
-    controller = module.get<AdminController>(AdminController);
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('/admin/users (GET)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/admin/users')
+      .expect(200);
+    expect(response.body).toBeDefined();
+  });
+
+  it('/admin/promote (POST)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/admin/promote')
+      .send({ superUserId: '1', userId: '2' })
+      .expect(201);
+
+    expect(response.body).toBeDefined();
   });
 });

@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import {
+  passwordResetState$,
+  sendResetEmail,
+  setResetField,
+} from '../rxjs/passwordResetState';
+import { Subscription } from 'rxjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 const ForgotPasswordForm: React.FC = () => {
+  const [state, setState] = useState({ email: '', resetStatus: 'idle' });
   const router = useRouter();
+
+  useEffect(() => {
+    const sub: Subscription = passwordResetState$.subscribe(setState);
+    return () => sub.unsubscribe();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const previewLink = await sendResetEmail();
+
+    if (previewLink) {
+      window.open(previewLink, '_blank');
+    }
+  };
 
   const handleBackToHome = () => {
     router.push('/');
@@ -15,7 +36,8 @@ const ForgotPasswordForm: React.FC = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-6">
           Forgot Password
         </h2>
-        <form>
+
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               className="block text-white text-sm font-semibold mb-2"
@@ -26,6 +48,8 @@ const ForgotPasswordForm: React.FC = () => {
             <input
               type="email"
               id="email"
+              value={state.email}
+              onChange={(e) => setResetField('email', e.target.value)}
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your email"
             />
@@ -33,11 +57,22 @@ const ForgotPasswordForm: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+            className="w-full bg-yellow-400 text-white font-semibold py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
           >
             Reset Password
           </button>
         </form>
+
+        {state.resetStatus === 'success' && (
+          <p className="text-green-200 text-center mt-4">
+            Reset email sent! Please check your inbox.
+          </p>
+        )}
+        {state.resetStatus === 'error' && (
+          <p className="text-red-300 text-center mt-4">
+            Failed to send reset email. Try again.
+          </p>
+        )}
 
         <p className="text-white text-center mt-4">
           Remember your password?{' '}

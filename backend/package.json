@@ -4,7 +4,7 @@
   "description": "A brand and microinfluencer interface app",
   "author": "andrew",
   "private": true,
-  "type": "module",
+  "type": "commonjs", 
   "license": "MIT",
   "scripts": {
     "build": "nest build",

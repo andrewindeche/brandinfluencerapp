@@ -31,12 +31,13 @@ export const initialState: FormState = {
 const stateSubject = new BehaviorSubject<FormState>(initialState);
 
 const fetchUserType = debounce(async (email: string) => {
-  try {
-    if (!email) {
-      stateSubject.next({ ...stateSubject.value, role: 'unknown' });
-      return;
-    }
+  if (!email) {
+    stateSubject.next({ ...stateSubject.value, role: 'unknown' });
+    return;
+  }
 
+  console.log('Fetching user type for email:', email);
+  try {
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
     const role = response.data.type;
     stateSubject.next({ ...stateSubject.value, role });
@@ -92,10 +93,10 @@ export const submitSignUpForm = async (
 
   const apiEndpoint =
     formState.role === 'influencer'
-      ? 'http://localhost:4000/auth/influencer/register'
+      ? '/auth/influencer/register'
       : formState.role === 'brand'
-        ? 'http://localhost:4000/auth/brand/register'
-        : 'http://localhost:4000/auth/other/register';
+        ? '/auth/brand/register'
+        : '/auth/other/register';
 
   try {
     const response = await axiosInstance.post(apiEndpoint, signUpData);

@@ -24,7 +24,7 @@ export class SendForgotPasswordEmailService {
     });
   }
 
-  async sendEmail(to: string, resetLink: string): Promise<void> {
+  async sendEmail(to: string, resetLink: string): Promise<string> {
     const mailOptions = {
       from: '"Support Team" <no-reply@example.com>',
       to: to,
@@ -34,8 +34,7 @@ export class SendForgotPasswordEmailService {
     };
 
     const info = await this.transporter.sendMail(mailOptions);
-
-    console.log(`Email sent: ${info.messageId}`);
-    console.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    return previewUrl || ''; 
   }
 }
