@@ -24,6 +24,12 @@ const ForgotPasswordForm: React.FC = () => {
     if (previewLink) {
       window.open(previewLink, '_blank');
     }
+
+    setState({
+      ...state,
+      email: '',
+      resetStatus: 'idle',
+    });
   };
 
   const handleBackToHome = () => {
