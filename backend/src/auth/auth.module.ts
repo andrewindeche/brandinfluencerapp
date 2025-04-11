@@ -11,7 +11,8 @@ import { UserModule } from '../user/user.module';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { ForgotPasswordService } from '../forgot-password/forgot-password.service';
-import { RedisService } from 'src/redis/redis.service';
+import { SessionService } from '../session/session.service';
+import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from 'src/send-forgot-password-email/send-forgot-password-email.service';
 
 let secretKey: string;
@@ -46,8 +47,9 @@ if (process.env.JWT_SECRET) {
     ForgotPasswordService,
     RedisService,
     SendForgotPasswordEmailService,
+    SessionService
   ],
   controllers: [AuthController],
-  exports: [AuthService, JwtStrategy, JwtModule, BrandModule, PassportModule],
+  exports: [AuthService, JwtStrategy, JwtModule, BrandModule, PassportModule,SessionService],
 })
 export class AuthModule {}
