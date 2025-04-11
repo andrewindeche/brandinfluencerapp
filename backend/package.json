@@ -4,7 +4,7 @@
   "description": "A brand and microinfluencer interface app",
   "author": "andrew",
   "private": true,
-  "type": "commonjs", 
+  "type": "commonjs",
   "license": "MIT",
   "scripts": {
     "build": "nest build",
@@ -48,7 +48,8 @@
     "passport-jwt": "^4.0.1",
     "rate-limit-redis": "^4.2.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.5",
