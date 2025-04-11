@@ -6,6 +6,8 @@ import {
   InternalServerErrorException,
   ConflictException,
   Res,
+  NotFoundException,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { SessionService } from '../../session/session.service';
@@ -16,6 +18,8 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
 import { ForgotPasswordService } from '../../forgot-password/forgot-password.service';
 import { ForgotPasswordDto } from '../../send-forgot-password-email/dto/ForgotPasswordDto';
+import { UserService } from '../../user/user.service';
+import * as bcrypt from 'bcryptjs';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +28,7 @@ export class AuthController {
     private jwtService: JwtService,
     private readonly forgotPasswordService: ForgotPasswordService,
     private readonly sessionService: SessionService,
+    private readonly usersService: UserService,
   ) {}
 
   @Post('influencer/login')
@@ -139,5 +144,21 @@ export class AuthController {
       message: 'Reset email sent.',
       previewLink,
     };
+  }
+
+  @Post('reset-password/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body('password') password: string,
+  ) {
+    const email = await this.forgotPasswordService.validateToken(token);
+    const user = await this.usersService.findUserByEmail(email);
+    if (!user) throw new NotFoundException('User not found');
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await this.usersService.updatePassword(user.id, hashedPassword);
+    await this.forgotPasswordService.invalidateToken(token);
+
+    return { message: 'Password reset successful' };
   }
 }

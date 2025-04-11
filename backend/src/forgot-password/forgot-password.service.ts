@@ -16,7 +16,7 @@ export class ForgotPasswordService {
 
     await this.redisService.setToken(key, email, 15 * 60);
 
-    const resetLink = `http://localhost:4000/reset-password?token=${token}`;
+    const resetLink = `http://localhost:3000/forgotpassword?token=${token}`;
     const previewLink = await this.mailService.sendEmail(email, resetLink);
 
     return previewLink;
