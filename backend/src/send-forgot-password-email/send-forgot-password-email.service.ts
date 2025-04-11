@@ -35,6 +35,6 @@ export class SendForgotPasswordEmailService {
 
     const info = await this.transporter.sendMail(mailOptions);
     const previewUrl = nodemailer.getTestMessageUrl(info);
-    return previewUrl || ''; 
+    return previewUrl || '';
   }
 }

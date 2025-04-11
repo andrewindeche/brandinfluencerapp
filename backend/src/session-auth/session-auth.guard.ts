@@ -28,9 +28,8 @@ export class SessionAuthGuard implements CanActivate {
 
     request.user = {
       ...request.user,
-      ...session, 
+      ...session,
     };
     return true;
   }
 }
-

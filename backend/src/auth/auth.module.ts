@@ -47,9 +47,16 @@ if (process.env.JWT_SECRET) {
     ForgotPasswordService,
     RedisService,
     SendForgotPasswordEmailService,
-    SessionService
+    SessionService,
   ],
   controllers: [AuthController],
-  exports: [AuthService, JwtStrategy, JwtModule, BrandModule, PassportModule,SessionService],
+  exports: [
+    AuthService,
+    JwtStrategy,
+    JwtModule,
+    BrandModule,
+    PassportModule,
+    SessionService,
+  ],
 })
 export class AuthModule {}

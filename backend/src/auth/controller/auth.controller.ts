@@ -134,7 +134,7 @@ export class AuthController {
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     const { email } = body;
     const previewLink = await this.forgotPasswordService.sendResetEmail(email);
-  
+
     return {
       message: 'Reset email sent.',
       previewLink,

@@ -19,7 +19,7 @@ export class ForgotPasswordService {
     const resetLink = `http://localhost:4000/reset-password?token=${token}`;
     const previewLink = await this.mailService.sendEmail(email, resetLink);
 
-  return previewLink;
+    return previewLink;
   }
 
   async validateToken(token: string): Promise<string> {

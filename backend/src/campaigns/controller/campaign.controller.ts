@@ -16,10 +16,10 @@ import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { SessionAuthGuard } from '../../session-auth/session-auth.guard';
 
 @Controller('campaign')
-@UseGuards(JwtAuthGuard,SessionAuthGuard)
+@UseGuards(JwtAuthGuard, SessionAuthGuard)
 export class CampaignController {
   constructor(private readonly campaignService: CampaignsService) {}
-  
+
   @Post()
   async createCampaign(
     @Body() createCampaignDto: CreateCampaignDto,

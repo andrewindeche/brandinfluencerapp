@@ -19,5 +19,6 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       'prettier/prettier': 'error',
     },
+    ignores: ['dist/**/*', '*.d.ts'],
   },
 ];
