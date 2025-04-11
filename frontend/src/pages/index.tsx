@@ -76,12 +76,7 @@ const HomePage: React.FC = () => {
             objectFit="cover"
             className="object-cover"
           />
-          <p
-            className="absolute bottom-4 left-1/2 transform -rotate-2 -translate-x-1/2 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm"
-            style={{ width: '200px', height: '40px' }}
-          >
-            AMY - TIK TOK
-          </p>
+          <p className="influencer-name">AMY - TIK TOK</p>
         </div>
 
         <div
@@ -97,12 +92,7 @@ const HomePage: React.FC = () => {
             priority
             className="object-cover"
           />
-          <p
-            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm"
-            style={{ width: '180px', height: '40px' }}
-          >
-            BRAD - YOU TUBER
-          </p>
+          <p className="influencer-name">BRAD - YOU TUBER</p>
         </div>
 
         <div
@@ -117,9 +107,7 @@ const HomePage: React.FC = () => {
             sizes="(max-width: 100px) 100vw, 50vw"
             className="object-cover"
           />
-          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-30 text-white text-center px-2 py-1 rounded-2xl font-bold text-base sm:text-sm">
-            LIZZIE - INSTAGRAM
-          </p>
+          <p className="influencer-name">LIZZIE - INSTAGRAM</p>
         </div>
       </div>
     </div>

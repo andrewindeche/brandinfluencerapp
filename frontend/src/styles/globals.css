@@ -29,7 +29,6 @@ body {
   font-family: var(--font-joti-one);
 }
 
-
 button {
   background-color: #FBBF24;
   color: white;
@@ -70,7 +69,6 @@ button:hover {
   background-position: 100% 0%;
 }
 
-
 h1 {
   font-family: var(--font-irish-grover);
 }
@@ -85,6 +83,22 @@ h3 {
 
 h4 {
   font-family: var(--font-joti-one);
+}
+
+.influencer-name {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  width: 200px;
+  height: 40px;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .transition-transform {
