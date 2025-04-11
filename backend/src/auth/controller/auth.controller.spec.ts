@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
+import { RedisService } from '../../redis/redis.service';
 
 describe('AuthController', () => {
   let controller: AuthController;

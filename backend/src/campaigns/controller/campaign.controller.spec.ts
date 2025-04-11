@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CampaignController } from './campaign.controller';
+import { RedisService } from '../../redis/redis.service';
 
 describe('CampaignController', () => {
   let controller: CampaignController;
