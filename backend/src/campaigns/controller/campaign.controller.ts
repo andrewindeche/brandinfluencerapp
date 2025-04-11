@@ -19,8 +19,7 @@ import { SessionAuthGuard } from '../../session-auth/session-auth.guard';
 @UseGuards(JwtAuthGuard,SessionAuthGuard)
 export class CampaignController {
   constructor(private readonly campaignService: CampaignsService) {}
-
-  @UseGuards(JwtAuthGuard,SessionAuthGuard)
+  
   @Post()
   async createCampaign(
     @Body() createCampaignDto: CreateCampaignDto,
@@ -34,7 +33,6 @@ export class CampaignController {
     return this.campaignService.createCampaign(createCampaignDto);
   }
 
-  @UseGuards(JwtAuthGuard,SessionAuthGuard,)
   @Post(':campaignId/join')
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
     try {
@@ -77,7 +75,6 @@ export class CampaignController {
   }
 
   @Post(':campaignId/submissions')
-  @UseGuards(JwtAuthGuard,SessionAuthGuard,)
   async addSubmission(
     @Param('campaignId') campaignId: string,
     @Body('content') content: string,
@@ -110,25 +107,21 @@ export class CampaignController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard,SessionAuthGuard,)
   getAllCampaigns(@Req() req) {
     return this.campaignService.getCampaigns();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard,SessionAuthGuard,)
   getCampaign(@Param('id') id: string) {
     return this.campaignService.getCampaignById(id);
   }
 
   @Get(':id/influencers')
-  @UseGuards(JwtAuthGuard,SessionAuthGuard,)
   async getInfluencersByCampaign(@Param('id') campaignId: string) {
     return this.campaignService.getInfluencersByCampaign(campaignId);
   }
 
   @Get('influencer/:influencerId')
-  @UseGuards(JwtAuthGuard,SessionAuthGuard,)
   async getCampaignsByInfluencer(@Param('influencerId') influencerId: string) {
     return this.campaignService.getCampaignsByInfluencer(influencerId);
   }
