@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import RateLimitRedisStore, { RedisReply } from 'rate-limit-redis';
 import rateLimit from 'express-rate-limit';
 import Redis from 'ioredis';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,7 +27,7 @@ async function bootstrap() {
   );
 
   app.useGlobalPipes(new ValidationPipe());
-
+  app.use(cookieParser());
   app.enableCors({
     origin: 'http://localhost:3000',
     methods: 'GET,POST,PUT,DELETE',
