@@ -17,6 +17,7 @@ import { ForgotPasswordService } from './forgot-password/forgot-password.service
 import * as fs from 'fs';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 function loadJwtSecret() {
   try {
@@ -38,6 +39,7 @@ function loadJwtSecret() {
     AdminModule,
     UserModule,
     PassportModule,
+    PrometheusModule.register(),
     JwtModule.register({
       secret: loadJwtSecret(),
       signOptions: { expiresIn: '60s' },
