@@ -39,4 +39,19 @@ export class RedisService {
   async deleteToken(key: string) {
     await this.client.del(key);
   }
+
+  async isRateLimited(key: string): Promise<boolean> {
+    const exists = await this.client.exists(key);
+    return exists === 1;
+  }
+
+  async setRateLimit(key: string, ttlSeconds: number): Promise<void> {
+    await this.client.set(key, '1', 'EX', ttlSeconds);
+  }
+
+  async rateLimitOrThrow(key: string, ttlSeconds: number, message = 'Too many requests'): Promise<void> {
+    const isLimited = await this.isRateLimited(key);
+    if (isLimited) throw new Error(message);
+    await this.setRateLimit(key, ttlSeconds);
+  }
 }

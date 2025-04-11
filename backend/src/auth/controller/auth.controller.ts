@@ -156,7 +156,7 @@ export class AuthController {
     if (!user) throw new NotFoundException('User not found');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await this.usersService.updatePassword(user.id, hashedPassword);
+    await this.usersService.updatePassword(user.id, password);
     await this.forgotPasswordService.invalidateToken(token);
 
     return { message: 'Password reset successful' };
