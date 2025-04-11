@@ -42,4 +42,14 @@ export class UserService {
       throw new Error('Error finding user by email: ' + error.message);
     }
   }
+
+  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
+    try {
+      await this.userModel.findByIdAndUpdate(userId, {
+        password: hashedPassword,
+      });
+    } catch (error) {
+      throw new Error('Error updating password: ' + error.message);
+    }
+  }
 }
