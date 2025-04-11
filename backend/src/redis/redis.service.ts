@@ -12,6 +12,10 @@ export class RedisService {
     });
   }
 
+  getClient(): Redis {
+    return this.client;
+  }
+
   async setValue(key: string, value: string, ttl?: number) {
     await this.client.set(key, value, 'EX', ttl || 3600);
   }

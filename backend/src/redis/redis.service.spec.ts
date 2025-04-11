@@ -2,17 +2,26 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RedisService } from './redis.service';
 
 describe('RedisService', () => {
-  let service: RedisService;
+  let redisService: RedisService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [RedisService],
     }).compile();
 
-    service = module.get<RedisService>(RedisService);
+    redisService = module.get<RedisService>(RedisService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('should set and retrieve session data', async () => {
+    await redisService.setValue('session:testuser', 'testdata');
+    const data = await redisService.getValue('session:testuser');
+    expect(data).toBe('testdata');
+  });
+
+  it('should delete session data', async () => {
+    await redisService.setValue('session:testuser', 'testdata');
+    await redisService.deleteValue('session:testuser');
+    const data = await redisService.getValue('session:testuser');
+    expect(data).toBeNull();
   });
 });

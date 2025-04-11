@@ -10,12 +10,13 @@ import {
 import { AdminService } from './admin.service';
 import { PromoteUserDto } from '../auth/dto/promoteUserToAdmin';
 import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { RoleGuard } from '../auth/roles.guard';
+import { SessionAuthGuard } from '../session-auth/session-auth.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 
 @Controller('admin')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, SessionAuthGuard, RoleGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
