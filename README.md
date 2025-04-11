@@ -12,8 +12,6 @@
 | 8.RxJs | State Management Library| [state];|
 | 9.Ethereal | Fake Email Server| [smtp]; [Email];|
 | 10.Redis | Cache manager & session manager| [cache]; [session];|
-| 11.Prometheus |  Monitoring & Metrics Collection| [monitoring], [metrics] |
-| 12.Grafana | Data Visualization & Monitoring  | [visualization], [monitoring]|
 
 ## <h1> Description</h1>
 <p>The aim of the project is to build a brand-influencer app that allow brands to connect to influencers to monitor active campaigns so that an influencer can view ongoing campaigns, track submission statuses, and monitor their performance while brands/SMEs to monitor influencers' participation in campaigns and approve/reject submissions..</p>
