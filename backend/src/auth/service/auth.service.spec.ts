@@ -36,7 +36,18 @@ describe('AuthService', () => {
 
   describe('loginInfluencer', () => {
     it('should return access and refresh tokens', async () => {
-      const influencer = { username: 'influencer1', id: 'influencerId' };
+      const influencer = {
+        username: 'influencer1',
+        id: 'influencerId',
+        socialMediaHandles: [],
+        category: 'fitness',
+        bio: 'Fitness Enthusiast',
+        location: 'New York',
+        submissions: 'Test submission',
+        role: 'influencer',
+        password: 'password',
+        email: 'influencer@example.com',
+      };
 
       const accessToken = 'access_token';
       const refreshToken = 'refresh_token';
@@ -172,6 +183,7 @@ describe('AuthService', () => {
         password: 'password',
         category: 'fitness',
         bio: 'bio',
+        role: 'influencer',
         location: 'location',
         confirmPassword: 'password',
       };
@@ -194,6 +206,8 @@ describe('AuthService', () => {
         username: 'influencer1',
         email: 'test@domain.com',
         password: 'password',
+        confirmPassword: 'password',
+        role: 'influencer',
         category: 'fitness',
         bio: 'bio',
         location: 'location',
@@ -202,7 +216,7 @@ describe('AuthService', () => {
 
       await expect(
         authService.registerInfluencer(createUserDto),
-      ).rejects.toThrowError('Username or email already exists.');
+      ).rejects.toThrow('Username or email already exists.');
     });
   });
 
@@ -212,18 +226,23 @@ describe('AuthService', () => {
         username: 'brand1',
         email: 'brand@domain.com',
         password: 'password',
+        confirmPassword: 'password',
+        role: 'brand' as 'brand',
       };
+
       const hashedPassword = 'hashedPassword';
       const newUser = {
         ...createUserDto,
         password: hashedPassword,
         role: 'brand',
       };
+
       jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
       jest.spyOn(bcryptjs, 'hash').mockResolvedValue(hashedPassword);
       jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
 
       const result = await authService.registerBrand(createUserDto);
+
       expect(result).toEqual(newUser);
     });
 
@@ -232,12 +251,15 @@ describe('AuthService', () => {
         username: 'brand1',
         email: 'brand@domain.com',
         password: 'password',
+        confirmPassword: 'password',
+        role: 'brand' as 'brand',
       };
+
       jest.spyOn(userModel, 'findOne').mockResolvedValue({});
 
-      await expect(
-        authService.registerBrand(createUserDto),
-      ).rejects.toThrowError('Username or email already exists.');
+      await expect(authService.registerBrand(createUserDto)).rejects.toThrow(
+        'Username or email already exists.',
+      );
     });
   });
 });
