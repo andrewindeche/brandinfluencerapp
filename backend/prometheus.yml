@@ -1,0 +1,4 @@
+scrape_configs:
+  - job_name: 'nestjs-app'
+    static_configs:
+      - targets: ['localhost:4000','localhost:3000']
