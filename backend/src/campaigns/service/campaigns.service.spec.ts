@@ -80,19 +80,22 @@ describe('CampaignsService', () => {
     it('should create campaign with default status active', async () => {
       const startDate = new Date(Date.now() + 100000).toISOString();
       const endDate = new Date(Date.now() + 200000).toISOString();
-
-      const saveMock = jest.fn().mockResolvedValue({ title: 'Created' });
-      campaignModel.prototype.save = saveMock;
-
+    
+      const mockSavedCampaign = { title: 'Created' };
+      const saveMock = jest.fn().mockResolvedValue(mockSavedCampaign);
+      campaignModel.create = jest.fn().mockReturnValue({
+        save: saveMock,
+      });
+    
       const result = await service.createCampaign({
         title: 'New Campaign',
         description: 'Details',
         startDate,
         endDate,
       } as any);
-
-      expect(result).toEqual({ title: 'Created' });
-    });
+    
+      expect(result).toEqual(mockSavedCampaign);
+    });    
   });
 
   describe('addSubmission', () => {

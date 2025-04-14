@@ -5,7 +5,7 @@ import { AuthService } from './auth/service/auth.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CampaignsModule } from './campaigns/campaigns.module.js';
+import { CampaignsModule } from './campaigns/campaigns.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
