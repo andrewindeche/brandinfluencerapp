@@ -5,16 +5,12 @@ import { SessionService } from '../../session/session.service';
 import { ForgotPasswordService } from '../../forgot-password/forgot-password.service';
 import { UserService } from '../../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
-import * as bcrypt from 'bcryptjs';
 import * as supertest from 'supertest';
 
 describe('AuthController', () => {
-  let authController: AuthController;
   let authService: AuthService;
   let sessionService: SessionService;
   let forgotPasswordService: ForgotPasswordService;
-  let userService: UserService;
   let jwtService: JwtService;
   let app: any;
 
@@ -62,13 +58,11 @@ describe('AuthController', () => {
     app = module.createNestApplication();
     await app.init();
 
-    authController = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);
     sessionService = module.get<SessionService>(SessionService);
     forgotPasswordService = module.get<ForgotPasswordService>(
       ForgotPasswordService,
     );
-    userService = module.get<UserService>(UserService);
     jwtService = module.get<JwtService>(JwtService);
   });
 
@@ -155,7 +149,17 @@ describe('AuthController', () => {
         bio: 'Bio',
         location: 'NY',
       };
-      const newUser = { id: '1', ...registerDto, role: 'influencer' };
+      const newUser = {
+        id: '1',
+        username: 'influencer1',
+        _id: '1',
+        email: 'test@domain.com',
+        password: 'password123',
+        category: 'fitness',
+        bio: 'Bio',
+        location: 'NY',
+        role: 'influencer',
+      } as any;
 
       jest.spyOn(authService, 'registerInfluencer').mockResolvedValue(newUser);
 
@@ -193,12 +197,12 @@ describe('AuthController', () => {
     it('should refresh access token', async () => {
       const refreshToken = 'refreshToken';
       const mockUser = {
-        username: 'influencer1',
         _id: '1',
+        username: 'influencer1',
         role: 'influencer',
-        password: 'password',
+        password: 'password123',
         email: 'influencer1@example.com',
-      };
+      } as any;
       const newAccessToken = 'newAccessToken';
 
       jest
