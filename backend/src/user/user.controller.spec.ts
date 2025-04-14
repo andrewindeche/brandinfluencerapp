@@ -94,7 +94,7 @@ describe('UserController', () => {
         password: 'hashedpassword',
         _id: new mongoose.Types.ObjectId(),
       } as unknown as User;
-      
+
       jest.spyOn(service, 'findUserByEmail').mockResolvedValue(user);
       const result = await controller.getUserType('test@example.com');
       expect(result).toEqual({ type: 'brand' });
