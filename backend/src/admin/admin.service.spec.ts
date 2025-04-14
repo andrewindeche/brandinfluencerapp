@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 import { User } from '../user/user.schema';
 import { ForbiddenException } from '@nestjs/common';
 
-jest.mock('src/user/user.service');
+jest.mock('../user/user.service');
 
 describe('AdminService', () => {
   let adminService: AdminService;

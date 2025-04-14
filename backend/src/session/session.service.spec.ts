@@ -1,5 +1,5 @@
 import { SessionService } from './session.service';
-import { RedisService } from 'src/redis/redis.service';
+import { RedisService } from '../redis/redis.service';
 
 describe('SessionService', () => {
   let sessionService: SessionService;

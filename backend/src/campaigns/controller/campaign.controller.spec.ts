@@ -5,7 +5,7 @@ import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { SessionAuthGuard } from '../../session-auth/session-auth.guard';
 
-jest.mock('../service/campaigns.service'); // Mocking the CampaignService
+jest.mock('../service/campaigns.service');
 
 describe('CampaignController', () => {
   let controller: CampaignController;

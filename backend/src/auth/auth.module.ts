@@ -13,7 +13,7 @@ import * as fs from 'fs';
 import { ForgotPasswordService } from '../forgot-password/forgot-password.service';
 import { SessionService } from '../session/session.service';
 import { RedisService } from '../redis/redis.service';
-import { SendForgotPasswordEmailService } from 'src/send-forgot-password-email/send-forgot-password-email.service';
+import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
 
 let secretKey: string;
 
