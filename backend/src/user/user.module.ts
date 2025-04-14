@@ -17,6 +17,6 @@ import { BrandSchema } from '../user/brand/schema/brand.schema';
   ],
   controllers: [UserController],
   providers: [UserService, RedisService],
-  exports: [UserService, MongooseModule,RedisService],
+  exports: [UserService, MongooseModule, RedisService],
 })
 export class UserModule {}

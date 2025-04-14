@@ -2,14 +2,15 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
-import * as bcrypt from 'bcryptjs'; 
+import * as bcrypt from 'bcryptjs';
 import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') 
-  private userModel: Model<User>,
-  private readonly redisService: RedisService, 
+  constructor(
+    @InjectModel('User')
+    private userModel: Model<User>,
+    private readonly redisService: RedisService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -55,22 +56,25 @@ export class UserService {
     await this.redisService.rateLimitOrThrow(
       rateLimitKey,
       ttl,
-      'Password can only be changed once per hour'
+      'Password can only be changed once per hour',
     );
     try {
       const user = await this.userModel.findById(userId).select('password');
-  
+
       if (!user) {
         throw new Error('User not found');
       }
-  
-      const isSamePassword = await bcrypt.compare(newRawPassword, user.password);
+
+      const isSamePassword = await bcrypt.compare(
+        newRawPassword,
+        user.password,
+      );
       if (isSamePassword) {
         throw new Error('New password cannot be the same as the old password');
       }
-  
+
       const hashedPassword = await bcrypt.hash(newRawPassword, 10);
-  
+
       await this.userModel.findByIdAndUpdate(userId, {
         password: hashedPassword,
       });

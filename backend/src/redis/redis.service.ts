@@ -49,7 +49,11 @@ export class RedisService {
     await this.client.set(key, '1', 'EX', ttlSeconds);
   }
 
-  async rateLimitOrThrow(key: string, ttlSeconds: number, message = 'Too many requests'): Promise<void> {
+  async rateLimitOrThrow(
+    key: string,
+    ttlSeconds: number,
+    message = 'Too many requests',
+  ): Promise<void> {
     const isLimited = await this.isRateLimited(key);
     if (isLimited) throw new Error(message);
     await this.setRateLimit(key, ttlSeconds);

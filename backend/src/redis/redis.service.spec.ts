@@ -59,13 +59,13 @@ describe('RedisService', () => {
   it('should throw an error if rate limited', async () => {
     await redisService.setRateLimit('rate:testuser', 5);
     await expect(
-      redisService.rateLimitOrThrow('rate:testuser', 5)
+      redisService.rateLimitOrThrow('rate:testuser', 5),
     ).rejects.toThrow('Too many requests');
   });
 
   it('should not throw if not rate limited and then set rate limit', async () => {
     await expect(
-      redisService.rateLimitOrThrow('rate:testuser', 5)
+      redisService.rateLimitOrThrow('rate:testuser', 5),
     ).resolves.toBeUndefined();
 
     const isLimited = await redisService.isRateLimited('rate:testuser');
