@@ -1,18 +1,243 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { getModelToken } from '@nestjs/mongoose';
+import * as bcryptjs from 'bcryptjs';
+import { UnauthorizedException } from '@nestjs/common';
+
+jest.mock('bcryptjs');
+jest.mock('@nestjs/jwt');
 
 describe('AuthService', () => {
-  let service: AuthService;
+  let authService: AuthService;
+  let userModel: any;
+  let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        JwtService,
+        {
+          provide: getModelToken('User'),
+          useValue: {
+            findOne: jest.fn(),
+            findByIdAndUpdate: jest.fn(),
+            save: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    authService = module.get<AuthService>(AuthService);
+    userModel = module.get(getModelToken('User'));
+    jwtService = module.get<JwtService>(JwtService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('loginInfluencer', () => {
+    it('should return access and refresh tokens', async () => {
+      const influencer = { username: 'influencer1', id: 'influencerId' };
+
+      const accessToken = 'access_token';
+      const refreshToken = 'refresh_token';
+
+      jest
+        .spyOn(jwtService, 'sign')
+        .mockReturnValueOnce(accessToken)
+        .mockReturnValueOnce(refreshToken);
+
+      const result = await authService.loginInfluencer(influencer);
+
+      expect(result).toHaveProperty('access_token');
+      expect(result.access_token).toBe(accessToken);
+      expect(result).toHaveProperty('refresh_token');
+      expect(result.refresh_token).toBe(refreshToken);
+      expect(jwtService.sign).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('loginBrand', () => {
+    it('should return access and refresh tokens for brand', async () => {
+      const brand = { username: 'brand1', _id: 'brandId' };
+
+      const accessToken = 'access_token';
+      const refreshToken = 'refresh_token';
+
+      jest
+        .spyOn(jwtService, 'sign')
+        .mockReturnValueOnce(accessToken)
+        .mockReturnValueOnce(refreshToken);
+
+      const result = await authService.loginBrand(brand);
+
+      expect(result).toHaveProperty('access_token');
+      expect(result.access_token).toBe(accessToken);
+      expect(result).toHaveProperty('refresh_token');
+      expect(result.refresh_token).toBe(refreshToken);
+      expect(jwtService.sign).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('loginSuperuser', () => {
+    it('should return access and refresh tokens for superuser', async () => {
+      const superuser = {
+        username: 'superuser1',
+        _id: 'superuserId',
+        password: 'password',
+      };
+      const accessToken = 'access_token';
+      const refreshToken = 'refresh_token';
+
+      jest
+        .spyOn(jwtService, 'sign')
+        .mockReturnValueOnce(accessToken)
+        .mockReturnValueOnce(refreshToken);
+      jest.spyOn(authService, 'validateUser').mockResolvedValue(superuser);
+
+      const result = await authService.loginSuperuser('superuser1', 'password');
+
+      expect(result).toHaveProperty('access_token');
+      expect(result.access_token).toBe(accessToken);
+      expect(result).toHaveProperty('refresh_token');
+      expect(result.refresh_token).toBe(refreshToken);
+    });
+
+    it('should throw UnauthorizedException if user not found', async () => {
+      jest.spyOn(authService, 'validateUser').mockResolvedValue(null);
+
+      await expect(
+        authService.loginSuperuser('invalidUser', 'password'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('validateRefreshToken', () => {
+    it('should return the user if refresh token is valid', async () => {
+      const user = { username: 'user1', refreshToken: 'hashedToken' };
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+
+      const result = await authService.validateRefreshToken('refreshToken');
+      expect(result).toEqual(user);
+    });
+
+    it('should throw UnauthorizedException if refresh token is invalid', async () => {
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+
+      await expect(
+        authService.validateRefreshToken('invalidToken'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('validateUser', () => {
+    it('should return user if username and password are correct', async () => {
+      const user = { username: 'user1', password: 'hashedPassword' };
+      const password = 'password';
+      const role = 'brand';
+
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(bcryptjs, 'compare').mockResolvedValue(true);
+
+      const result = await authService.validateUser('user1', password, role);
+      expect(result).toEqual(user);
+    });
+
+    it('should throw UnauthorizedException if password is incorrect', async () => {
+      const user = { username: 'user1', password: 'hashedPassword' };
+      const password = 'wrongPassword';
+      const role = 'brand';
+
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(bcryptjs, 'compare').mockResolvedValue(false);
+
+      await expect(
+        authService.validateUser('user1', password, role),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw UnauthorizedException if user is not found', async () => {
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+
+      await expect(
+        authService.validateUser('invalidUser', 'password', 'brand'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('registerInfluencer', () => {
+    it('should register a new influencer', async () => {
+      const createUserDto = {
+        username: 'influencer1',
+        email: 'test@domain.com',
+        password: 'password',
+        category: 'fitness',
+        bio: 'bio',
+        location: 'location',
+        confirmPassword: 'password',
+      };
+      const hashedPassword = 'hashedPassword';
+      const newUser = {
+        ...createUserDto,
+        password: hashedPassword,
+        role: 'influencer',
+      };
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+      jest.spyOn(bcryptjs, 'hash').mockResolvedValue(hashedPassword);
+      jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
+
+      const result = await authService.registerInfluencer(createUserDto);
+      expect(result).toEqual(newUser);
+    });
+
+    it('should throw error if username or email already exists', async () => {
+      const createUserDto = {
+        username: 'influencer1',
+        email: 'test@domain.com',
+        password: 'password',
+        category: 'fitness',
+        bio: 'bio',
+        location: 'location',
+      };
+      jest.spyOn(userModel, 'findOne').mockResolvedValue({});
+
+      await expect(
+        authService.registerInfluencer(createUserDto),
+      ).rejects.toThrowError('Username or email already exists.');
+    });
+  });
+
+  describe('registerBrand', () => {
+    it('should register a new brand', async () => {
+      const createUserDto = {
+        username: 'brand1',
+        email: 'brand@domain.com',
+        password: 'password',
+      };
+      const hashedPassword = 'hashedPassword';
+      const newUser = {
+        ...createUserDto,
+        password: hashedPassword,
+        role: 'brand',
+      };
+      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+      jest.spyOn(bcryptjs, 'hash').mockResolvedValue(hashedPassword);
+      jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
+
+      const result = await authService.registerBrand(createUserDto);
+      expect(result).toEqual(newUser);
+    });
+
+    it('should throw error if username or email already exists', async () => {
+      const createUserDto = {
+        username: 'brand1',
+        email: 'brand@domain.com',
+        password: 'password',
+      };
+      jest.spyOn(userModel, 'findOne').mockResolvedValue({});
+
+      await expect(
+        authService.registerBrand(createUserDto),
+      ).rejects.toThrowError('Username or email already exists.');
+    });
   });
 });

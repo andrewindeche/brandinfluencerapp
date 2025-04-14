@@ -108,7 +108,11 @@ describe('CampaignsService', () => {
       submissionModel.create = jest.fn();
 
       await expect(
-        service.addSubmission('campaign123', 'Submission content', 'influencer123'),
+        service.addSubmission(
+          'campaign123',
+          'Submission content',
+          'influencer123',
+        ),
       ).rejects.toThrow('Influencer has not joined the campaign');
     });
 
@@ -121,11 +125,21 @@ describe('CampaignsService', () => {
       };
       campaignModel.findById = jest.fn().mockResolvedValue(campaign);
 
-      const submission = { _id: 'submission123', content: 'Submission content' };
+      const submission = {
+        _id: 'submission123',
+        content: 'Submission content',
+      };
       submissionModel.create = jest.fn().mockResolvedValue(submission);
 
-      const result = await service.addSubmission('campaign123', 'Submission content', 'influencer123');
-      expect(result).toEqual({ id: 'submission123', content: 'Submission content' });
+      const result = await service.addSubmission(
+        'campaign123',
+        'Submission content',
+        'influencer123',
+      );
+      expect(result).toEqual({
+        id: 'submission123',
+        content: 'Submission content',
+      });
     });
   });
 

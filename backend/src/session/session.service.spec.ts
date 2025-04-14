@@ -5,9 +5,9 @@ describe('SessionService', () => {
   let sessionService: SessionService;
   let redisService: jest.Mocked<RedisService>;
   let redisClient: {
-    set: jest.Mock,
-    get: jest.Mock,
-    del: jest.Mock,
+    set: jest.Mock;
+    get: jest.Mock;
+    del: jest.Mock;
   };
 
   beforeEach(() => {

@@ -30,14 +30,18 @@ describe('CampaignController', () => {
     it('should throw UnauthorizedException if user is not a brand', async () => {
       const req = { user: { role: 'influencer' } };
 
-      await expect(controller.createCampaign({ title: 'Test Campaign' }, req))
-        .rejects
-        .toThrow(UnauthorizedException);
+      await expect(
+        controller.createCampaign({ title: 'Test Campaign' }, req),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should create a campaign if the user is a brand', async () => {
       const req = { user: { role: 'brand' } };
-      const createCampaignDto = { title: 'Test Campaign', startDate: '2025-01-01', endDate: '2025-12-31' };
+      const createCampaignDto = {
+        title: 'Test Campaign',
+        startDate: '2025-01-01',
+        endDate: '2025-12-31',
+      };
       const createdCampaign = { ...createCampaignDto, status: 'active' };
       jest.spyOn(service, 'createCampaign').mockResolvedValue(createdCampaign);
 
@@ -55,34 +59,43 @@ describe('CampaignController', () => {
       const campaign = { status: 'inactive', influencers: [] };
       jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
 
-      await expect(controller.joinCampaign(campaignId, req))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(controller.joinCampaign(campaignId, req)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException if influencer already joined', async () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
-      const campaign = { status: 'active', influencers: [{ _id: 'influencerId' }] };
+      const campaign = {
+        status: 'active',
+        influencers: [{ _id: 'influencerId' }],
+      };
       jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
 
-      await expect(controller.joinCampaign(campaignId, req))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(controller.joinCampaign(campaignId, req)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should join the campaign successfully if conditions are met', async () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
       const campaign = { status: 'active', influencers: [] };
-      const joinedCampaign = { ...campaign, influencers: [{ _id: 'influencerId' }] };
+      const joinedCampaign = {
+        ...campaign,
+        influencers: [{ _id: 'influencerId' }],
+      };
       jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
       jest.spyOn(service, 'joinCampaign').mockResolvedValue(joinedCampaign);
 
       const result = await controller.joinCampaign(campaignId, req);
 
       expect(result.message).toBe('Successfully joined the campaign');
-      expect(service.joinCampaign).toHaveBeenCalledWith(campaignId, req.user.sub);
+      expect(service.joinCampaign).toHaveBeenCalledWith(
+        campaignId,
+        req.user.sub,
+      );
     });
   });
 
@@ -91,9 +104,9 @@ describe('CampaignController', () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
 
-      await expect(controller.addSubmission(campaignId, null, req))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        controller.addSubmission(campaignId, null, req),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw Error if campaign is not found', async () => {
@@ -101,9 +114,9 @@ describe('CampaignController', () => {
       const campaignId = 'campaignId';
       jest.spyOn(service, 'getCampaignById').mockResolvedValue(null);
 
-      await expect(controller.addSubmission(campaignId, 'Some content', req))
-        .rejects
-        .toThrow(Error);
+      await expect(
+        controller.addSubmission(campaignId, 'Some content', req),
+      ).rejects.toThrow(Error);
     });
 
     it('should add a submission if conditions are met', async () => {
@@ -119,7 +132,11 @@ describe('CampaignController', () => {
       const result = await controller.addSubmission(campaignId, content, req);
 
       expect(result).toEqual(submission);
-      expect(service.addSubmission).toHaveBeenCalledWith(campaignId, content, req.user.sub);
+      expect(service.addSubmission).toHaveBeenCalledWith(
+        campaignId,
+        content,
+        req.user.sub,
+      );
     });
   });
 
@@ -152,7 +169,9 @@ describe('CampaignController', () => {
     it('should return influencers by campaign id', async () => {
       const campaignId = 'campaignId';
       const influencers = [{ username: 'influencer1' }];
-      jest.spyOn(service, 'getInfluencersByCampaign').mockResolvedValue(influencers);
+      jest
+        .spyOn(service, 'getInfluencersByCampaign')
+        .mockResolvedValue(influencers);
 
       const result = await controller.getInfluencersByCampaign(campaignId);
 
@@ -165,12 +184,16 @@ describe('CampaignController', () => {
     it('should return campaigns by influencer id', async () => {
       const influencerId = 'influencerId';
       const campaigns = [{ title: 'Test Campaign' }];
-      jest.spyOn(service, 'getCampaignsByInfluencer').mockResolvedValue(campaigns);
+      jest
+        .spyOn(service, 'getCampaignsByInfluencer')
+        .mockResolvedValue(campaigns);
 
       const result = await controller.getCampaignsByInfluencer(influencerId);
 
       expect(result).toEqual(campaigns);
-      expect(service.getCampaignsByInfluencer).toHaveBeenCalledWith(influencerId);
+      expect(service.getCampaignsByInfluencer).toHaveBeenCalledWith(
+        influencerId,
+      );
     });
   });
 });

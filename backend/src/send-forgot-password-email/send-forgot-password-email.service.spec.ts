@@ -20,7 +20,9 @@ describe('SendForgotPasswordEmailService', () => {
       pass: 'testpass',
     });
 
-    mockGetTestMessageUrl = jest.spyOn(nodemailer, 'getTestMessageUrl').mockReturnValue('http://preview.url');
+    mockGetTestMessageUrl = jest
+      .spyOn(nodemailer, 'getTestMessageUrl')
+      .mockReturnValue('http://preview.url');
 
     service = new SendForgotPasswordEmailService();
 
@@ -50,13 +52,15 @@ describe('SendForgotPasswordEmailService', () => {
 
     const previewUrl = await service.sendEmail(to, resetLink);
 
-    expect(mockSendMail).toHaveBeenCalledWith(expect.objectContaining({
-      from: '"Support Team" <no-reply@example.com>',
-      to: to,
-      subject: 'Password Recovery',
-      text: expect.stringContaining(resetLink),
-      html: expect.stringContaining(resetLink),
-    }));
+    expect(mockSendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: '"Support Team" <no-reply@example.com>',
+        to: to,
+        subject: 'Password Recovery',
+        text: expect.stringContaining(resetLink),
+        html: expect.stringContaining(resetLink),
+      }),
+    );
 
     expect(previewUrl).toBe('http://preview.url');
     expect(mockGetTestMessageUrl).toHaveBeenCalled();
