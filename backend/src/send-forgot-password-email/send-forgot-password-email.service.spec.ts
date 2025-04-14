@@ -1,6 +1,5 @@
 import { SendForgotPasswordEmailService } from './send-forgot-password-email.service';
 import * as nodemailer from 'nodemailer';
-import { SentMessageInfo } from 'nodemailer/lib/smtp-transport';
 
 jest.mock('nodemailer');
 

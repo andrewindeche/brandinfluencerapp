@@ -54,15 +54,15 @@ describe('AuthService', () => {
         $clone: jest.fn(),
         $createModifiedPathsSnapshot: jest.fn(),
       };
-  
+
       const accessToken = 'access_token';
       const refreshToken = 'refresh_token';
-  
+
       jest
         .spyOn(jwtService, 'sign')
         .mockReturnValueOnce(accessToken)
         .mockReturnValueOnce(refreshToken);
-  
+
       const result = await authService.loginInfluencer(influencer);
       expect(result).toHaveProperty('access_token');
       expect(result.access_token).toBe(accessToken);
@@ -77,30 +77,30 @@ describe('AuthService', () => {
       const brand: any = {
         _id: 'brandId',
         username: 'brand1',
-        email: 'brand1@example.com', 
-        password: 'password', 
-        role: 'brand', 
+        email: 'brand1@example.com',
+        password: 'password',
+        role: 'brand',
         $assertPopulated: jest.fn(),
         $clearModifiedPaths: jest.fn(),
         $clone: jest.fn(),
         $createModifiedPathsSnapshot: jest.fn(),
       };
-  
+
       const accessToken = 'access_token';
       const refreshToken = 'refresh_token';
-  
+
       jest
         .spyOn(jwtService, 'sign')
         .mockReturnValueOnce(accessToken)
         .mockReturnValueOnce(refreshToken);
-  
+
       const result = await authService.loginBrand(brand);
-  
+
       expect(result).toHaveProperty('access_token');
       expect(result.access_token).toBe(accessToken);
       expect(result).toHaveProperty('refresh_token');
       expect(result.refresh_token).toBe(refreshToken);
-  
+
       expect(jwtService.sign).toHaveBeenCalledTimes(2);
     });
   });
@@ -161,32 +161,32 @@ describe('AuthService', () => {
       const user = { username: 'user1', password: 'hashedPassword' };
       const password = 'password';
       const role = 'brand';
-  
+
       jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
-  
+
       jest.spyOn(bcryptjs, 'compare').mockResolvedValue(true);
-  
+
       const result = await authService.validateUser('user1', password, role);
       expect(result).toEqual(user);
     });
-  
+
     it('should throw UnauthorizedException if password is incorrect', async () => {
       const user = { username: 'user1', password: 'hashedPassword' };
       const password = 'wrongPassword';
       const role = 'brand';
-  
+
       jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
-  
+
       jest.spyOn(bcryptjs, 'compare').mockResolvedValue(false);
-  
+
       await expect(
         authService.validateUser('user1', password, role),
       ).rejects.toThrow(UnauthorizedException);
     });
-  
+
     it('should throw UnauthorizedException if user is not found', async () => {
       jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
-  
+
       await expect(
         authService.validateUser('invalidUser', 'password', 'brand'),
       ).rejects.toThrow(UnauthorizedException);
