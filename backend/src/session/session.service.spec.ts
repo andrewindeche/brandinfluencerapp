@@ -1,19 +1,73 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { SessionService } from './session.service';
-import { RedisService } from '../redis/redis.service';
+import { RedisService } from 'src/redis/redis.service';
 
 describe('SessionService', () => {
-  let service: SessionService;
+  let sessionService: SessionService;
+  let redisService: jest.Mocked<RedisService>;
+  let redisClient: {
+    set: jest.Mock,
+    get: jest.Mock,
+    del: jest.Mock,
+  };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [SessionService],
-    }).compile();
+  beforeEach(() => {
+    redisClient = {
+      set: jest.fn(),
+      get: jest.fn(),
+      del: jest.fn(),
+    };
 
-    service = module.get<SessionService>(SessionService);
+    redisService = {
+      getClient: jest.fn(() => redisClient),
+    } as any;
+
+    sessionService = new SessionService(redisService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('setSession', () => {
+    it('should store session data with expiration', async () => {
+      const userId = 'user123';
+      const sessionData = { email: 'test@example.com' };
+
+      await sessionService.setSession(userId, sessionData);
+
+      expect(redisClient.set).toHaveBeenCalledWith(
+        `session:${userId}`,
+        JSON.stringify(sessionData),
+        'EX',
+        3600,
+      );
+    });
+  });
+
+  describe('getSession', () => {
+    it('should return parsed session data if found', async () => {
+      const userId = 'user123';
+      const sessionData = { role: 'brand' };
+
+      redisClient.get.mockResolvedValue(JSON.stringify(sessionData));
+
+      const result = await sessionService.getSession(userId);
+      expect(result).toEqual(sessionData);
+    });
+
+    it('should return null if session not found', async () => {
+      const userId = 'user123';
+
+      redisClient.get.mockResolvedValue(null);
+
+      const result = await sessionService.getSession(userId);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('deleteSession', () => {
+    it('should call redis del with correct key', async () => {
+      const userId = 'user123';
+
+      await sessionService.deleteSession(userId);
+
+      expect(redisClient.del).toHaveBeenCalledWith(`session:${userId}`);
+    });
   });
 });
