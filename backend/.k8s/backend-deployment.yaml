@@ -17,4 +17,4 @@ spec:
         - name: backend
           image: nestjs-app
           ports:
-            - containerPort: 3000
+            - containerPort: 4000
