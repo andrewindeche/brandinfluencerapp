@@ -1,28 +1,21 @@
-# Use Node.js base image
-FROM node:22 AS builder
-
+FROM node:23-slim AS builder
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install
 
-# Copy all project files
 COPY . .
-
-# Build the Next.js application
 RUN npm run build
 
-# Use a smaller image for production
-FROM node:22 AS runner
+FROM node:23-slim AS runner
 WORKDIR /app
 
-# Copy built files from the builder stage
 COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.js ./next.config.js
 
-# Expose port
 EXPOSE 3000
 
-# Start Next.js
 CMD ["npm", "run", "start"]
