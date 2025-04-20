@@ -204,7 +204,7 @@ describe('AuthService', () => {
         category: 'fashion',
         bio: 'I love fashion!',
         location: 'NYC',
-      }; 
+      };
       const hashedPassword = 'hashedPassword';
       const newUser = {
         ...createUserDto,

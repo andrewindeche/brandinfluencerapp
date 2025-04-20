@@ -131,7 +131,9 @@ describe('AdminService', () => {
       const mockMongooseExec = <T>(returnValue: T) => ({
         exec: jest.fn().mockResolvedValue(returnValue),
       });
-      jest.spyOn(userModel, 'find').mockReturnValue(mockMongooseExec(users) as any);
+      jest
+        .spyOn(userModel, 'find')
+        .mockReturnValue(mockMongooseExec(users) as any);
       const result = await adminService.findAllUsers();
       expect(result).toEqual(users);
     });
