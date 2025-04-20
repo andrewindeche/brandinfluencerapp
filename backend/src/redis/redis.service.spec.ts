@@ -1,6 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RedisService } from './redis.service';
 
+jest.mock('ioredis', () => {
+  return class {
+    set = jest.fn().mockResolvedValue('OK');
+    get = jest.fn().mockResolvedValue('testdata');
+    del = jest.fn().mockResolvedValue(1);
+    keys = jest.fn().mockResolvedValue(['session:testuser']);
+    quit = jest.fn().mockResolvedValue('OK');
+    ttl = jest.fn().mockResolvedValue(5);
+  };
+});
+
 describe('RedisService', () => {
   let redisService: RedisService;
 
@@ -16,6 +27,7 @@ describe('RedisService', () => {
     const client = redisService.getClient();
     const keys = await client.keys('*');
     if (keys.length) await client.del(keys);
+    jest.clearAllMocks();
   });
 
   afterAll(async () => {

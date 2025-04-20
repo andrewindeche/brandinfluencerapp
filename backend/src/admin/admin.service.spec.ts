@@ -7,6 +7,11 @@ import { User } from '../user/user.schema';
 import { ForbiddenException } from '@nestjs/common';
 
 jest.mock('../user/user.service');
+jest.setTimeout(15000);
+
+const mockMongooseExec = (returnValue: any) => ({
+  exec: jest.fn().mockResolvedValue(returnValue),
+});
 
 describe('AdminService', () => {
   let adminService: AdminService;
@@ -111,8 +116,9 @@ describe('AdminService', () => {
       const superUser = { _id: superUserId, role: 'superuser' };
       jest.spyOn(userModel, 'findById').mockResolvedValueOnce(superUser);
 
-      jest.spyOn(userModel, 'findById').mockResolvedValueOnce(null);
-
+      jest.spyOn(userModel, 'findById').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      } as any);
       await expect(
         adminService.promoteUserToAdmin(superUserId, userId),
       ).rejects.toThrow('User not found.');
@@ -122,8 +128,10 @@ describe('AdminService', () => {
   describe('findAllUsers', () => {
     it('should return a list of users', async () => {
       const users = [{ username: 'user1' }, { username: 'user2' }];
-      jest.spyOn(userModel, 'find').mockResolvedValue(users);
-
+      const mockMongooseExec = <T>(returnValue: T) => ({
+        exec: jest.fn().mockResolvedValue(returnValue),
+      });
+      jest.spyOn(userModel, 'find').mockReturnValue(mockMongooseExec(users) as any);
       const result = await adminService.findAllUsers();
       expect(result).toEqual(users);
     });

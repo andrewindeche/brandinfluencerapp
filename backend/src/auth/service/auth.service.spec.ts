@@ -164,7 +164,7 @@ describe('AuthService', () => {
 
       jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
 
-      jest.spyOn(bcryptjs, 'compare').mockResolvedValue(true);
+      jest.spyOn(bcryptjs, 'compare' as any).mockResolvedValue(true);
 
       const result = await authService.validateUser('user1', password, role);
       expect(result).toEqual(user);
@@ -177,7 +177,7 @@ describe('AuthService', () => {
 
       jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
 
-      jest.spyOn(bcryptjs, 'compare').mockResolvedValue(false);
+      jest.spyOn(bcryptjs, 'compare' as any).mockResolvedValue(false);
 
       await expect(
         authService.validateUser('user1', password, role),
@@ -196,15 +196,15 @@ describe('AuthService', () => {
   describe('registerInfluencer', () => {
     it('should register a new influencer', async () => {
       const createUserDto = {
-        username: 'influencer1',
-        email: 'test@domain.com',
-        password: 'password',
-        category: 'fitness',
-        bio: 'bio',
-        role: 'influencer',
-        location: 'location',
-        confirmPassword: 'password',
-      };
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'securepassword',
+        confirmPassword: 'securepassword',
+        role: 'influencer' as 'influencer',
+        category: 'fashion',
+        bio: 'I love fashion!',
+        location: 'NYC',
+      }; 
       const hashedPassword = 'hashedPassword';
       const newUser = {
         ...createUserDto,
@@ -212,7 +212,7 @@ describe('AuthService', () => {
         role: 'influencer',
       };
       jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
-      jest.spyOn(bcryptjs, 'hash').mockResolvedValue(hashedPassword);
+      jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
       jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
 
       const result = await authService.registerInfluencer(createUserDto);
@@ -221,14 +221,14 @@ describe('AuthService', () => {
 
     it('should throw error if username or email already exists', async () => {
       const createUserDto = {
-        username: 'influencer1',
-        email: 'test@domain.com',
-        password: 'password',
-        confirmPassword: 'password',
-        role: 'brand',
-        category: 'fitness',
-        bio: 'bio',
-        location: 'location',
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'securepassword',
+        confirmPassword: 'securepassword',
+        role: 'influencer' as 'influencer',
+        category: 'fashion',
+        bio: 'I love fashion!',
+        location: 'NYC',
       };
       jest.spyOn(userModel, 'findOne').mockResolvedValue({});
 
@@ -256,7 +256,7 @@ describe('AuthService', () => {
       };
 
       jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
-      jest.spyOn(bcryptjs, 'hash').mockResolvedValue(hashedPassword);
+      jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
       jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
 
       const result = await authService.registerBrand(createUserDto);

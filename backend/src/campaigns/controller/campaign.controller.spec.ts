@@ -4,6 +4,7 @@ import { CampaignsService } from '../service/campaigns.service';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { SessionAuthGuard } from '../../session-auth/session-auth.guard';
+import { Campaign } from '../schemas/campaign.schema';
 
 jest.mock('../service/campaigns.service');
 
@@ -17,9 +18,9 @@ describe('CampaignController', () => {
       providers: [CampaignsService],
     })
       .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: jest.fn(() => true) }) // Mock JwtAuthGuard
+      .useValue({ canActivate: jest.fn(() => true) })
       .overrideGuard(SessionAuthGuard)
-      .useValue({ canActivate: jest.fn(() => true) }) // Mock SessionAuthGuard
+      .useValue({ canActivate: jest.fn(() => true) })
       .compile();
 
     controller = module.get<CampaignController>(CampaignController);
@@ -31,7 +32,13 @@ describe('CampaignController', () => {
       const req = { user: { role: 'influencer' } };
 
       await expect(
-        controller.createCampaign({ title: 'Test Campaign' }, req),
+        controller.createCampaign({
+          title: 'Test Campaign',
+          instructions: '',
+          startDate: '',
+          endDate: '',
+          images: []
+        }, req),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -39,9 +46,12 @@ describe('CampaignController', () => {
       const req = { user: { role: 'brand' } };
       const createCampaignDto = {
         title: 'Test Campaign',
+        instructions: 'Do this, do that',
         startDate: '2025-01-01',
         endDate: '2025-12-31',
+        images: ['image1.jpg', 'image2.jpg'],
       };
+
       const createdCampaign = { ...createCampaignDto, status: 'active' };
       jest.spyOn(service, 'createCampaign').mockResolvedValue(createdCampaign);
 
@@ -155,7 +165,13 @@ describe('CampaignController', () => {
   describe('getCampaign', () => {
     it('should return a campaign by id', async () => {
       const campaignId = 'campaignId';
-      const campaign = { title: 'Test Campaign' };
+      const campaign = {  
+        id: 'campaign-id',
+        title: 'Test Campaign',
+        instructions: 'Some instructions',
+        startDate: new Date(),
+        endDate: new Date(),
+        images: [], };
       jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
 
       const result = await controller.getCampaign(campaignId);
@@ -183,7 +199,20 @@ describe('CampaignController', () => {
   describe('getCampaignsByInfluencer', () => {
     it('should return campaigns by influencer id', async () => {
       const influencerId = 'influencerId';
-      const campaigns = [{ title: 'Test Campaign' }];
+      const campaigns = [
+        {
+          id: 'campaign-id',
+          _id: 'some-mongo-id',
+          title: 'Test Campaign',
+          instructions: 'Some instructions',
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          images: [],
+          influencers: [],
+          status: 'active',
+          submissions: [],
+        },
+      ] as unknown as Campaign[];       
       jest
         .spyOn(service, 'getCampaignsByInfluencer')
         .mockResolvedValue(campaigns);
