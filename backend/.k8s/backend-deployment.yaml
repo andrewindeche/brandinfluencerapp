@@ -18,5 +18,7 @@ spec:
           ports:
             - containerPort: 4000
           env:
-            - name: MONGO_URI
-              value: "mongodb://mongodb:27017/nest_campaigns"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"

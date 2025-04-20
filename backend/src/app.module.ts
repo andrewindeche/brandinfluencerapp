@@ -33,7 +33,7 @@ function loadJwtSecret() {
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/nest_campaigns'),
+    MongooseModule.forRoot('mongodb://mongodb:27017/nest_campaigns'),
     CampaignsModule,
     AuthModule,
     AdminModule,

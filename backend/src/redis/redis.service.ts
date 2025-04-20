@@ -7,12 +7,8 @@ export class RedisService {
 
   constructor() {
     const host = process.env.REDIS_HOST || 'redis';
-    const port = parseInt(process.env.REDIS_PORT || '6380', 10);
-
-    this.client = new Redis({
-      host,
-      port,
-    });
+    const port = parseInt(process.env.REDIS_PORT || '6379', 10);
+    this.client = new Redis({ host, port });
   }
 
   getClient(): Redis {
