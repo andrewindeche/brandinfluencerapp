@@ -86,7 +86,7 @@ describe('AuthController', () => {
       const response = await supertest(app.getHttpServer())
         .post('/auth/influencer/login')
         .send(loginDto)
-        .expect(200);
+        .expect(201);
 
       expect(response.body.access_token).toBeDefined();
       expect(response.body.refresh_token).toBeDefined();
@@ -120,7 +120,7 @@ describe('AuthController', () => {
       const response = await supertest(app.getHttpServer())
         .post('/auth/brand/login')
         .send(loginDto)
-        .expect(200);
+        .expect(201);
 
       expect(response.body.access_token).toBeDefined();
       expect(response.body.refresh_token).toBeDefined();
@@ -213,7 +213,7 @@ describe('AuthController', () => {
       const response = await supertest(app.getHttpServer())
         .post('/auth/refresh')
         .send({ refreshToken })
-        .expect(200);
+        .expect(201);
 
       expect(response.body.access_token).toBe(newAccessToken);
     });
@@ -242,7 +242,7 @@ describe('AuthController', () => {
       const response = await supertest(app.getHttpServer())
         .post('/auth/forgot-password')
         .send(forgotPasswordDto)
-        .expect(200);
+        .expect(201);
 
       expect(response.body.message).toBe('Reset email sent.');
       expect(response.body.previewLink).toBe(previewLink);
