@@ -162,7 +162,9 @@ describe('AuthService', () => {
       const password = 'password';
       const role = 'brand';
 
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(user),
+      });
 
       jest.spyOn(bcryptjs, 'compare' as any).mockResolvedValue(true);
 
@@ -175,7 +177,9 @@ describe('AuthService', () => {
       const password = 'wrongPassword';
       const role = 'brand';
 
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(user),
+      });
 
       jest.spyOn(bcryptjs, 'compare' as any).mockResolvedValue(false);
 
@@ -185,8 +189,9 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException if user is not found', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
-
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      });
       await expect(
         authService.validateUser('invalidUser', 'password', 'brand'),
       ).rejects.toThrow(UnauthorizedException);
@@ -211,7 +216,10 @@ describe('AuthService', () => {
         password: hashedPassword,
         role: 'influencer',
       };
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      });
+      
       jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
       jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
 
@@ -230,7 +238,9 @@ describe('AuthService', () => {
         bio: 'I love fashion!',
         location: 'NYC',
       };
-      jest.spyOn(userModel, 'findOne').mockResolvedValue({});
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue({}),
+      });      
 
       await expect(
         authService.registerInfluencer(createUserDto),
@@ -255,7 +265,9 @@ describe('AuthService', () => {
         role: 'brand',
       };
 
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(newUser),
+      });
       jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
       jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
 
@@ -273,7 +285,9 @@ describe('AuthService', () => {
         role: 'brand' as 'brand',
       };
 
-      jest.spyOn(userModel, 'findOne').mockResolvedValue({});
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue({}),
+      });      
 
       await expect(authService.registerBrand(createUserDto)).rejects.toThrow(
         'Username or email already exists.',
