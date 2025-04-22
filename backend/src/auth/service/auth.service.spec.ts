@@ -148,7 +148,9 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException if refresh token is invalid', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      });
 
       await expect(
         authService.validateRefreshToken('invalidToken'),
@@ -219,7 +221,7 @@ describe('AuthService', () => {
       jest.spyOn(userModel, 'findOne').mockReturnValue({
         exec: jest.fn().mockResolvedValue(null),
       });
-      
+
       jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
       jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
 
@@ -240,7 +242,7 @@ describe('AuthService', () => {
       };
       jest.spyOn(userModel, 'findOne').mockReturnValue({
         exec: jest.fn().mockResolvedValue({}),
-      });      
+      });
 
       await expect(
         authService.registerInfluencer(createUserDto),
@@ -287,7 +289,7 @@ describe('AuthService', () => {
 
       jest.spyOn(userModel, 'findOne').mockReturnValue({
         exec: jest.fn().mockResolvedValue({}),
-      });      
+      });
 
       await expect(authService.registerBrand(createUserDto)).rejects.toThrow(
         'Username or email already exists.',

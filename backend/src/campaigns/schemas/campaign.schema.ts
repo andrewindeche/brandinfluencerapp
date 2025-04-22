@@ -1,8 +1,8 @@
-import { Prop, Schema as NestSchema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema as Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema, Types } from 'mongoose';
 import { Document } from 'mongoose';
 
-@NestSchema()
+@Schema()
 export class Campaign extends Document {
   @Prop({ required: true })
   title: string;
