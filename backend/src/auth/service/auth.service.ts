@@ -128,9 +128,9 @@ export class AuthService {
 
   async loginSuperuser(username: string, password: string) {
     const user = await this.validateUser(username, password, 'superuser');
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+        if (!user) {
+          throw new UnauthorizedException();
+        }
     const payload = {
       username: user.username,
       sub: user._id,
