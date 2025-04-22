@@ -141,7 +141,10 @@ describe('AuthService', () => {
   describe('validateRefreshToken', () => {
     it('should return the user if refresh token is valid', async () => {
       const user = { username: 'user1', refreshToken: 'hashedToken' };
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(user),
+      });
 
       const result = await authService.validateRefreshToken('refreshToken');
       expect(result).toEqual(user);
