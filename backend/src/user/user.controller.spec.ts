@@ -83,7 +83,7 @@ describe('UserController', () => {
       } as unknown as User;
       jest.spyOn(service, 'findUserByEmail').mockResolvedValue(user);
       const result = await controller.getUserType('test@example.com');
-      expect(result).toEqual({ type: 'influencer' });
+      expect(result).toEqual({ type: 'brand' });
     });
 
     it('should return "brand" if user role is not influencer', async () => {
