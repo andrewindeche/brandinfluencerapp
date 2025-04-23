@@ -53,7 +53,7 @@ describe('AdminService', () => {
         save: jest.fn(),
       };
       (userModel as any).mockImplementation = jest.fn(() => mockUser);
-      });
+    });
 
     it('should create a superuser if one does not exist', async () => {
       const username = 'superuser1';
