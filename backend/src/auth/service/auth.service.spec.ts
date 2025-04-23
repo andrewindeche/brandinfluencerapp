@@ -8,6 +8,11 @@ import { UnauthorizedException } from '@nestjs/common';
 jest.mock('bcryptjs');
 jest.mock('@nestjs/jwt');
 
+const userModelMock = jest.fn().mockImplementation((data) => ({
+  ...data,
+  save: jest.fn().mockResolvedValue(data),
+}));
+
 describe('AuthService', () => {
   let authService: AuthService;
   let userModel: any;
@@ -20,11 +25,7 @@ describe('AuthService', () => {
         JwtService,
         {
           provide: getModelToken('User'),
-          useValue: {
-            findOne: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            save: jest.fn(),
-          },
+          useValue: userModelMock,
         },
       ],
     }).compile();
@@ -271,10 +272,15 @@ describe('AuthService', () => {
       };
 
       jest.spyOn(userModel, 'findOne').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(newUser),
+        exec: jest.fn().mockResolvedValue(null),
       });
+
       jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
-      jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
+
+      (userModel as jest.Mock).mockImplementation(() => ({
+        ...newUser,
+        save: jest.fn().mockResolvedValue(newUser),
+      }));
 
       const result = await authService.registerBrand(createUserDto);
 

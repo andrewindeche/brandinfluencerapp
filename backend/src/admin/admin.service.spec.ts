@@ -45,13 +45,26 @@ describe('AdminService', () => {
   });
 
   describe('createSuperUser', () => {
+    let mockUser: any;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      mockUser = {
+        save: jest.fn(),
+      };
+      (userModel as any).mockImplementation = jest.fn(() => mockUser);
+      });
+
     it('should create a superuser if one does not exist', async () => {
       const username = 'superuser1';
       const email = 'superuser1@example.com';
       const password = 'SuperSecretPassword';
 
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
-      jest.spyOn(userModel.prototype, 'save').mockResolvedValue({
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      } as any);
+
+      mockUser.save.mockResolvedValue({
         username,
         email,
         password: 'hashedPassword',
@@ -63,8 +76,10 @@ describe('AdminService', () => {
         email,
         password,
       );
+
       expect(result).toHaveProperty('username', username);
       expect(result).toHaveProperty('role', 'superuser');
+      expect(mockUser.save).toHaveBeenCalled();
     });
 
     it('should throw an error if a superuser already exists', async () => {
@@ -72,7 +87,9 @@ describe('AdminService', () => {
       const email = 'superuser1@example.com';
       const password = 'SuperSecretPassword';
 
-      jest.spyOn(userModel, 'findOne').mockResolvedValue({ role: 'superuser' });
+      jest.spyOn(userModel, 'findOne').mockReturnValue({
+        exec: jest.fn().mockResolvedValue({ role: 'superuser' }),
+      } as any);
 
       await expect(
         adminService.createSuperUser(username, email, password),
