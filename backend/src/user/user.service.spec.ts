@@ -37,6 +37,7 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     redisService = module.get<RedisService>(RedisService);
+    model = module.get(getModelToken('User'));
   });
 
   it('should fetch all users', async () => {
