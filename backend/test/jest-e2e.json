@@ -7,6 +7,6 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "setupFilesAfterEnv": ["./setupTests.ts"],
-  "testTimeout": 30000
-
+  "testTimeout": 30000,
+  "maxWorkers": 2
 }
