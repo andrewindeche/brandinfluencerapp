@@ -8,11 +8,6 @@ import { UnauthorizedException } from '@nestjs/common';
 jest.mock('bcryptjs');
 jest.mock('@nestjs/jwt');
 
-const userModelMock = jest.fn().mockImplementation((data) => ({
-  ...data,
-  save: jest.fn().mockResolvedValue(data),
-}));
-
 describe('AuthService', () => {
   let authService: AuthService;
   let userModel: any;
@@ -25,7 +20,10 @@ describe('AuthService', () => {
         JwtService,
         {
           provide: getModelToken('User'),
-          useValue: userModelMock,
+          useValue: {
+            findOne: jest.fn(),
+            create: jest.fn(),
+          },
         },
       ],
     }).compile();

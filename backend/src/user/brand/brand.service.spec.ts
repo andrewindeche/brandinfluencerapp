@@ -1,20 +1,26 @@
 import { BrandService } from './brand.service';
-import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../../user/user.schema';
 import { Campaign } from '../../campaigns/schemas/campaign.schema';
 import * as bcryptjs from 'bcryptjs';
 
 describe('BrandService', () => {
   let service: BrandService;
-  let userModel: jest.Mocked<Model<User>>;
+  let userModel: any;
+  let findOneMock: jest.Mock;
+  let saveMock: jest.Mock;
   let campaignModel: jest.Mocked<Model<Campaign>>;
 
   beforeEach(() => {
-    userModel = {
-      findOne: jest.fn(),
-      save: jest.fn(),
-    } as any;
+    findOneMock = jest.fn();
+    saveMock = jest.fn();
+
+    function MockUserModel(this: any, data: any) {
+      Object.assign(this, data);
+      this.save = saveMock;
+    }
+    MockUserModel.findOne = findOneMock;
+
+    userModel = MockUserModel;
 
     campaignModel = {
       find: jest.fn(),
@@ -25,7 +31,7 @@ describe('BrandService', () => {
 
   describe('createBrand', () => {
     it('should throw if user with email or username exists', async () => {
-      userModel.findOne.mockResolvedValue({});
+      findOneMock.mockResolvedValue({});
 
       await expect(
         service.createBrand({
@@ -39,24 +45,14 @@ describe('BrandService', () => {
     });
 
     it('should hash password and create brand', async () => {
-      userModel.findOne.mockResolvedValue(null);
-      const saveMock = jest.fn().mockResolvedValue({
+      findOneMock.mockResolvedValue(null);
+      saveMock.mockResolvedValue({
         username: 'testuser',
         email: 'test@example.com',
         role: 'brand',
       });
 
-      userModel.constructor = jest.fn().mockImplementation((data) => ({
-        ...data,
-        save: saveMock,
-      }));
-
-      const serviceWithConstructor = new BrandService(
-        userModel.constructor as any,
-        campaignModel,
-      );
-
-      const result = await serviceWithConstructor.createBrand({
+      const result = await service.createBrand({
         username: 'testuser',
         email: 'test@example.com',
         password: 'pass123',
@@ -77,14 +73,14 @@ describe('BrandService', () => {
         role: 'brand',
       };
 
-      userModel.findOne.mockResolvedValue(user as any);
+      findOneMock.mockResolvedValue(user);
 
       const result = await service.login('testuser', 'pass123', 'brand');
       expect(result).toEqual(user);
     });
 
     it('should return null if credentials are incorrect', async () => {
-      userModel.findOne.mockResolvedValue(null);
+      findOneMock.mockResolvedValue(null);
 
       const result = await service.login('testuser', 'wrongpass', 'brand');
       expect(result).toBeNull();
