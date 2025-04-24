@@ -47,7 +47,7 @@ describe('ForgotPasswordService', () => {
   describe('sendResetEmail', () => {
     it('should generate a reset token, store it in Redis, and send an email', async () => {
       const email = 'test@example.com';
-      const token = uuidv4();
+      const token = 'mocked-token';
       const previewLink = 'http://localhost:3000/forgotpassword?token=' + token;
 
       redisService.setToken.mockResolvedValue(true);
@@ -83,7 +83,7 @@ describe('ForgotPasswordService', () => {
     });
 
     it('should throw a NotFoundException if the token is invalid or expired', async () => {
-      const token = uuidv4();
+      const token = 'mocked-token';
       redisService.getToken.mockResolvedValue(null);
 
       await expect(service.validateToken(token)).rejects.toThrow(
@@ -94,7 +94,7 @@ describe('ForgotPasswordService', () => {
 
   describe('invalidateToken', () => {
     it('should delete the token from Redis', async () => {
-      const token = uuidv4();
+      const token = 'mocked-token';
       await service.invalidateToken(token);
 
       expect(redisService.deleteToken).toHaveBeenCalledWith(
