@@ -5,6 +5,10 @@ import { SendForgotPasswordEmailService } from '../send-forgot-password-email/se
 import { NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+jest.mock('uuid', () => ({
+  v4: jest.fn().mockReturnValue('mocked-token'),
+}));
+
 describe('ForgotPasswordService', () => {
   let service: ForgotPasswordService;
   let redisService: {
