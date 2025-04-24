@@ -98,7 +98,6 @@ export class AuthController {
       const newUser = await this.authService.registerInfluencer(registerDto);
       return newUser;
     } catch (error) {
-      console.log('Registration error:', error);
       if (error.message === 'Email or username already exists.') {
         throw new ConflictException('Email or username already exists.');
       }
