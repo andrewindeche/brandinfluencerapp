@@ -9,22 +9,33 @@ import { ConflictException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService;
-  let model: jest.Mocked<Model<User>>;
   let redisService: RedisService;
 
+  const mockSave = jest.fn();
+  const mockFind = jest.fn();
+  const mockFindOne = jest.fn();
+  const mockFindById = jest.fn();
+  const mockFindByIdAndUpdate = jest.fn();
+
+  const mockUserModelConstructor = jest.fn().mockImplementation((userData) => ({
+    ...userData,
+    save: mockSave,
+  }));
+
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
         {
           provide: getModelToken('User'),
-          useValue: {
-            find: jest.fn(),
-            findOne: jest.fn(),
-            findById: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            create: jest.fn(),
-          },
+          useValue: Object.assign(mockUserModelConstructor, {
+            find: mockFind,
+            findOne: mockFindOne,
+            findById: mockFindById,
+            findByIdAndUpdate: mockFindByIdAndUpdate,
+          }),
         },
         {
           provide: RedisService,
@@ -37,35 +48,33 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     redisService = module.get<RedisService>(RedisService);
-    model = module.get(getModelToken('User'));
   });
 
   it('should fetch all users', async () => {
     const users = [{ email: 'test@example.com', username: 'testuser' }];
-    jest.spyOn(model, 'find').mockReturnValue({
-      exec: jest.fn().mockResolvedValue(users),
-    } as any);
+    mockFind.mockReturnValue({ exec: jest.fn().mockResolvedValue(users) });
 
-    expect(await service.findAll()).toEqual(users);
+    const result = await service.findAll();
+    expect(result).toEqual(users);
   });
 
   it('should create a user', async () => {
-    const userData = { email: 'new@example.com', username: 'newuser' };
-    jest.spyOn(model, 'findOne').mockReturnValue({
-      exec: jest.fn().mockResolvedValue(null),
-    } as any);
-    const mockUserInstance = {
-      save: jest.fn().mockResolvedValue(userData),
-    };
-    jest.spyOn(model, 'create').mockReturnValue(mockUserInstance as any);
+    const userData = { email: 'new@example.com', username: 'newuser', password: 'secret' };
+    mockFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
-    expect(await service.createUser(userData as any)).toEqual(userData);
+    mockSave.mockResolvedValue(userData);
+
+    const result = await service.createUser(userData as any);
+    expect(result).toEqual(userData);
+    expect(mockUserModelConstructor).toHaveBeenCalledWith(expect.objectContaining({
+      email: userData.email,
+      username: userData.username,
+    }));
+    expect(mockSave).toHaveBeenCalled();
   });
 
   it('should not create a user if email or username exists', async () => {
-    jest.spyOn(model, 'findOne').mockReturnValue({
-      exec: jest.fn().mockResolvedValue({ email: 'existing@example.com' }),
-    } as any);
+    mockFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ email: 'existing@example.com' }) });
 
     await expect(
       service.createUser({ email: 'existing@example.com' } as any),
@@ -74,38 +83,48 @@ describe('UserService', () => {
 
   it('should find a user by email', async () => {
     const user = { email: 'test@example.com', username: 'testuser' };
-    jest.spyOn(model, 'findOne').mockReturnValue({
-      exec: jest.fn().mockResolvedValue(user),
-    } as any);
+    mockFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(user) });
 
-    expect(await service.findUserByEmail('test@example.com')).toEqual(user);
+    const result = await service.findUserByEmail('test@example.com');
+    expect(result).toEqual(user);
   });
 
   it('should update user password', async () => {
     const userId = '1234';
     const newPassword = 'newpassword';
+    const oldPassword = 'oldpassword';
+    const hashedOldPassword = await bcrypt.hash(oldPassword, 10);
+  
     jest.spyOn(redisService, 'rateLimitOrThrow').mockResolvedValue();
-    jest.spyOn(model, 'findById').mockReturnValue({
+  
+    mockFindById.mockReturnValue({
       select: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ password: 'oldhashedpassword' }),
+        exec: jest.fn().mockResolvedValue({
+          password: hashedOldPassword,
+          save: jest.fn().mockResolvedValue(true),
+        }),
       }),
-    } as unknown as ReturnType<typeof model.findById>);
-    await expect(
-      service.updatePassword(userId, newPassword),
-    ).resolves.not.toThrow();
+    } as any);
+  
+    jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
+    await expect(service.updatePassword(userId, newPassword)).resolves.not.toThrow();
   });
+  
 
   it('should throw error when new password matches old password', async () => {
-    jest.spyOn(model, 'findById').mockReturnValue({
+    const hashed = await bcrypt.hash('samepassword', 10);
+    mockFindById.mockReturnValue({
       select: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ password: 'hashedpassword' }),
+        exec: jest.fn().mockResolvedValue({
+          password: hashed,
+        }),
       }),
-    } as unknown as ReturnType<typeof model.findById>);
+    } as any);
 
     jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
 
-    await expect(
-      service.updatePassword('1234', 'hashedpassword'),
-    ).rejects.toThrow('New password cannot be the same as the old password');
+    await expect(service.updatePassword('1234', 'samepassword')).rejects.toThrow(
+      'New password cannot be the same as the old password',
+    );
   });
 });
