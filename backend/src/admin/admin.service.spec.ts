@@ -2,35 +2,40 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AdminService } from './admin.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { UserService } from '../user/user.service';
-import { Model } from 'mongoose';
-import { User } from '../user/user.schema';
 import { ForbiddenException } from '@nestjs/common';
 
 jest.mock('../user/user.service');
-jest.setTimeout(15000);
-
-const mockMongooseExec = (returnValue: any) => ({
-  exec: jest.fn().mockResolvedValue(returnValue),
-});
 
 describe('AdminService', () => {
   let adminService: AdminService;
-  let userModel: Model<User>;
-  let userService: UserService;
+
+  const mockSave = jest.fn();
+  const mockFindOne = jest.fn();
+  const mockFindById = jest.fn();
+  const mockFind = jest.fn();
+
+  const mockUserModel = {
+    findOne: mockFindOne,
+    findById: mockFindById,
+    find: mockFind,
+    constructor: jest.fn().mockImplementation(() => ({
+      save: mockSave,
+    })),
+  };
+
+  const mockExec = (resolvedValue) => ({
+    exec: jest.fn().mockResolvedValue(resolvedValue),
+  });
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AdminService,
         {
           provide: getModelToken('User'),
-          useValue: {
-            findOne: jest.fn(),
-            findById: jest.fn(),
-            find: jest.fn(),
-            exec: jest.fn(),
-            save: jest.fn(),
-          },
+          useValue: mockUserModel,
         },
         {
           provide: UserService,
@@ -40,59 +45,36 @@ describe('AdminService', () => {
     }).compile();
 
     adminService = module.get<AdminService>(AdminService);
-    userModel = module.get<Model<User>>(getModelToken('User'));
-    userService = module.get<UserService>(UserService);
   });
 
   describe('createSuperUser', () => {
-    let mockUser: any;
-
-    beforeEach(() => {
-      jest.clearAllMocks();
-      mockUser = {
-        save: jest.fn(),
-      };
-      (userModel as any).mockImplementation = jest.fn(() => mockUser);
-    });
-
     it('should create a superuser if one does not exist', async () => {
       const username = 'superuser1';
       const email = 'superuser1@example.com';
       const password = 'SuperSecretPassword';
 
-      jest.spyOn(userModel, 'findOne').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
+      // Mock `findOne` to return null (meaning no superuser exists)
+      mockFindOne.mockReturnValue(mockExec(null));
 
-      mockUser.save.mockResolvedValue({
+      // Mock `save` to return a user object when called
+      mockSave.mockResolvedValue({
         username,
         email,
-        password: 'hashedPassword',
         role: 'superuser',
       });
 
-      const result = await adminService.createSuperUser(
-        username,
-        email,
-        password,
-      );
+      const result = await adminService.createSuperUser(username, email, password);
 
       expect(result).toHaveProperty('username', username);
       expect(result).toHaveProperty('role', 'superuser');
-      expect(mockUser.save).toHaveBeenCalled();
+      expect(mockSave).toHaveBeenCalled();
     });
 
     it('should throw an error if a superuser already exists', async () => {
-      const username = 'superuser1';
-      const email = 'superuser1@example.com';
-      const password = 'SuperSecretPassword';
-
-      jest.spyOn(userModel, 'findOne').mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ role: 'superuser' }),
-      } as any);
+      mockFindOne.mockReturnValue(mockExec({ role: 'superuser' }));
 
       await expect(
-        adminService.createSuperUser(username, email, password),
+        adminService.createSuperUser('name', 'email', 'pass'),
       ).rejects.toThrow('Superuser already exists.');
     });
   });
@@ -103,41 +85,38 @@ describe('AdminService', () => {
       const userId = 'userId';
 
       const superUser = { _id: superUserId, role: 'superuser' };
-      const user = { _id: userId, role: 'user' };
+      const user = {
+        _id: userId,
+        role: 'user',
+        save: jest.fn().mockResolvedValue({ _id: userId, role: 'admin' }),
+      };
 
-      jest.spyOn(userModel, 'findById').mockResolvedValueOnce(superUser);
-      jest.spyOn(userModel, 'findById').mockResolvedValueOnce(user);
-      jest
-        .spyOn(userModel.prototype, 'save')
-        .mockResolvedValue({ ...user, role: 'admin' });
+      mockFindById
+        .mockReturnValueOnce(mockExec(superUser))
+        .mockReturnValueOnce(mockExec(user));
 
       const result = await adminService.promoteUserToAdmin(superUserId, userId);
+
       expect(result).toHaveProperty('role', 'admin');
     });
 
-    it('should throw ForbiddenException if superuser is not found or has incorrect role', async () => {
-      const superUserId = 'superuserId';
-      const userId = 'userId';
-
-      jest.spyOn(userModel, 'findById').mockResolvedValueOnce(null);
+    it('should throw ForbiddenException if superuser is not found or incorrect', async () => {
+      mockFindById.mockReturnValueOnce(mockExec(null));
 
       await expect(
-        adminService.promoteUserToAdmin(superUserId, userId),
+        adminService.promoteUserToAdmin('superUserId', 'userId'),
       ).rejects.toThrow(ForbiddenException);
     });
 
     it('should throw an error if the user to promote does not exist', async () => {
-      const superUserId = 'superuserId';
-      const userId = 'userId';
+      const superUser = { _id: 'id', role: 'superuser' };
 
-      const superUser = { _id: superUserId, role: 'superuser' };
-      jest.spyOn(userModel, 'findById').mockResolvedValueOnce(superUser);
+      mockFindById
+        .mockReturnValueOnce(mockExec(superUser))
+        .mockReturnValueOnce(mockExec(null));
 
-      jest.spyOn(userModel, 'findById').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
       await expect(
-        adminService.promoteUserToAdmin(superUserId, userId),
+        adminService.promoteUserToAdmin('superUserId', 'userId'),
       ).rejects.toThrow('User not found.');
     });
   });
@@ -145,13 +124,11 @@ describe('AdminService', () => {
   describe('findAllUsers', () => {
     it('should return a list of users', async () => {
       const users = [{ username: 'user1' }, { username: 'user2' }];
-      const mockMongooseExec = <T>(returnValue: T) => ({
-        exec: jest.fn().mockResolvedValue(returnValue),
-      });
-      jest
-        .spyOn(userModel, 'find')
-        .mockReturnValue(mockMongooseExec(users) as any);
+
+      mockFind.mockReturnValue(mockExec(users));
+
       const result = await adminService.findAllUsers();
+
       expect(result).toEqual(users);
     });
   });
