@@ -12,6 +12,10 @@ describe('AuthService', () => {
   let authService: AuthService;
   let userModel: any;
   let jwtService: JwtService;
+  const mockSave = jest.fn();
+  const mockUserModel = jest.fn().mockImplementation(() => ({
+    save: mockSave,
+  }));
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,10 +24,9 @@ describe('AuthService', () => {
         JwtService,
         {
           provide: getModelToken('User'),
-          useValue: {
+          useValue: Object.assign(mockUserModel, {
             findOne: jest.fn(),
-            create: jest.fn(),
-          },
+          }),
         },
       ],
     }).compile();
@@ -215,20 +218,21 @@ describe('AuthService', () => {
         location: 'NYC',
       };
       const hashedPassword = 'hashedPassword';
-      const newUser = {
+      const savedUser = {
         ...createUserDto,
         password: hashedPassword,
         role: 'influencer',
       };
-      jest.spyOn(userModel, 'findOne').mockReturnValue({
+      userModel.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(null),
       });
 
-      jest.spyOn(bcryptjs, 'hash' as any).mockResolvedValue(hashedPassword);
-      jest.spyOn(userModel, 'save').mockResolvedValue(newUser);
+      (bcryptjs.hash as jest.Mock).mockResolvedValue(hashedPassword);
+      mockSave.mockResolvedValue(savedUser);
 
       const result = await authService.registerInfluencer(createUserDto);
-      expect(result).toEqual(newUser);
+
+      expect(result).toEqual(savedUser);
     });
 
     it('should throw error if username or email already exists', async () => {
