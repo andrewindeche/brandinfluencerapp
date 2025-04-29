@@ -1,9 +1,11 @@
 import { Prop, Schema as Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema, Types } from 'mongoose';
-import { Document } from 'mongoose';
 
 @Schema()
-export class Campaign extends Document {
+export class Campaign {
+  @Prop()
+  _id?: Types.ObjectId;
+
   @Prop({ required: true })
   title: string;
 
