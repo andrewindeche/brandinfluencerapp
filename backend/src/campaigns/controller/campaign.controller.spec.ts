@@ -128,8 +128,10 @@ describe('CampaignController', () => {
     });
 
     it('should join the campaign successfully if conditions are met', async () => {
-      const req = { user: { sub: 'influencerId' } };
-      const campaignId = 'campaignId';
+      const campaignId = '64b1f98d7bcb98b7ce058f77';
+      const req = {
+        user: { sub: '64b1f98d7bcb98b7ce058f66' },
+      };
 
       const campaign: Partial<Campaign> = {
         _id: new Types.ObjectId(),
@@ -153,7 +155,7 @@ describe('CampaignController', () => {
         .mockResolvedValue(campaign as Campaign);
       jest
         .spyOn(service, 'joinCampaign')
-        .mockResolvedValue(joinedCampaign as Campaign);
+        .mockResolvedValue(campaign as any);
 
       const result = await controller.joinCampaign(campaignId, req);
 
