@@ -7,6 +7,8 @@ import {
   UnauthorizedException,
   BadRequestException,
   Req,
+  InternalServerErrorException,
+  HttpException,
 } from '@nestjs/common';
 import { isValidObjectId } from 'mongoose';
 import { CampaignsService } from '../service/campaigns.service';
@@ -37,17 +39,19 @@ export class CampaignController {
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
     try {
       if (!req.user || !req.user.sub) {
-        throw new Error('User is not authenticated or missing sub');
+        throw new BadRequestException(
+          'User is not authenticated or missing sub',
+        );
       }
 
       const influencerId = req.user.sub.toString();
       if (!isValidObjectId(influencerId)) {
-        throw new Error('Invalid influencer ID');
+        throw new BadRequestException('Invalid influencer ID');
       }
 
       const campaign = await this.campaignService.getCampaignById(campaignId);
       if (!campaign) {
-        throw new Error('Campaign not found');
+        throw new BadRequestException('Campaign not found');
       }
 
       if (campaign.status !== 'active') {
@@ -70,7 +74,10 @@ export class CampaignController {
         campaign: joinedCampaign,
       };
     } catch (error) {
-      return { error: error.message };
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -89,7 +96,7 @@ export class CampaignController {
 
       const campaign = await this.campaignService.getCampaignById(campaignId);
       if (!campaign) {
-        throw new Error('Campaign not found');
+        throw new BadRequestException('Campaign not found');
       }
 
       if (campaign.status !== 'active') {
@@ -102,7 +109,10 @@ export class CampaignController {
         influencerId,
       );
     } catch (error) {
-      return { error: error.message };
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
