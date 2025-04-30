@@ -3,6 +3,7 @@ import { AdminService } from './admin.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { UserService } from '../user/user.service';
 import { ForbiddenException } from '@nestjs/common';
+import { User } from '../user/user.schema';
 
 jest.mock('../user/user.service');
 
@@ -13,9 +14,18 @@ describe('AdminService', () => {
   const mockFindOne = jest.fn();
   const mockFindById = jest.fn();
   const mockFind = jest.fn();
+  const mockUser: Partial<User> = {
+    _id: 'user123',
+    username: 'superadmin',
+    email: 'admin@example.com',
+    password: 'hashedpassword',
+    role: 'superuser',
+  };
+  
 
   const mockUserModel = {
     findOne: mockFindOne,
+    create: jest.fn().mockResolvedValue(mockUser),
     findById: mockFindById,
     find: mockFind,
     constructor: jest.fn().mockImplementation(() => ({
@@ -53,10 +63,8 @@ describe('AdminService', () => {
       const email = 'superuser1@example.com';
       const password = 'SuperSecretPassword';
 
-      // Mock `findOne` to return null (meaning no superuser exists)
       mockFindOne.mockReturnValue(mockExec(null));
 
-      // Mock `save` to return a user object when called
       mockSave.mockResolvedValue({
         username,
         email,
