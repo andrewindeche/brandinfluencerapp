@@ -38,9 +38,10 @@ describe('CampaignsService', () => {
           useValue: Object.assign(
             jest.fn().mockImplementation((data) => ({
               ...data,
+              _id: new Types.ObjectId(), // ensure _id is a valid ObjectId
               save: jest
                 .fn()
-                .mockResolvedValue({ _id: 'submission123', ...data }),
+                .mockResolvedValue({ _id: new Types.ObjectId(), ...data }),
             })),
             {
               create: jest.fn(),
@@ -92,7 +93,7 @@ describe('CampaignsService', () => {
     it('should create campaign with default status active', async () => {
       const startDate = new Date(Date.now() + 100000).toISOString();
       const endDate = new Date(Date.now() + 200000).toISOString();
-    
+
       const mockCampaignData = {
         title: 'New Campaign',
         description: 'Details',
@@ -100,17 +101,19 @@ describe('CampaignsService', () => {
         endDate,
         status: 'active',
       };
-    
-      const mockSave = jest.fn().mockResolvedValue({ _id: 'mockId', ...mockCampaignData });
+
+      const mockSave = jest
+        .fn()
+        .mockResolvedValue({ _id: 'mockId', ...mockCampaignData });
       const mockCampaignInstance = { ...mockCampaignData, save: mockSave };
-    
+
       (campaignModel as any).mockImplementation(() => mockCampaignInstance);
-    
+
       const result = await service.createCampaign(mockCampaignData as any);
-    
+
       expect(mockSave).toHaveBeenCalled();
       expect(result).toEqual({ _id: 'mockId', ...mockCampaignData });
-    })
+    });
   });
 
   describe('addSubmission', () => {
@@ -156,7 +159,7 @@ describe('CampaignsService', () => {
         influencerId,
       );
       expect(result).toEqual({
-        id: 'submission123',
+        id: expect.any(String),
         content: 'Submission content',
       });
     });
