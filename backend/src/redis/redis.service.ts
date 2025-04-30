@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import type { Redis as RedisClient } from 'ioredis';
 
 @Injectable()
 export class RedisService {
-  private client: RedisClient;
+  private client: Redis;
 
   constructor() {
     const host = process.env.REDIS_HOST || 'redis';

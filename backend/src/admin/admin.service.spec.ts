@@ -63,7 +63,11 @@ describe('AdminService', () => {
         role: 'superuser',
       });
 
-      const result = await adminService.createSuperUser(username, email, password);
+      const result = await adminService.createSuperUser(
+        username,
+        email,
+        password,
+      );
 
       expect(result).toHaveProperty('username', username);
       expect(result).toHaveProperty('role', 'superuser');

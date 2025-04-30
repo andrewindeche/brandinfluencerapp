@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CampaignsService } from './campaigns.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Campaign } from '../schemas/campaign.schema';
 import { Submission } from '../../auth/schema/submission.schema';
 import { BadRequestException } from '@nestjs/common';
@@ -19,21 +19,33 @@ describe('CampaignsService', () => {
         CampaignsService,
         {
           provide: getModelToken(Campaign.name),
-          useValue: {
-            findById: jest.fn(),
-            find: jest.fn(),
-            create: jest.fn(),
-            exec: jest.fn(),
-            save: jest.fn(),
-            populate: jest.fn(),
-          },
+          useValue: Object.assign(
+            jest.fn().mockImplementation((data) => ({
+              ...data,
+              save: jest.fn().mockResolvedValue({ _id: 'mockId', ...data }),
+            })),
+            {
+              findById: jest.fn(),
+              find: jest.fn(),
+              create: jest.fn(),
+              exec: jest.fn(),
+              populate: jest.fn(),
+            },
+          ),
         },
         {
           provide: getModelToken(Submission.name),
-          useValue: {
-            create: jest.fn(),
-            save: jest.fn(),
-          },
+          useValue: Object.assign(
+            jest.fn().mockImplementation((data) => ({
+              ...data,
+              save: jest
+                .fn()
+                .mockResolvedValue({ _id: 'submission123', ...data }),
+            })),
+            {
+              create: jest.fn(),
+            },
+          ),
         },
         {
           provide: CACHE_MANAGER,
@@ -80,22 +92,25 @@ describe('CampaignsService', () => {
     it('should create campaign with default status active', async () => {
       const startDate = new Date(Date.now() + 100000).toISOString();
       const endDate = new Date(Date.now() + 200000).toISOString();
-
-      const mockSavedCampaign = { title: 'Created' };
-      const saveMock = jest.fn().mockResolvedValue(mockSavedCampaign);
-      campaignModel.create = jest.fn().mockReturnValue({
-        save: saveMock,
-      });
-
-      const result = await service.createCampaign({
+    
+      const mockCampaignData = {
         title: 'New Campaign',
         description: 'Details',
         startDate,
         endDate,
-      } as any);
-
-      expect(result).toEqual(mockSavedCampaign);
-    });
+        status: 'active',
+      };
+    
+      const mockSave = jest.fn().mockResolvedValue({ _id: 'mockId', ...mockCampaignData });
+      const mockCampaignInstance = { ...mockCampaignData, save: mockSave };
+    
+      (campaignModel as any).mockImplementation(() => mockCampaignInstance);
+    
+      const result = await service.createCampaign(mockCampaignData as any);
+    
+      expect(mockSave).toHaveBeenCalled();
+      expect(result).toEqual({ _id: 'mockId', ...mockCampaignData });
+    })
   });
 
   describe('addSubmission', () => {
@@ -106,23 +121,24 @@ describe('CampaignsService', () => {
     });
 
     it('should throw if influencer has not joined the campaign', async () => {
-      const campaign = { _id: 'campaign123', influencers: [] };
+      const campaignId = new Types.ObjectId().toHexString();
+      const influencerId = new Types.ObjectId().toHexString();
+
+      const campaign = { _id: campaignId, influencers: [] };
       campaignModel.findById = jest.fn().mockResolvedValue(campaign);
-      submissionModel.create = jest.fn();
 
       await expect(
-        service.addSubmission(
-          'campaign123',
-          'Submission content',
-          'influencer123',
-        ),
+        service.addSubmission(campaignId, 'Submission content', influencerId),
       ).rejects.toThrow('Influencer has not joined the campaign');
     });
 
     it('should add a submission successfully if campaign and influencer are valid', async () => {
+      const campaignId = new Types.ObjectId().toHexString();
+      const influencerId = new Types.ObjectId().toHexString();
+
       const campaign = {
-        _id: 'campaign123',
-        influencers: ['influencer123'],
+        _id: campaignId,
+        influencers: [influencerId],
         submissions: [],
         save: jest.fn(),
       };
@@ -135,9 +151,9 @@ describe('CampaignsService', () => {
       submissionModel.create = jest.fn().mockResolvedValue(submission);
 
       const result = await service.addSubmission(
-        'campaign123',
+        campaignId,
         'Submission content',
-        'influencer123',
+        influencerId,
       );
       expect(result).toEqual({
         id: 'submission123',
@@ -167,7 +183,7 @@ describe('CampaignsService', () => {
       };
       campaignModel.findById = jest.fn().mockResolvedValue(campaignMock as any);
 
-      await service.updateCampaignStatus('123');
+      await service.updateCampaignStatus(new Types.ObjectId().toHexString());
       expect(campaignMock.status).toBe('active');
     });
   });

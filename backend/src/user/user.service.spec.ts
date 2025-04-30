@@ -59,22 +59,30 @@ describe('UserService', () => {
   });
 
   it('should create a user', async () => {
-    const userData = { email: 'new@example.com', username: 'newuser', password: 'secret' };
+    const userData = {
+      email: 'new@example.com',
+      username: 'newuser',
+      password: 'secret',
+    };
     mockFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
 
     mockSave.mockResolvedValue(userData);
 
     const result = await service.createUser(userData as any);
     expect(result).toEqual(userData);
-    expect(mockUserModelConstructor).toHaveBeenCalledWith(expect.objectContaining({
-      email: userData.email,
-      username: userData.username,
-    }));
+    expect(mockUserModelConstructor).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: userData.email,
+        username: userData.username,
+      }),
+    );
     expect(mockSave).toHaveBeenCalled();
   });
 
   it('should not create a user if email or username exists', async () => {
-    mockFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue({ email: 'existing@example.com' }) });
+    mockFindOne.mockReturnValue({
+      exec: jest.fn().mockResolvedValue({ email: 'existing@example.com' }),
+    });
 
     await expect(
       service.createUser({ email: 'existing@example.com' } as any),
@@ -94,9 +102,9 @@ describe('UserService', () => {
     const newPassword = 'newpassword';
     const oldPassword = 'oldpassword';
     const hashedOldPassword = await bcrypt.hash(oldPassword, 10);
-  
+
     jest.spyOn(redisService, 'rateLimitOrThrow').mockResolvedValue();
-  
+
     mockFindById.mockReturnValue({
       select: jest.fn().mockReturnValue({
         exec: jest.fn().mockResolvedValue({
@@ -105,11 +113,12 @@ describe('UserService', () => {
         }),
       }),
     } as any);
-  
+
     jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
-    await expect(service.updatePassword(userId, newPassword)).resolves.not.toThrow();
+    await expect(
+      service.updatePassword(userId, newPassword),
+    ).resolves.not.toThrow();
   });
-  
 
   it('should throw error when new password matches old password', async () => {
     const hashed = await bcrypt.hash('samepassword', 10);
@@ -123,8 +132,8 @@ describe('UserService', () => {
 
     jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
 
-    await expect(service.updatePassword('1234', 'samepassword')).rejects.toThrow(
-      'New password cannot be the same as the old password',
-    );
+    await expect(
+      service.updatePassword('1234', 'samepassword'),
+    ).rejects.toThrow('New password cannot be the same as the old password');
   });
 });

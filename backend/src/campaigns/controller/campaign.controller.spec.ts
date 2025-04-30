@@ -62,7 +62,7 @@ describe('CampaignController', () => {
         status: 'active',
         influencers: [],
         submissions: [],
-        _id: 'mock-mongo-id',
+        _id: new Types.ObjectId(),
       };
 
       jest
@@ -80,8 +80,9 @@ describe('CampaignController', () => {
     it('should throw BadRequestException if campaign is not active', async () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
-      const campaign = Object.assign(new Campaign(), {
-        _id: new Types.ObjectId('60d21b4667d0d8992e610c85'),
+
+      const campaign: Partial<Campaign> = {
+        _id: new Types.ObjectId(),
         title: 'Test Campaign',
         instructions: 'Do this, do that',
         startDate: new Date().toISOString(),
@@ -90,9 +91,11 @@ describe('CampaignController', () => {
         status: 'inactive',
         influencers: [],
         submissions: [],
-      });
+      };
 
-      jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
+      jest
+        .spyOn(service, 'getCampaignById')
+        .mockResolvedValue(campaign as Campaign);
 
       await expect(controller.joinCampaign(campaignId, req)).rejects.toThrow(
         BadRequestException,
@@ -103,19 +106,21 @@ describe('CampaignController', () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
 
-      const campaign = Object.assign(new Campaign(), {
-        _id: new Types.ObjectId('60d21b4667d0d8992e610c85'),
+      const campaign: Partial<Campaign> = {
+        _id: new Types.ObjectId(),
         title: 'Test Campaign',
         instructions: 'Do this, do that',
         startDate: new Date().toISOString(),
         endDate: new Date().toISOString(),
         images: ['image1.jpg', 'image2.jpg'],
         status: 'active',
-        influencers: [{ _id: new Types.ObjectId('60d21b4667d0d8992e610c85') }],
+        influencers: [{ _id: new Types.ObjectId() }] as any,
         submissions: [],
-      });
+      };
 
-      jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
+      jest
+        .spyOn(service, 'getCampaignById')
+        .mockResolvedValue(campaign as Campaign);
 
       await expect(controller.joinCampaign(campaignId, req)).rejects.toThrow(
         BadRequestException,
@@ -126,8 +131,8 @@ describe('CampaignController', () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
 
-      const campaign = Object.assign(new Campaign(), {
-        _id: new Types.ObjectId('60d21b4667d0d8992e610c85'),
+      const campaign: Partial<Campaign> = {
+        _id: new Types.ObjectId(),
         title: 'Test Campaign',
         instructions: 'Do this, do that',
         startDate: new Date().toISOString(),
@@ -136,15 +141,19 @@ describe('CampaignController', () => {
         status: 'active',
         influencers: [],
         submissions: [],
-      });
+      };
 
-      const joinedCampaign = Object.assign(new Campaign(), {
+      const joinedCampaign: Partial<Campaign> = {
         ...campaign,
-        influencers: [{ _id: new Types.ObjectId('60d21b4667d0d8992e610c85') }],
-      });
+        influencers: [{ _id: new Types.ObjectId() }] as any,
+      };
 
-      jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
-      jest.spyOn(service, 'joinCampaign').mockResolvedValue(joinedCampaign);
+      jest
+        .spyOn(service, 'getCampaignById')
+        .mockResolvedValue(campaign as Campaign);
+      jest
+        .spyOn(service, 'joinCampaign')
+        .mockResolvedValue(joinedCampaign as Campaign);
 
       const result = await controller.joinCampaign(campaignId, req);
 
@@ -180,7 +189,8 @@ describe('CampaignController', () => {
       const req = { user: { sub: 'influencerId' } };
       const campaignId = 'campaignId';
       const content = 'Some content';
-      const campaign = new Campaign({
+
+      const campaign: Partial<Campaign> = {
         _id: new Types.ObjectId(),
         title: 'Test Campaign',
         instructions: 'Do this, do that',
@@ -190,10 +200,13 @@ describe('CampaignController', () => {
         status: 'active',
         influencers: [],
         submissions: [],
-      });
+      };
+
       const submission = { id: 'submissionId', content };
 
-      jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
+      jest
+        .spyOn(service, 'getCampaignById')
+        .mockResolvedValue(campaign as Campaign);
       jest.spyOn(service, 'addSubmission').mockResolvedValue(submission);
 
       const result = await controller.addSubmission(campaignId, content, req);
@@ -209,18 +222,22 @@ describe('CampaignController', () => {
 
   describe('getCampaigns', () => {
     it('should return a list of campaigns', async () => {
-      const campaigns = [{ title: 'Test Campaign' }];
-      jest.spyOn(service, 'getCampaignById').mockResolvedValue({
-        _id: new Types.ObjectId(),
-        title: 'Test Campaign',
-        instructions: 'Do this, do that',
-        startDate: new Date().toISOString(),
-        endDate: new Date().toISOString(),
-        images: ['image1.jpg', 'image2.jpg'],
-        status: 'active',
-        influencers: [],
-        submissions: [],
-      } as Campaign);
+      const campaigns: Campaign[] = [
+        {
+          _id: new Types.ObjectId(),
+          title: 'Test Campaign',
+          instructions: 'Some instructions',
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          images: [],
+          influencers: [],
+          status: 'active',
+          submissions: [],
+        },
+      ];
+
+      jest.spyOn(service, 'getCampaigns').mockResolvedValue(campaigns);
+
       const result = await controller.getAllCampaigns({});
 
       expect(result).toEqual(campaigns);
@@ -231,7 +248,8 @@ describe('CampaignController', () => {
   describe('getCampaign', () => {
     it('should return a campaign by id', async () => {
       const campaignId = 'campaignId';
-      const campaign = new Campaign({
+
+      const campaign: Partial<Campaign> = {
         _id: new Types.ObjectId(),
         title: 'Test Campaign',
         instructions: 'Do this, do that',
@@ -241,8 +259,11 @@ describe('CampaignController', () => {
         status: 'active',
         influencers: [],
         submissions: [],
-      });
-      jest.spyOn(service, 'getCampaignById').mockResolvedValue(campaign);
+      };
+
+      jest
+        .spyOn(service, 'getCampaignById')
+        .mockResolvedValue(campaign as Campaign);
 
       const result = await controller.getCampaign(campaignId);
 
@@ -269,10 +290,9 @@ describe('CampaignController', () => {
   describe('getCampaignsByInfluencer', () => {
     it('should return campaigns by influencer id', async () => {
       const influencerId = 'influencerId';
-      const campaigns = [
+      const campaigns: Partial<Campaign>[] = [
         {
-          id: 'campaign-id',
-          _id: 'some-mongo-id',
+          _id: new Types.ObjectId(),
           title: 'Test Campaign',
           instructions: 'Some instructions',
           startDate: new Date().toISOString(),
@@ -282,10 +302,10 @@ describe('CampaignController', () => {
           status: 'active',
           submissions: [],
         },
-      ] as unknown as Campaign[];
+      ];
       jest
         .spyOn(service, 'getCampaignsByInfluencer')
-        .mockResolvedValue(campaigns);
+        .mockResolvedValue(campaigns as Campaign[]);
 
       const result = await controller.getCampaignsByInfluencer(influencerId);
 
