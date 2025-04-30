@@ -23,7 +23,7 @@ export class AdminService {
 
     if (!superUserExists) {
       const hashedPassword = await bcrypt.hash(password, 10);
-      const superUser = new this.userModel({
+      const superUser = await this.userModel.create({
         username,
         email,
         password: hashedPassword,
