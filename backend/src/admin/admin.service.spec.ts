@@ -21,11 +21,23 @@ describe('AdminService', () => {
     password: 'hashedpassword',
     role: 'superuser',
   };
-  
 
   const mockUserModel = {
-    findOne: mockFindOne,
-    create: jest.fn().mockResolvedValue(mockUser),
+    findOne: jest.fn(),
+    create: jest.fn().mockResolvedValue({
+      _id: 'user123',
+      username: 'superuser1',
+      email: 'admin@example.com',
+      password: 'hashedpassword',
+      role: 'superuser',
+      save: jest.fn().mockResolvedValue({
+        _id: 'user123',
+        username: 'superuser1',
+        email: 'admin@example.com',
+        password: 'hashedpassword',
+        role: 'superuser',
+      }),
+    }),
     findById: mockFindById,
     find: mockFind,
     constructor: jest.fn().mockImplementation(() => ({
@@ -63,12 +75,14 @@ describe('AdminService', () => {
       const email = 'superuser1@example.com';
       const password = 'SuperSecretPassword';
 
-      mockFindOne.mockReturnValue(mockExec(null));
-
-      mockSave.mockResolvedValue({
+      mockUserModel.findOne.mockReturnValue(mockExec(null)); // Simulate no existing superuser
+      mockUserModel.create.mockResolvedValue({
+        _id: 'user123',
         username,
         email,
+        password: 'hashedPassword',
         role: 'superuser',
+        save: mockSave,
       });
 
       const result = await adminService.createSuperUser(
@@ -83,7 +97,9 @@ describe('AdminService', () => {
     });
 
     it('should throw an error if a superuser already exists', async () => {
-      mockFindOne.mockReturnValue(mockExec({ role: 'superuser' }));
+      mockFindOne.mockReturnValue(
+        mockExec({ _id: 'user123', role: 'superuser' }),
+      );
 
       await expect(
         adminService.createSuperUser('name', 'email', 'pass'),

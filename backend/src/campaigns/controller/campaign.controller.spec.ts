@@ -153,9 +153,7 @@ describe('CampaignController', () => {
       jest
         .spyOn(service, 'getCampaignById')
         .mockResolvedValue(campaign as Campaign);
-      jest
-        .spyOn(service, 'joinCampaign')
-        .mockResolvedValue(campaign as any);
+      jest.spyOn(service, 'joinCampaign').mockResolvedValue(campaign as any);
 
       const result = await controller.joinCampaign(campaignId, req);
 

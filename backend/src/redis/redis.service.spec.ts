@@ -9,6 +9,7 @@ jest.mock('ioredis', () => ({
   incr: jest.fn(),
   expire: jest.fn(),
   quit: jest.fn(),
+  exists: jest.fn(), 
 }));
 
 describe('RedisService', () => {
