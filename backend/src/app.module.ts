@@ -53,7 +53,7 @@ import { RedisModule } from './redis/redis.module';
     UserModule,
     PassportModule,
     MetricsModule,
-    RedisModule
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [
