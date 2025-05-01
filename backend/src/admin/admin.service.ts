@@ -31,10 +31,8 @@ export class AdminService {
       });
 
       await superUser.save();
-      console.log('Superuser created:', username);
       return superUser;
     } else {
-      console.log('Superuser already exists.');
       throw new Error('Superuser already exists.');
     }
   }
