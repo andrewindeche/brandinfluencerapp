@@ -75,7 +75,7 @@ describe('AdminService', () => {
       const email = 'superuser1@example.com';
       const password = 'SuperSecretPassword';
 
-      mockUserModel.findOne.mockReturnValue(mockExec(null)); // Simulate no existing superuser
+      mockUserModel.findOne.mockReturnValue(mockExec(null));
       mockUserModel.create.mockResolvedValue({
         _id: 'user123',
         username,
@@ -97,10 +97,16 @@ describe('AdminService', () => {
     });
 
     it('should throw an error if a superuser already exists', async () => {
-      mockFindOne.mockReturnValue(
-        mockExec({ _id: 'user123', role: 'superuser' }),
-      );
-
+      const existingSuperUser = {
+        _id: 'user123',
+        username: 'superuser1',
+        email: 'superuser1@example.com',
+        password: 'hashedPassword',
+        role: 'superuser',
+      };
+    
+      jest.spyOn(mockUserModel, 'findOne').mockReturnValueOnce(mockExec(existingSuperUser));
+    
       await expect(
         adminService.createSuperUser('name', 'email', 'pass'),
       ).rejects.toThrow('Superuser already exists.');
