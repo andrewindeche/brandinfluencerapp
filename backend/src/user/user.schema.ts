@@ -22,3 +22,5 @@ export const UserSchema = new Schema(
 );
 
 export const UserModel = model<User>('User', UserSchema);
+
+export { Document };

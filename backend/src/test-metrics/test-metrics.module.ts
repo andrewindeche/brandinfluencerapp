@@ -12,7 +12,6 @@ register.clear();
 @Module({
   imports: [PrometheusModule.register({ path: '/metrics' })],
   providers: [
-    // Test Execution Metrics
     makeCounterProvider({
       name: 'test_cases_total',
       help: 'Total test cases executed',
@@ -31,7 +30,6 @@ register.clear();
       buckets: [0.1, 1, 2, 5, 10],
     }),
 
-    // Performance Metrics
     makeHistogramProvider({
       name: 'http_request_duration_seconds',
       help: 'API response time',
@@ -45,7 +43,6 @@ register.clear();
     makeGaugeProvider({ name: 'process_memory_bytes', help: 'Memory usage' }),
     makeGaugeProvider({ name: 'process_cpu_seconds_total', help: 'CPU usage' }),
 
-    // Error & Reliability Metrics
     makeCounterProvider({
       name: 'app_exceptions_total',
       help: 'Total unhandled exceptions',
@@ -73,7 +70,6 @@ register.clear();
       help: 'Event loop lag',
     }),
 
-    // Custom Business Metrics
     makeCounterProvider({
       name: 'user_signups_total',
       help: 'Total user signups per test run',
