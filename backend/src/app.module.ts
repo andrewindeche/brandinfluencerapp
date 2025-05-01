@@ -18,6 +18,7 @@ import { RedisService } from './redis/redis.service';
 import { SessionService } from './session/session.service';
 import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ForgotPasswordService } from './forgot-password/forgot-password.service
     UserModule,
     PassportModule,
     MetricsModule,
+    RedisModule
   ],
   controllers: [AppController],
   providers: [

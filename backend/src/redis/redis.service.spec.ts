@@ -7,7 +7,6 @@ describe('RedisService', () => {
   let mockRedisClient: Partial<Redis>;
 
   beforeEach(async () => {
-    // Define all mocked methods upfront
     mockRedisClient = {
       set: jest.fn(),
       get: jest.fn(),
