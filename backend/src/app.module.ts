@@ -1,53 +1,56 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from './auth/service/auth.service';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { MetricsModule } from './test-metrics/test-metrics.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthService } from './auth/service/auth.service';
 import { JwtStrategy } from './auth/jwt.strategy';
-import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { RedisService } from './redis/redis.service';
 import { SessionService } from './session/session.service';
+import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
-import * as fs from 'fs';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
-import { MetricsModule } from './test-metrics/test-metrics.module';
-
-function loadJwtSecret() {
-  try {
-    const secret = fs.readFileSync('.jwt_secret').toString().trim();
-    process.env.JWT_SECRET = secret;
-    return secret;
-  } catch (error) {
-    throw new Error(
-      'JWT secret not found, ensure the .jwt_secret file is present.',
-    );
-  }
-}
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://mongodb:27017/nest_campaigns'),
+    ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '60s' },
+      }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get<string>('REDIS_HOST'),
+        port: configService.get<number>('REDIS_PORT'),
+      }),
+      inject: [ConfigService],
+    }),
     CampaignsModule,
     AuthModule,
     AdminModule,
     UserModule,
     PassportModule,
-    JwtModule.register({
-      secret: loadJwtSecret(),
-      signOptions: { expiresIn: '60s' },
-    }),
-    CacheModule.register({
-      store: redisStore,
-      host: 'localhost',
-      port: 6380,
-    }),
     MetricsModule,
   ],
   controllers: [AppController],
