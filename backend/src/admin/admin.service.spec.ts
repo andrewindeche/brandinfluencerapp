@@ -104,9 +104,11 @@ describe('AdminService', () => {
         password: 'hashedPassword',
         role: 'superuser',
       };
-    
-      jest.spyOn(mockUserModel, 'findOne').mockReturnValueOnce(mockExec(existingSuperUser));
-    
+
+      jest
+        .spyOn(mockUserModel, 'findOne')
+        .mockReturnValueOnce(mockExec(existingSuperUser));
+
       await expect(
         adminService.createSuperUser('name', 'email', 'pass'),
       ).rejects.toThrow('Superuser already exists.');
