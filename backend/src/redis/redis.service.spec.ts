@@ -33,13 +33,15 @@ describe('RedisService', () => {
 
   it('should call set() when setValue is called', async () => {
     await redisService.setValue('key1', 'value1');
-
-    // Check if Redis set method is called with the expected parameters
-    expect(mockRedisClient.set).toHaveBeenCalledWith('key1', 'value1', 'EX', 3600);
+    expect(mockRedisClient.set).toHaveBeenCalledWith(
+      'key1',
+      'value1',
+      'EX',
+      3600,
+    );
   });
 
   it('should call get() when getValue is called', async () => {
-    // Mock the return value for get method
     mockRedisClient.get = jest.fn().mockResolvedValue('value1');
 
     const result = await redisService.getValue('key1');
@@ -71,6 +73,8 @@ describe('RedisService', () => {
   it('should throw error if rate limit is exceeded', async () => {
     mockRedisClient.exists = jest.fn().mockResolvedValue(1);
 
-    await expect(redisService.rateLimitOrThrow('key1', 60)).rejects.toThrow('Too many requests');
+    await expect(redisService.rateLimitOrThrow('key1', 60)).rejects.toThrow(
+      'Too many requests',
+    );
   });
 });
