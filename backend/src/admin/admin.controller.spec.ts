@@ -71,6 +71,11 @@ describe('AdminController (e2e)', () => {
     }
     await mongoose.disconnect();
     await mongod.stop();
+
+    const redisClient = mockRedisService.getClient();
+    await redisClient.quit();
+
+    jest.clearAllTimers();
   });
 
   it('/admin/promote (POST)', async () => {
