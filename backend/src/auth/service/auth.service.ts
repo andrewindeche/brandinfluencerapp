@@ -69,6 +69,11 @@ export class AuthService {
     return user;
   }
 
+  async validateUserByIdAndRole(userId: string, role: string) {
+    const user = await this.userModel.findById(userId);
+    return user && user.role === role ? user : null;
+  }
+
   async validateUserByJwt(
     username: string,
     role: 'brand' | 'influencer' | 'admin' | 'superuser',
