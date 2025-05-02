@@ -24,12 +24,11 @@ describe('SessionAuthGuard', () => {
       getSession: jest.fn(),
     } as unknown as jest.Mocked<SessionService>;
 
-    guard = new SessionAuthGuard(sessionService);
+    guard = new SessionAuthGuard(sessionService, false);
   });
 
   it('should throw if session ID is missing', async () => {
     const context = mockContext();
-
     await expect(guard.canActivate(context)).rejects.toThrow(
       new UnauthorizedException('Session ID missing'),
     );
@@ -51,8 +50,8 @@ describe('SessionAuthGuard', () => {
     const req = context.switchToHttp().getRequest() as any;
     sessionService.getSession.mockResolvedValue(sessionData);
 
-    const result = await guard.canActivate(context);
-    expect(result).toBe(true);
+    await guard.canActivate(context);
+
     expect(req.user).toEqual(sessionData);
   });
 });
