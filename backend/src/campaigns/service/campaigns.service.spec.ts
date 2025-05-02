@@ -38,7 +38,7 @@ describe('CampaignsService', () => {
           useValue: Object.assign(
             jest.fn().mockImplementation((data) => ({
               ...data,
-              _id: new Types.ObjectId(), // ensure _id is a valid ObjectId
+              _id: new Types.ObjectId(),
               save: jest
                 .fn()
                 .mockResolvedValue({ _id: new Types.ObjectId(), ...data }),
@@ -175,6 +175,49 @@ describe('CampaignsService', () => {
     });
   });
 
+  describe('getInfluencersWithSubmissions', () => {
+    it('should return influencers with filtered submissions', async () => {
+      const campaignId = new Types.ObjectId().toHexString();
+      const campaign = {
+        _id: campaignId,
+        influencers: [
+          {
+            _id: new Types.ObjectId(),
+            username: 'john',
+            submissions: [{ content: 'post', submittedAt: new Date() }],
+          },
+        ],
+      };
+  
+      campaignModel.findById = jest.fn().mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          populate: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(campaign),
+          }),
+        }),
+      });
+  
+      const result = await service.getInfluencersWithSubmissions(campaignId);
+      expect(result.length).toBe(1);
+      expect(result[0].influencer.username).toBe('john');
+      expect(result[0].submissions.length).toBe(1);
+    });
+  
+    it('should throw if campaign not found', async () => {
+      campaignModel.findById = jest.fn().mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          populate: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(null),
+          }),
+        }),
+      });
+  
+      await expect(
+        service.getInfluencersWithSubmissions(new Types.ObjectId().toHexString()),
+      ).rejects.toThrow('Campaign not found');
+    });
+  });
+  
   describe('updateCampaignStatus', () => {
     it('should activate or deactivate campaign based on dates', async () => {
       const now = new Date();
