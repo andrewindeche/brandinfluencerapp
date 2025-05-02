@@ -66,6 +66,11 @@ describe('AuthController', () => {
     jwtService = module.get<JwtService>(JwtService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  });
+
   afterAll(async () => {
     await app.close();
   });

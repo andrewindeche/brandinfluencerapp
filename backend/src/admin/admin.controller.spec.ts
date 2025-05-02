@@ -65,6 +65,11 @@ describe('AdminController (e2e)', () => {
     userModel = app.get(getModelToken('User'));
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+  });
+
   afterAll(async () => {
     if (app) {
       await app.close();
