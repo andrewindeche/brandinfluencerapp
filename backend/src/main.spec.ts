@@ -69,8 +69,12 @@ describe('Bootstrap (main.ts)', () => {
 
     expect(NestFactory.create).toHaveBeenCalledWith(AppModule);
     expect(mockApp.use).toHaveBeenCalled();
-    expect(mockApp.useGlobalPipes).toHaveBeenCalledWith(expect.any(ValidationPipe));
-    expect(mockApp.enableCors).toHaveBeenCalledWith(expect.objectContaining({ origin: expect.any(Array) }));
+    expect(mockApp.useGlobalPipes).toHaveBeenCalledWith(
+      expect.any(ValidationPipe),
+    );
+    expect(mockApp.enableCors).toHaveBeenCalledWith(
+      expect.objectContaining({ origin: expect.any(Array) }),
+    );
     expect(mockApp.listen).toHaveBeenCalledWith('4001');
   });
 });
