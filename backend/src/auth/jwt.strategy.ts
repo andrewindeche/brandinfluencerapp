@@ -14,13 +14,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.authService.validateUserByJwt(
-      payload.username,
+    const user = await this.authService.validateUserByIdAndRole(
+      payload.sub,
       payload.role,
     );
+
     if (!user) {
       throw new UnauthorizedException('Unauthorized access');
     }
+
     return {
       sub: user.id,
       username: user.username,
