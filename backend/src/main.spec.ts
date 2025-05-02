@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { bootstrap } from './main';
 
 jest.mock('express-rate-limit', () => {
   return {
@@ -59,10 +60,11 @@ describe('Bootstrap (main.ts)', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.resetModules();
   });
 
   it('should bootstrap the app without throwing', async () => {
-    require('./main');
+    await bootstrap();
     await new Promise((resolve) => setImmediate(resolve));
 
     expect(NestFactory.create).toHaveBeenCalledWith(AppModule);
