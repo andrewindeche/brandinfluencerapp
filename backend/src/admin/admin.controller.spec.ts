@@ -10,6 +10,7 @@ import * as bcrypt from 'bcryptjs';
 import { getModelToken } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/user.schema';
 import * as jwt from 'jsonwebtoken';
+import { SessionAuthGuard } from '../session-auth/session-auth.guard';
 
 jest.setTimeout(60000);
 
@@ -37,27 +38,31 @@ describe('AdminController (e2e)', () => {
 
   beforeAll(async () => {
     process.env.JWT_SECRET = 'test-secret';
-    
+
     mongod = await MongoMemoryServer.create();
     const uri = mongod.getUri();
-
-    console.log('MongoMemoryServer URI:', uri);
     process.env.MONGO_URI = uri;
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+
+    const moduleBuilder = Test.createTestingModule({
       imports: [
         MongooseModule.forRoot(uri),
         MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
         AppModule,
       ],
-    })
-      .overrideProvider(RedisService)
-      .useValue(mockRedisService)
-      .compile();
+    });
+
+    moduleBuilder.overrideGuard(SessionAuthGuard).useValue({
+      canActivate: () => true,
+    });
+
+    moduleBuilder.overrideProvider(RedisService).useValue(mockRedisService);
+
+    const moduleFixture: TestingModule = await moduleBuilder.compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    userModel = moduleFixture.get<mongoose.Model<User>>(getModelToken('User'));
+    userModel = app.get(getModelToken('User'));
   });
 
   afterAll(async () => {
@@ -83,7 +88,11 @@ describe('AdminController (e2e)', () => {
       username: 'user',
     });
 
-    const token = generateJwtToken(superUser._id.toString(), 'superuser');
+    const token = generateJwtToken(
+      superUser._id.toString(),
+      'superuser',
+      'superadmin',
+    );
 
     const response = await request(app.getHttpServer())
       .post('/admin/promote')
@@ -99,9 +108,9 @@ describe('AdminController (e2e)', () => {
   });
 });
 
-function generateJwtToken(userId: string, role: string) {
+function generateJwtToken(userId: string, role: string, username: string) {
   return jwt.sign(
-    { sub: userId, role },
+    { sub: userId, role, username },
     process.env.JWT_SECRET || 'test-secret',
     { expiresIn: '1h' },
   );
