@@ -8,7 +8,7 @@ import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const redisClient = new Redis({
     host: process.env.REDIS_HOST || 'redis',
@@ -43,4 +43,6 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 4000);
 }
 
-bootstrap();
+if (require.main === module) {
+  bootstrap();
+}
