@@ -20,8 +20,8 @@ import { CreateUserDto } from '../auth/dto/create-user.dto';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Roles('superuser')
   @Post('promote')
-  @Roles('admin')
   async promoteUserToAdmin(@Body() promoteUserDto: PromoteUserDto) {
     const { superUserId, userId } = promoteUserDto;
     return this.adminService.promoteUserToAdmin(superUserId, userId);
