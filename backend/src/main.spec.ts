@@ -5,11 +5,10 @@ import { ValidationPipe } from '@nestjs/common';
 jest.mock('express-rate-limit', () => {
   return {
     __esModule: true,
-    default: jest.fn(() => (req: any, res: any, next: any) => next()),
+    default: jest.fn(() => (next: any) => next()),
   };
 });
 
-// ✅ Fix ioredis mock to act like a constructor
 jest.mock('ioredis', () => {
   return {
     __esModule: true,
@@ -38,7 +37,6 @@ jest.mock('dotenv', () => ({
 
 jest.mock('cookie-parser', () => jest.fn());
 
-// ✅ Explicitly assign NestFactory.create as jest mock
 (NestFactory.create as unknown) = jest.fn();
 
 describe('Bootstrap (main.ts)', () => {
