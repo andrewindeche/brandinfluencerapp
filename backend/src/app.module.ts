@@ -39,7 +39,17 @@ import * as path from 'path';
 
     JwtModule.registerAsync({
       useFactory: async () => {
-        const jwtSecret = fs.readFileSync(path.resolve(__dirname, '..', '..', '.jwt_secret'), 'utf-8').trim();
+        const jwtSecretPath = path.resolve(__dirname, '..', '.jwt_secret');
+        console.log('Resolved JWT secret file path:', jwtSecretPath); 
+        console.log('Current working directory:', process.cwd());
+        
+        if (!fs.existsSync(jwtSecretPath)) {
+          console.error('JWT secret file not found at:', jwtSecretPath);
+          throw new Error('JWT secret file missing');
+        }
+
+        const jwtSecret = fs.readFileSync(jwtSecretPath, 'utf-8').trim();
+
         return {
           secret: jwtSecret,
           signOptions: { expiresIn: '60s' },
@@ -55,6 +65,7 @@ import * as path from 'path';
       }),
       inject: [ConfigService],
     }),
+
     CampaignsModule,
     AuthModule,
     AdminModule,
