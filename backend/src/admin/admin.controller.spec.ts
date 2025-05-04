@@ -18,6 +18,7 @@ describe('AdminController (e2e)', () => {
   let app: INestApplication;
   let mongod: MongoMemoryServer;
   let userModel: mongoose.Model<User>;
+  let superUserId: string;
 
   const mockRedisService = {
     getValue: jest.fn().mockResolvedValue(null),
@@ -43,6 +44,17 @@ describe('AdminController (e2e)', () => {
     const uri = mongod.getUri();
     process.env.MONGO_URI = uri;
 
+    const standaloneConnection = await mongoose.createConnection(uri).asPromise();
+    const StandaloneUserModel = standaloneConnection.model<User>('User', UserSchema);
+    const superUser = await StandaloneUserModel.create({
+      email: 'superadmin@test.com',
+      password: await bcrypt.hash('password', 10),
+      role: 'superuser',
+      username: 'superadmin',
+    });
+    superUserId = superUser._id.toString();
+    await standaloneConnection.close();
+
     const moduleBuilder = Test.createTestingModule({
       imports: [
         MongooseModule.forRoot(uri),
@@ -52,7 +64,15 @@ describe('AdminController (e2e)', () => {
     });
 
     moduleBuilder.overrideGuard(SessionAuthGuard).useValue({
-      canActivate: () => true,
+      canActivate: (context) => {
+        const request = context.switchToHttp().getRequest();
+        request.user = {
+          id: superUserId,
+          role: 'superuser',
+          username: 'superadmin',
+        };
+        return true;
+      },
     });
 
     moduleBuilder.overrideProvider(RedisService).useValue(mockRedisService);
@@ -84,13 +104,6 @@ describe('AdminController (e2e)', () => {
   });
 
   it('/admin/promote (POST)', async () => {
-    const superUser = await userModel.create({
-      email: 'superadmin@test.com',
-      password: await bcrypt.hash('password', 10),
-      role: 'superuser',
-      username: 'superadmin',
-    });
-
     const userToPromote = await userModel.create({
       email: 'user@test.com',
       password: await bcrypt.hash('password', 10),
@@ -99,7 +112,7 @@ describe('AdminController (e2e)', () => {
     });
 
     const token = generateJwtToken(
-      superUser._id.toString(),
+      superUserId,
       'superuser',
       'superadmin',
     );
@@ -108,7 +121,7 @@ describe('AdminController (e2e)', () => {
       .post('/admin/promote')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        superUserId: superUser._id.toString(),
+        superUserId,
         userId: userToPromote._id.toString(),
       })
       .expect(201);
