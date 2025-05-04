@@ -19,6 +19,8 @@ import { SessionService } from './session/session.service';
 import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { RedisModule } from './redis/redis.module';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -36,12 +38,15 @@ import { RedisModule } from './redis/redis.module';
     }),
 
     JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
-      }),
-      inject: [ConfigService],
+      useFactory: async () => {
+        const jwtSecret = fs.readFileSync(path.resolve(__dirname, '..', '..', '.jwt_secret'), 'utf-8').trim();
+        return {
+          secret: jwtSecret,
+          signOptions: { expiresIn: '60s' },
+        };
+      },
     }),
+
     CacheModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         store: redisStore,
