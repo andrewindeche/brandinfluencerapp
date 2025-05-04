@@ -7,7 +7,6 @@ import Redis from 'ioredis';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 dotenv.config();
-
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const redisClient = new Redis({

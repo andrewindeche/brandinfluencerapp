@@ -2,6 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RedisService } from './redis.service';
 import Redis from 'ioredis';
 
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => ({
+    set: jest.fn(),
+    get: jest.fn(),
+    del: jest.fn(),
+    exists: jest.fn(),
+    quit: jest.fn(),
+    on: jest.fn(),
+  }));
+});
+
 describe('RedisService', () => {
   let redisService: RedisService;
   let mockRedisClient: Partial<Redis>;
@@ -12,19 +23,27 @@ describe('RedisService', () => {
       get: jest.fn(),
       del: jest.fn(),
       exists: jest.fn(),
+      quit: jest.fn(),
+      on: jest.fn(),
     };
+
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RedisService,
         {
-          provide: Redis,
+          provide: 'REDIS_CLIENT',
           useValue: mockRedisClient,
         },
       ],
     }).compile();
 
     redisService = module.get<RedisService>(RedisService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {

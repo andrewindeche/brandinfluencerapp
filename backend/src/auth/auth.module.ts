@@ -14,6 +14,7 @@ import { ForgotPasswordService } from '../forgot-password/forgot-password.servic
 import { SessionService } from '../session/session.service';
 import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
+import { RedisModule } from '../redis/redis.module';
 
 let secretKey: string;
 
@@ -38,6 +39,7 @@ if (process.env.JWT_SECRET) {
       signOptions: { expiresIn: '60m' },
     }),
     BrandModule,
+    RedisModule,
   ],
   providers: [
     AuthService,
@@ -48,6 +50,7 @@ if (process.env.JWT_SECRET) {
     RedisService,
     SendForgotPasswordEmailService,
     SessionService,
+    RedisModule,
   ],
   controllers: [AuthController],
   exports: [

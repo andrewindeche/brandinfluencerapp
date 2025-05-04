@@ -23,15 +23,18 @@ import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      envFilePath:
+        process.env.NODE_ENV === 'development' ? '.env.local' : '.env',
       isGlobal: true,
     }),
+
     MongooseModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
       }),
       inject: [ConfigService],
     }),
+
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
@@ -57,6 +60,7 @@ import { RedisModule } from './redis/redis.module';
   ],
   controllers: [AppController],
   providers: [
+    ConfigService,
     AppService,
     AuthService,
     JwtStrategy,

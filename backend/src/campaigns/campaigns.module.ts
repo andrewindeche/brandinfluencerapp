@@ -5,6 +5,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { CampaignsService } from './service/campaigns.service';
 import { SessionService } from '../session/session.service';
 import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '../redis/redis.module';
 import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
@@ -22,6 +23,7 @@ import { InfluencerSchema } from '../user/influencer/influencer.schema';
       host: 'localhost',
       port: 6380,
     }),
+    RedisModule,
   ],
   providers: [CampaignsService, SessionService, RedisService],
   controllers: [CampaignController],

@@ -5,3 +5,4 @@ backend/dist
 .vscode
 backend/.env
 backend/.envexample
+backend/.env.local

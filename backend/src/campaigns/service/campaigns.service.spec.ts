@@ -188,7 +188,7 @@ describe('CampaignsService', () => {
           },
         ],
       };
-  
+
       campaignModel.findById = jest.fn().mockReturnValue({
         populate: jest.fn().mockReturnValue({
           populate: jest.fn().mockReturnValue({
@@ -196,13 +196,13 @@ describe('CampaignsService', () => {
           }),
         }),
       });
-  
+
       const result = await service.getInfluencersWithSubmissions(campaignId);
       expect(result.length).toBe(1);
       expect(result[0].influencer.username).toBe('john');
       expect(result[0].submissions.length).toBe(1);
     });
-  
+
     it('should throw if campaign not found', async () => {
       campaignModel.findById = jest.fn().mockReturnValue({
         populate: jest.fn().mockReturnValue({
@@ -211,13 +211,15 @@ describe('CampaignsService', () => {
           }),
         }),
       });
-  
+
       await expect(
-        service.getInfluencersWithSubmissions(new Types.ObjectId().toHexString()),
+        service.getInfluencersWithSubmissions(
+          new Types.ObjectId().toHexString(),
+        ),
       ).rejects.toThrow('Campaign not found');
     });
   });
-  
+
   describe('updateCampaignStatus', () => {
     it('should activate or deactivate campaign based on dates', async () => {
       const now = new Date();
