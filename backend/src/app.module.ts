@@ -26,7 +26,7 @@ import * as path from 'path';
   imports: [
     ConfigModule.forRoot({
       envFilePath:
-        process.env.NODE_ENV === 'development' ? '.env.local' : '.env',
+        process.env.NODE_ENV === 'development' ? '.env' : '.env.local',
       isGlobal: true,
     }),
 
@@ -40,9 +40,6 @@ import * as path from 'path';
     JwtModule.registerAsync({
       useFactory: async () => {
         const jwtSecretPath = path.resolve(__dirname, '..', '.jwt_secret');
-        console.log('Resolved JWT secret file path:', jwtSecretPath); 
-        console.log('Current working directory:', process.cwd());
-        
         if (!fs.existsSync(jwtSecretPath)) {
           console.error('JWT secret file not found at:', jwtSecretPath);
           throw new Error('JWT secret file missing');
@@ -62,6 +59,7 @@ import * as path from 'path';
         store: redisStore,
         host: configService.get<string>('REDIS_HOST'),
         port: configService.get<number>('REDIS_PORT'),
+        password: configService.get<number>('REDIS_PASSWORD')
       }),
       inject: [ConfigService],
     }),
@@ -76,7 +74,6 @@ import * as path from 'path';
   ],
   controllers: [AppController],
   providers: [
-    ConfigService,
     AppService,
     AuthService,
     JwtStrategy,

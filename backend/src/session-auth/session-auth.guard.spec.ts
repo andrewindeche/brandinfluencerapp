@@ -24,7 +24,7 @@ describe('SessionAuthGuard', () => {
       getSession: jest.fn(),
     } as unknown as jest.Mocked<SessionService>;
 
-    guard = new SessionAuthGuard(sessionService, false);
+    guard = new SessionAuthGuard(sessionService);
   });
 
   it('should throw if session ID is missing', async () => {

@@ -9,15 +9,17 @@ import { SessionService } from '../session/session.service';
 
 @Injectable()
 export class SessionAuthGuard implements CanActivate {
-  constructor(
-    private readonly sessionService: SessionService,
-    private readonly bypassInTestMode = process.env.NODE_ENV === 'test',
-  ) {}
+  private readonly bypassInTestMode: boolean;
+
+  constructor(private readonly sessionService: SessionService) {
+    this.bypassInTestMode = process.env.NODE_ENV === 'test';
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     if (this.bypassInTestMode) {
       return true;
     }
+
     const request = context.switchToHttp().getRequest<Request>();
     const sessionId = request.cookies?.sessionId;
 
@@ -37,3 +39,4 @@ export class SessionAuthGuard implements CanActivate {
     return true;
   }
 }
+
