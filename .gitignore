@@ -4,5 +4,4 @@ backend/dump.rdb
 backend/dist
 .vscode
 backend/.env
-backend/.envexample
 backend/.env.local

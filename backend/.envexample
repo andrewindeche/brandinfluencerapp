@@ -1,0 +1,5 @@
+MONGO_URI=mongodb://localhost:27017/db_name
+PORT=4000
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD="Password44#"
