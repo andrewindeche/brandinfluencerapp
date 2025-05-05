@@ -15,6 +15,6 @@ const RedisProvider = {
 
 @Module({
   providers: [RedisProvider, RedisService],
-  exports: ['REDIS_CLIENT',RedisService],
+  exports: ['REDIS_CLIENT', RedisService],
 })
 export class RedisModule {}

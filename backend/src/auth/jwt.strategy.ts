@@ -8,10 +8,9 @@ import * as path from 'path';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    const jwtSecret = fs.readFileSync(
-      path.join(__dirname, '../../.jwt_secret'),
-      'utf8',
-    ).trim();
+    const jwtSecret = fs
+      .readFileSync(path.join(__dirname, '../../.jwt_secret'), 'utf8')
+      .trim();
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

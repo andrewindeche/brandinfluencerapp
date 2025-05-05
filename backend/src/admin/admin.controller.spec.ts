@@ -11,6 +11,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/user.schema';
 import * as jwt from 'jsonwebtoken';
 import { SessionAuthGuard } from '../session-auth/session-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 jest.setTimeout(60000);
 
@@ -44,8 +45,13 @@ describe('AdminController (e2e)', () => {
     const uri = mongod.getUri();
     process.env.MONGO_URI = uri;
 
-    const standaloneConnection = await mongoose.createConnection(uri).asPromise();
-    const StandaloneUserModel = standaloneConnection.model<User>('User', UserSchema);
+    const standaloneConnection = await mongoose
+      .createConnection(uri)
+      .asPromise();
+    const StandaloneUserModel = standaloneConnection.model<User>(
+      'User',
+      UserSchema,
+    );
     const superUser = await StandaloneUserModel.create({
       email: 'superadmin@test.com',
       password: await bcrypt.hash('password', 10),
@@ -61,6 +67,18 @@ describe('AdminController (e2e)', () => {
         MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
         AppModule,
       ],
+    });
+
+    moduleBuilder.overrideGuard(JwtAuthGuard).useValue({
+      canActivate: (context) => {
+        const request = context.switchToHttp().getRequest();
+        request.user = {
+          id: superUserId,
+          role: 'superuser',
+          username: 'superadmin',
+        };
+        return true;
+      },
     });
 
     moduleBuilder.overrideGuard(SessionAuthGuard).useValue({
@@ -111,11 +129,7 @@ describe('AdminController (e2e)', () => {
       username: 'user',
     });
 
-    const token = generateJwtToken(
-      superUserId,
-      'superuser',
-      'superadmin',
-    );
+    const token = generateJwtToken(superUserId, 'superuser', 'superadmin');
 
     const response = await request(app.getHttpServer())
       .post('/admin/promote')
