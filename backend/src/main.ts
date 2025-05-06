@@ -44,7 +44,6 @@ export async function bootstrap() {
     console.log(`[Request] ${req.method} ${req.url}`);
     next();
   });
-  
 
   await app.listen(process.env.PORT ?? 4000);
 }
