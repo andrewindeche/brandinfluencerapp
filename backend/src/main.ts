@@ -36,9 +36,15 @@ export async function bootstrap() {
   app.enableCors({
     origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
     methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
+
+  app.use((req, res, next) => {
+    console.log(`[Request] ${req.method} ${req.url}`);
+    next();
+  });
+  
 
   await app.listen(process.env.PORT ?? 4000);
 }
