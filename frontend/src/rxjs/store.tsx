@@ -36,7 +36,6 @@ const fetchUserType = debounce(async (email: string) => {
     return;
   }
 
-  console.log('Fetching user type for email:', email);
   try {
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
     const role = response.data.type;
