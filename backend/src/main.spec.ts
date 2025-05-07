@@ -19,23 +19,6 @@ jest.mock('ioredis', () => {
   };
 });
 
-jest.mock('dotenv', () => ({
-  config: jest.fn().mockImplementation(() => ({
-    parsed: {
-      REDIS_HOST: 'localhost',
-      REDIS_PORT: '6379',
-      PORT: '4001',
-      JWT_SECRET: 'test-secret',
-    },
-  })),
-  parse: jest.fn().mockReturnValue({
-    REDIS_HOST: 'localhost',
-    REDIS_PORT: '6379',
-    PORT: '4001',
-    JWT_SECRET: 'test-secret',
-  }),
-}));
-
 jest.mock('cookie-parser', () => jest.fn());
 
 (NestFactory.create as unknown) = jest.fn();
@@ -48,6 +31,7 @@ describe('Bootstrap (main.ts)', () => {
       use: jest.fn(),
       useGlobalPipes: jest.fn(),
       enableCors: jest.fn(),
+      useGlobalFilters: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined),
     };
 
@@ -56,6 +40,7 @@ describe('Bootstrap (main.ts)', () => {
     process.env.REDIS_HOST = 'localhost';
     process.env.REDIS_PORT = '6379';
     process.env.PORT = '4001';
+    process.env.JWT_SECRET = 'test-secret';
   });
 
   afterEach(() => {
@@ -73,8 +58,14 @@ describe('Bootstrap (main.ts)', () => {
       expect.any(ValidationPipe),
     );
     expect(mockApp.enableCors).toHaveBeenCalledWith(
-      expect.objectContaining({ origin: expect.any(Array) }),
+      expect.objectContaining({
+        origin: expect.any(Array),
+        methods: expect.any(String),
+        allowedHeaders: expect.any(Array),
+        credentials: true,
+      }),
     );
+    expect(mockApp.useGlobalFilters).toHaveBeenCalled();
     expect(mockApp.listen).toHaveBeenCalledWith('4001');
   });
 });
