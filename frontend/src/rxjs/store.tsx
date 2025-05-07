@@ -14,6 +14,7 @@ type FormState = {
   category?: string;
   bio?: string;
   location?: string;
+  errors: Record<string, string>;
 };
 
 export const initialState: FormState = {
@@ -26,9 +27,17 @@ export const initialState: FormState = {
   bio: '',
   location: '',
   confirmPassword: '',
+  errors: {},
 };
 
 const stateSubject = new BehaviorSubject<FormState>(initialState);
+
+export const setErrors = (newErrors: Record<string, string>) => {
+  stateSubject.next({
+    ...stateSubject.value,
+    errors: newErrors,
+  });
+};
 
 const fetchUserType = debounce(async (email: string) => {
   if (!email) {
@@ -69,7 +78,7 @@ export const submitSignUpForm = async (
   const formState = stateSubject.value;
 
   if (formState.password !== formState.confirmPassword) {
-    alert('Passwords do not match.');
+    setErrors({ confirmPassword: 'Passwords do not match.' });
     return;
   }
 
@@ -86,7 +95,7 @@ export const submitSignUpForm = async (
   };
 
   if (formState.role === 'unknown') {
-    alert('Please select a valid user type.');
+    setErrors({ role: 'Please select a valid user type.' });
     return;
   }
 
@@ -106,28 +115,25 @@ export const submitSignUpForm = async (
     stateSubject.next(initialState);
 
     if (error instanceof AxiosError) {
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        if (error.response.status === 409) {
-          alert('The email or username already exists.');
-        } else {
-          alert(
-            'Failed to sign up. Please check your information and try again.',
-          );
-        }
-      } else if (error.request) {
-        alert('No response from server. Please try again later.');
-        console.error('Error request:', error.request);
+      const customError = error.response?.data || {};
+
+      setShowErrorDialog(true);
+
+      if (customError.code === 'DUPLICATE_USER') {
+        setErrors({
+          email: customError.message || 'The email or username already exists.',
+        });
       } else {
-        alert('Unexpected error occurred. Please try again.');
-        console.error('Error message:', error.message);
+        setErrors({
+          general:
+            customError.message ||
+            'Failed to sign up. Please check your information and try again.',
+        });
       }
     } else {
-      alert('Unexpected error occurred. Please try again.');
+      setErrors({ general: 'Unexpected error occurred. Please try again.' });
       console.error('Unexpected error:', error);
     }
-
-    setShowErrorDialog(true);
   }
 };
 

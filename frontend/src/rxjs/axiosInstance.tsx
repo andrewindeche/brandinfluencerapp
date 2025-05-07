@@ -21,7 +21,26 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    return Promise.reject(error);
+    if (error.response) {
+      const { status, data } = error.response;
+
+      if (status === 409 && data?.code === 'DUPLICATE_USER') {
+        return Promise.reject({
+          message: 'Username or email already exists.',
+          code: 'DUPLICATE_USER',
+        });
+      }
+
+      return Promise.reject({
+        message: data?.message || 'An unexpected error occurred.',
+        code: data?.code || 'UNKNOWN_ERROR',
+      });
+    }
+
+    return Promise.reject({
+      message: 'Network error. Please try again later.',
+      code: 'NETWORK_ERROR',
+    });
   },
 );
 
