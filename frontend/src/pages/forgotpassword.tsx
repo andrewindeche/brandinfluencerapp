@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axiosInstance from '../rxjs/axiosInstance';
-import {
-  passwordResetState$,
-  sendResetEmail,
-  setResetField,
-} from '../rxjs/passwordResetState';
-import { Subscription } from 'rxjs';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -19,27 +13,27 @@ const ForgotPasswordForm: React.FC = () => {
   const router = useRouter();
   const token = router.query.token as string | undefined;
 
-  useEffect(() => {
-    const sub: Subscription = passwordResetState$.subscribe((data) =>
-      setState((prev) => ({ ...prev, ...data })),
-    );
-    return () => sub.unsubscribe();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const previewLink = await sendResetEmail();
+    try {
+      const res = await axiosInstance.post('/auth/forgot-password', {
+        email: state.email,
+      });
 
-    if (previewLink) {
-      window.open(previewLink, '_blank');
-      setState({ ...state, email: '', resetStatus: 'idle' });
+      if (res.data.previewLink) {
+        window.open(res.data.previewLink, '_blank');
+        setState((prev) => ({
+          ...prev,
+          email: '',
+          resetStatus: 'success',
+        }));
+      } else {
+        setState((prev) => ({ ...prev, resetStatus: 'error' }));
+      }
+    } catch (error) {
+      console.error('Email reset error:', error);
+      setState((prev) => ({ ...prev, resetStatus: 'error' }));
     }
-
-    setState({
-      ...state,
-      email: '',
-      resetStatus: 'idle',
-    });
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -64,6 +58,12 @@ const ForgotPasswordForm: React.FC = () => {
     } catch (error) {
       console.error('Reset error:', error);
       alert('Failed to reset password.');
+    } finally {
+      setState((prev) => ({
+        ...prev,
+        password: '',
+        confirmPassword: '',
+      }));
     }
   };
 
@@ -141,7 +141,9 @@ const ForgotPasswordForm: React.FC = () => {
                 type="email"
                 id="email"
                 value={state.email}
-                onChange={(e) => setResetField('email', e.target.value)}
+                onChange={(e) =>
+                  setState((prev) => ({ ...prev, email: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
                 placeholder="Enter your email"
               />
@@ -163,7 +165,7 @@ const ForgotPasswordForm: React.FC = () => {
         )}
         {state.resetStatus === 'error' && !token && (
           <p className="text-red-300 text-center mt-4">
-            Failed to send reset email. Try again Later.
+            Failed to send reset email. Try again later.
           </p>
         )}
 
