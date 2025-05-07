@@ -1,6 +1,8 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Irish_Grover, Joti_One, Kaushan_Script } from 'next/font/google';
+import Toast from '../app/components/Toast'; // ✅ Adjusted path
+import { useState, useCallback } from 'react';
 
 const irishGrover = Irish_Grover({
   weight: '400',
@@ -21,11 +23,31 @@ const kaushanScript = Kaushan_Script({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  const showToast = useCallback(
+    (message: string, type: 'success' | 'error') => {
+      setToast({ message, type });
+      setTimeout(() => setToast(null), 8000);
+    },
+    [],
+  );
+
   return (
     <main
       className={`${irishGrover.variable} ${jotiOne.variable} ${kaushanScript.variable}`}
     >
-      <Component {...pageProps} />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <Component {...pageProps} showToast={showToast} />
     </main>
   );
 }

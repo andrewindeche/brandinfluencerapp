@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { AxiosError } from 'axios';
+import Toast from '../app/components/Toast';
 import {
   formState$,
   setFormField,
@@ -12,8 +13,11 @@ import {
 const SignUpForm: React.FC = () => {
   const router = useRouter();
   const [formState, setFormState] = useState(initialState);
-  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
@@ -73,9 +77,7 @@ const SignUpForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       await submitSignUpForm(
@@ -83,8 +85,11 @@ const SignUpForm: React.FC = () => {
           setFormState(initialState);
           router.push('/login?signup=success');
         },
-        setShowErrorDialog,
+        () => {},
         setErrors,
+        (message, type = 'error') => {
+          setToast({ message, type });
+        },
       );
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -92,19 +97,23 @@ const SignUpForm: React.FC = () => {
 
         if (status === 409 && data?.code === 'DUPLICATE_USER') {
           setErrors({ email: data.message, username: data.message });
-        } else if (data?.message) {
-          setShowErrorDialog(true);
         } else {
-          alert('Unexpected error occurred.');
+          setToast({
+            message: 'An unexpected error occurred. Please try again.',
+            type: 'error',
+          });
         }
       } else {
-        alert('Unexpected error occurred.');
+        setToast({
+          message: 'Unexpected error occurred.',
+          type: 'error',
+        });
       }
     }
   };
 
-  const closeErrorDialog = () => {
-    setShowErrorDialog(false);
+  const closeToast = () => {
+    setToast(null);
   };
 
   const { email, role, username, password, confirmPassword } = formState;
@@ -118,8 +127,8 @@ const SignUpForm: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="email"
+              className="block text-white text-sm font-semibold mb-2"
             >
               Email Address
             </label>
@@ -138,8 +147,8 @@ const SignUpForm: React.FC = () => {
 
           <div className="mb-4">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="role"
+              className="block text-white text-sm font-semibold mb-2"
             >
               User Type
             </label>
@@ -160,8 +169,8 @@ const SignUpForm: React.FC = () => {
 
           <div className="mb-4">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="username"
+              className="block text-white text-sm font-semibold mb-2"
             >
               Username
             </label>
@@ -180,8 +189,8 @@ const SignUpForm: React.FC = () => {
 
           <div className="mb-4">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="password"
+              className="block text-white text-sm font-semibold mb-2"
             >
               Password
             </label>
@@ -200,8 +209,8 @@ const SignUpForm: React.FC = () => {
 
           <div className="mb-4">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="confirmPassword"
+              className="block text-white text-sm font-semibold mb-2"
             >
               Confirm Password
             </label>
@@ -239,21 +248,10 @@ const SignUpForm: React.FC = () => {
           </Link>
         </p>
       </div>
-      {showErrorDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm text-center">
-            <h3 className="text-2xl font-bold mb-4">Sign Up Failed!</h3>
-            <p className="mb-4">
-              There was an error during registration. Please try again.
-            </p>
-            <button
-              onClick={closeErrorDialog}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       )}
     </div>
   );

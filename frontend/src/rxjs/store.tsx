@@ -73,8 +73,9 @@ export const setFormField = (field: keyof FormState, value: string) => {
 
 export const submitSignUpForm = async (
   navigateToLogin: () => void,
-  setShowErrorDialog: (show: boolean) => void,
+  _setShowErrorDialog: (show: boolean) => void,
   setErrors: (errors: Record<string, string>) => void,
+  showToast: (message: string, type?: 'success' | 'error') => void,
 ) => {
   const formState = stateSubject.value;
 
@@ -111,29 +112,23 @@ export const submitSignUpForm = async (
     const response = await axiosInstance.post(apiEndpoint, signUpData);
     console.log('Sign up successful:', response.data);
     stateSubject.next(initialState);
+    showToast('Registration successful', 'success');
     navigateToLogin();
   } catch (error: unknown) {
     stateSubject.next(initialState);
+    if (error instanceof AxiosError && error.response) {
+      const { status, data } = error.response;
 
-    if (error instanceof AxiosError) {
-      const customError = error.response?.data || {};
-
-      setShowErrorDialog(true);
-
-      if (customError.code === 'DUPLICATE_USER') {
-        setErrors({
-          email: customError.message || 'The email or username already exists.',
-        });
+      if (status === 409 && data?.code === 'DUPLICATE_USER') {
+        setErrors({ email: data.message, username: data.message });
+        showToast(data.message, 'error');
+      } else if (typeof data === 'object' && data?.message) {
+        showToast(data.message, 'error');
       } else {
-        setErrors({
-          general:
-            customError.message ||
-            'Failed to sign up. Please check your information and try again.',
-        });
+        showToast('Unexpected error occurred.', 'error');
       }
     } else {
-      setErrors({ general: 'Unexpected error occurred. Please try again.' });
-      console.error('Unexpected error:', error);
+      showToast('Unexpected error occurred.', 'error');
     }
   }
 };
