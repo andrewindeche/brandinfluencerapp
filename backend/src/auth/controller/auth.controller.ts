@@ -98,12 +98,13 @@ export class AuthController {
       const newUser = await this.authService.registerInfluencer(registerDto);
       return newUser;
     } catch (error) {
-      if (error.message === 'Email or username already exists.') {
-        throw new ConflictException('Email or username already exists.');
+      if (
+        error.message.toLowerCase().includes('username') &&
+        error.message.toLowerCase().includes('email') &&
+        error.message.toLowerCase().includes('exists')
+      ) {
+        throw new ConflictException('Username or email already exists.');
       }
-      throw new InternalServerErrorException(
-        'An error occurred during registration.',
-      );
     }
   }
 
@@ -113,9 +114,18 @@ export class AuthController {
       const newUser = await this.authService.registerBrand(registerDto);
       return newUser;
     } catch (error) {
-      if (error.message === 'Email or username already exists.') {
-        throw new ConflictException('Email or username already exists.');
+      console.error('REGISTER ERROR:', error);
+
+      const message = error?.message?.toLowerCase() || '';
+
+      if (
+        message.includes('username') &&
+        message.includes('email') &&
+        message.includes('exists')
+      ) {
+        throw new ConflictException('Username or email already exists.');
       }
+
       throw new InternalServerErrorException(
         'An error occurred during registration.',
       );
