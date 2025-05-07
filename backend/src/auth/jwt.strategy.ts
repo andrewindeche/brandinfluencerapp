@@ -8,10 +8,10 @@ import * as path from 'path';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    const jwtSecret = fs
-      .readFileSync(path.join(__dirname, '../../.jwt_secret'), 'utf8')
-      .trim();
-
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is not set.');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,

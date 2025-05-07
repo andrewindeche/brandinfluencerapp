@@ -19,8 +19,6 @@ import { SessionService } from './session/session.service';
 import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { RedisModule } from './redis/redis.module';
-import * as fs from 'fs';
-import * as path from 'path';
 
 @Module({
   imports: [
@@ -39,13 +37,11 @@ import * as path from 'path';
 
     JwtModule.registerAsync({
       useFactory: async () => {
-        const jwtSecretPath = path.resolve(__dirname, '..', '.jwt_secret');
-        if (!fs.existsSync(jwtSecretPath)) {
-          console.error('JWT secret file not found at:', jwtSecretPath);
-          throw new Error('JWT secret file missing');
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+          console.error('JWT secret is missing in the environment.');
+          throw new Error('JWT secret missing');
         }
-
-        const jwtSecret = fs.readFileSync(jwtSecretPath, 'utf-8').trim();
 
         return {
           secret: jwtSecret,
@@ -59,7 +55,7 @@ import * as path from 'path';
         store: redisStore,
         host: configService.get<string>('REDIS_HOST'),
         port: configService.get<number>('REDIS_PORT'),
-        password: configService.get<number>('REDIS_PASSWORD'),
+        password: configService.get<string>('REDIS_PASSWORD'),
       }),
       inject: [ConfigService],
     }),
