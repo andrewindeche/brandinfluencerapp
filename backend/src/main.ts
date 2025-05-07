@@ -6,8 +6,23 @@ import rateLimit from 'express-rate-limit';
 import Redis from 'ioredis';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
+import * as crypto from 'crypto';
+import { MongoExceptionFilter } from 'filters/mongo-exception.filter';
+import { AllExceptionsFilter } from 'filters/all-exceptions.filter';
+
 dotenv.config();
+
+function generateJwtSecret() {
+  if (!process.env.JWT_SECRET) {
+    const secret = crypto.randomBytes(32).toString('base64');
+    console.log('Generated JWT Secret:', secret);
+    process.env.JWT_SECRET = secret;
+  }
+}
+
 export async function bootstrap() {
+  generateJwtSecret(); 
+
   const app = await NestFactory.create(AppModule);
   const redisClient = new Redis({
     host: process.env.REDIS_HOST || 'localhost',
@@ -33,6 +48,11 @@ export async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+  app.useGlobalFilters(
+    new MongoExceptionFilter(),
+    new AllExceptionsFilter(),
+  );
+
   app.enableCors({
     origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
     methods: 'GET,POST,PUT,DELETE',
