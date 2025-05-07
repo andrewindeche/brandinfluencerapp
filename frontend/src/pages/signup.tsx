@@ -78,16 +78,24 @@ const SignUpForm: React.FC = () => {
     }
 
     try {
-      await submitSignUpForm(() => {
-        setFormState(initialState);
-        router.push('/login?signup=success');
-      }, setShowErrorDialog);
+      await submitSignUpForm(
+        () => {
+          setFormState(initialState);
+          router.push('/login?signup=success');
+        },
+        setShowErrorDialog,
+        setErrors,
+      );
     } catch (error) {
       if (error instanceof AxiosError) {
-        if (error.response && error.response.status === 409) {
-          alert('Email or username already exists.');
+        const { status, data } = error.response || {};
+
+        if (status === 409 && data?.code === 'DUPLICATE_USER') {
+          setErrors({ email: data.message, username: data.message });
+        } else if (data?.message) {
+          setShowErrorDialog(true);
         } else {
-          alert('There was an error during registration. Please try again.');
+          alert('Unexpected error occurred.');
         }
       } else {
         alert('Unexpected error occurred.');

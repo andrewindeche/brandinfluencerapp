@@ -74,6 +74,7 @@ export const setFormField = (field: keyof FormState, value: string) => {
 export const submitSignUpForm = async (
   navigateToLogin: () => void,
   setShowErrorDialog: (show: boolean) => void,
+  setErrors: (errors: Record<string, string>) => void,
 ) => {
   const formState = stateSubject.value;
 
