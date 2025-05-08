@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axiosInstance from '../rxjs/axiosInstance';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Toast from '../app/components/Toast';
 
 const ForgotPasswordForm: React.FC = () => {
   const [state, setState] = useState({
@@ -10,8 +11,21 @@ const ForgotPasswordForm: React.FC = () => {
     password: '',
     confirmPassword: '',
   });
+
+  const [toast, setToast] = useState<{
+    message: string;
+    type?: 'success' | 'error';
+  } | null>(null);
+
   const router = useRouter();
   const token = router.query.token as string | undefined;
+
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' = 'success',
+  ) => {
+    setToast({ message, type });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +43,12 @@ const ForgotPasswordForm: React.FC = () => {
         }));
       } else {
         setState((prev) => ({ ...prev, resetStatus: 'error' }));
+        showToast('Failed to send reset email.', 'error');
       }
     } catch (error) {
       console.error('Email reset error:', error);
       setState((prev) => ({ ...prev, resetStatus: 'error' }));
+      showToast('Error sending reset email.', 'error');
     }
   };
 
@@ -40,7 +56,7 @@ const ForgotPasswordForm: React.FC = () => {
     e.preventDefault();
 
     if (state.password !== state.confirmPassword) {
-      alert('Passwords do not match');
+      showToast('Passwords do not match.', 'error');
       return;
     }
 
@@ -50,14 +66,14 @@ const ForgotPasswordForm: React.FC = () => {
       });
 
       if (res.status === 201 || res.status === 200) {
-        alert('Password reset successful!');
+        showToast('Password reset successful!');
         router.push('/login');
       } else {
-        alert('Failed to reset password.');
+        showToast('Failed to reset password.', 'error');
       }
     } catch (error) {
       console.error('Reset error:', error);
-      alert('Failed to reset password.');
+      showToast('Failed to reset password. Try again later', 'error');
     } finally {
       setState((prev) => ({
         ...prev,
@@ -185,6 +201,13 @@ const ForgotPasswordForm: React.FC = () => {
           Back to Home
         </button>
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

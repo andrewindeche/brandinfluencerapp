@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
 
-type PasswordResetState = {
+export type PasswordResetState = {
   email: string;
   token: string;
   newPassword: string;
@@ -35,12 +35,31 @@ export const setResetField = (
   });
 };
 
-export const sendResetEmail = async () => {
-  const { email } = passwordResetSubject.value;
+const updateResetState = (partial: Partial<PasswordResetState>) => {
   passwordResetSubject.next({
     ...passwordResetSubject.value,
-    resetStatus: 'loading',
+    ...partial,
   });
+};
+
+const handleResetError = (error: unknown, fallback = 'An error occurred.') => {
+  let errorMessage = fallback;
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as { message: unknown }).message === 'string'
+  ) {
+    errorMessage = (error as { message: string }).message;
+  }
+
+  updateResetState({ resetStatus: 'error', errorMessage });
+};
+
+export const sendResetEmail = async () => {
+  const { email } = passwordResetSubject.value;
+  updateResetState({ resetStatus: 'loading' });
 
   try {
     const response = await axiosInstance.post('/auth/forgot-password', {
@@ -48,30 +67,17 @@ export const sendResetEmail = async () => {
     });
     const previewLink = response.data.previewLink;
 
-    passwordResetSubject.next({
-      ...passwordResetSubject.value,
-      resetStatus: 'success',
-    });
+    updateResetState({ resetStatus: 'success' });
 
     return previewLink;
   } catch (error: unknown) {
     let errorMessage = 'Failed to send reset email. Try again later.';
-    if (error instanceof Error) {
-      if (error.message) {
-        errorMessage = error.message;
-      }
-    } else if (error instanceof AxiosError && error.response) {
-      if (error.response.status === 429) {
-        errorMessage = 'Too many login attempts. Please try again later.';
-      }
+
+    if (error instanceof AxiosError && error.response?.status === 429) {
+      errorMessage = 'Too many login attempts. Please try again later.';
     }
 
-    passwordResetSubject.next({
-      ...passwordResetSubject.value,
-      resetStatus: 'error',
-      errorMessage,
-    });
-
+    handleResetError(error, errorMessage);
     return null;
   }
 };
@@ -80,35 +86,25 @@ export const resetPassword = async () => {
   const { token, newPassword, confirmPassword } = passwordResetSubject.value;
 
   if (newPassword !== confirmPassword) {
-    passwordResetSubject.next({
-      ...passwordResetSubject.value,
+    updateResetState({
       resetStatus: 'error',
       errorMessage: 'Passwords do not match.',
     });
     return;
   }
 
-  passwordResetSubject.next({
-    ...passwordResetSubject.value,
-    resetStatus: 'loading',
-  });
+  updateResetState({ resetStatus: 'loading' });
 
   try {
-    await axiosInstance.post('/auth/reset-password', {
-      token,
-      newPassword,
+    await axiosInstance.post(`/auth/reset-password/${token}`, {
+      password: newPassword,
     });
+
     passwordResetSubject.next({
       ...initialResetState,
       resetStatus: 'success',
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    passwordResetSubject.next({
-      ...passwordResetSubject.value,
-      resetStatus: 'error',
-      errorMessage: `Failed to reset password: ${errorMessage}`,
-    });
+    handleResetError(error, 'Failed to reset password');
   }
 };

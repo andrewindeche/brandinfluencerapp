@@ -1,4 +1,3 @@
-// components/Toast.tsx
 import React, { useEffect } from 'react';
 
 interface ToastProps {
@@ -13,11 +12,16 @@ const Toast: React.FC<ToastProps> = ({
   onClose,
 }) => {
   useEffect(() => {
-    const timer = setTimeout(onClose, 8000);
+    const timer = setTimeout(onClose, 4000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bgColor = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+  const bgColor =
+    type === 'error'
+      ? 'bg-red-500'
+      : type === 'success'
+        ? 'bg-green-500'
+        : 'bg-gray-500';
 
   return (
     <div
