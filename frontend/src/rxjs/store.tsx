@@ -109,8 +109,6 @@ export const submitSignUpForm = async (
         : '/auth/other/register';
 
   try {
-    const response = await axiosInstance.post(apiEndpoint, signUpData);
-    console.log('Sign up successful:', response.data);
     stateSubject.next(initialState);
     showToast('Registration successful', 'success');
     navigateToLogin();
