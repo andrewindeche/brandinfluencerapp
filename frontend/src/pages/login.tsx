@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { formState$, setEmail } from '../rxjs/store';
+import Toast from '../app/components/Toast';
 
 const LoginForm: React.FC = () => {
   const [userType, setUserType] = useState<
@@ -13,6 +14,10 @@ const LoginForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [toast, setToast] = useState<null | {
+    message: string;
+    type: 'success' | 'error';
+  }>(null);
 
   const router = useRouter();
 
@@ -68,10 +73,13 @@ const LoginForm: React.FC = () => {
           router.push('/dashboard');
           break;
         default:
-          alert('Unknown user type');
+          setToast({ message: 'Unknown user type', type: 'error' });
       }
     } else {
-      alert('Please enter both email and password');
+      setToast({
+        message: 'Please enter both email and password',
+        type: 'error',
+      });
     }
   };
 
@@ -226,6 +234,14 @@ const LoginForm: React.FC = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );
