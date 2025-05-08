@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import UserMenu from '../app/components/UserMenu';
+import { useRoleGuard } from '../hooks/useRoleGuard';
 
 const MAX_CHAR_COUNT = 70;
 
 const InfluencerPage: React.FC = () => {
+  useRoleGuard(['influencer']);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [expandedCards, setExpandedCards] = useState<{

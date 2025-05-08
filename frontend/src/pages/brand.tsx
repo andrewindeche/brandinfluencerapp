@@ -3,8 +3,10 @@ import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
 import { Influencer } from '../types';
 import UserMenu from '../app/components/UserMenu';
+import { useRoleGuard } from '../hooks/useRoleGuard';
 
 const BrandPage: React.FC = () => {
+  useRoleGuard(['brand']);
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
     'influencers',
   );

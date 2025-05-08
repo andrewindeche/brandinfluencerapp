@@ -61,15 +61,19 @@ const LoginForm: React.FC = () => {
 
       switch (userType) {
         case 'brand':
+          sessionStorage.setItem('toastMessage', 'Login successful!');
           router.push('/brand');
           break;
         case 'influencer':
+          sessionStorage.setItem('toastMessage', 'Login successful!');
           router.push('/influencer');
           break;
         case 'admin':
+          sessionStorage.setItem('toastMessage', 'Login successful!');
           router.push('/admin');
           break;
         case 'user':
+          sessionStorage.setItem('toastMessage', 'Login successful!');
           router.push('/dashboard');
           break;
         default:

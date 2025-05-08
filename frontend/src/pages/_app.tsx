@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Irish_Grover, Joti_One, Kaushan_Script } from 'next/font/google';
-import Toast from '../app/components/Toast'; // ✅ Adjusted path
+import Toast from '../app/components/Toast';
 import { useState, useCallback } from 'react';
 
 const irishGrover = Irish_Grover({
