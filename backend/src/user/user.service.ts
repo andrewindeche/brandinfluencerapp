@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
@@ -18,26 +18,6 @@ export class UserService {
       return await this.userModel.find().exec();
     } catch (error) {
       throw new Error('Error fetching users: ' + error.message);
-    }
-  }
-
-  async createUser(userData: User): Promise<User> {
-    const existingUser = await this.userModel
-      .findOne({
-        $or: [{ email: userData.email }, { username: userData.username }],
-      })
-      .exec();
-
-    if (existingUser) {
-      throw new ConflictException('Email or username already exists.');
-    }
-
-    try {
-      const user = new this.userModel(userData);
-      return await user.save();
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw new Error('Error creating user: ' + error.message);
     }
   }
 

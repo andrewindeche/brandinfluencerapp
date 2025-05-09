@@ -1,11 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { RedisService } from '../redis/redis.service';
-import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
-import { ConflictException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService;
@@ -56,37 +53,6 @@ describe('UserService', () => {
 
     const result = await service.findAll();
     expect(result).toEqual(users);
-  });
-
-  it('should create a user', async () => {
-    const userData = {
-      email: 'new@example.com',
-      username: 'newuser',
-      password: 'secret',
-    };
-    mockFindOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
-
-    mockSave.mockResolvedValue(userData);
-
-    const result = await service.createUser(userData as any);
-    expect(result).toEqual(userData);
-    expect(mockUserModelConstructor).toHaveBeenCalledWith(
-      expect.objectContaining({
-        email: userData.email,
-        username: userData.username,
-      }),
-    );
-    expect(mockSave).toHaveBeenCalled();
-  });
-
-  it('should not create a user if email or username exists', async () => {
-    mockFindOne.mockReturnValue({
-      exec: jest.fn().mockResolvedValue({ email: 'existing@example.com' }),
-    });
-
-    await expect(
-      service.createUser({ email: 'existing@example.com' } as any),
-    ).rejects.toThrow(ConflictException);
   });
 
   it('should find a user by email', async () => {

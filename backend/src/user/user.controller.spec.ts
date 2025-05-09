@@ -3,7 +3,6 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User } from './user.schema';
 import * as mongoose from 'mongoose';
-import { ConflictException } from '@nestjs/common';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -42,33 +41,6 @@ describe('UserController', () => {
       jest.spyOn(service, 'findAll').mockResolvedValue(result);
 
       expect(await controller.findAll()).toEqual(result);
-    });
-  });
-
-  describe('create', () => {
-    it('should create a user and return the user', async () => {
-      const userData = { email: 'new@example.com', username: 'newuser' };
-      const result = {
-        ...userData,
-        role: 'brand',
-      } as unknown as User;
-      jest.spyOn(service, 'createUser').mockResolvedValue(result);
-
-      expect(await controller.create(userData)).toEqual(result);
-    });
-
-    it('should throw ConflictException if user already exists', async () => {
-      const userData = {
-        email: 'existing@example.com',
-        username: 'existinguser',
-      };
-      jest
-        .spyOn(service, 'createUser')
-        .mockRejectedValue(new ConflictException('User already exists'));
-
-      await expect(controller.create(userData)).rejects.toThrow(
-        ConflictException,
-      );
     });
   });
 

@@ -11,11 +11,6 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Post()
-  async create(@Body() userData): Promise<User> {
-    return this.userService.createUser(userData);
-  }
-
   @Get('user-type')
   async getUserType(@Query('email') email: string): Promise<{ type: string }> {
     const user = await this.userService.findUserByEmail(email);

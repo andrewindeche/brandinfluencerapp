@@ -7,7 +7,7 @@ import Redis from 'ioredis';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 import * as crypto from 'crypto';
-import { MongoExceptionFilter } from '../filters/mongo-exception.filter'; 
+import { MongoExceptionFilter } from '../filters/mongo-exception.filter';
 import { AllExceptionsFilter } from '../filters/all-exceptions.filter';
 
 dotenv.config();

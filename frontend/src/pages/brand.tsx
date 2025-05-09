@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
 import { Influencer } from '../types';
@@ -10,6 +10,17 @@ const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
     'influencers',
   );
+  const [toast, setToast] = useState<{ message: string; type: string } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const toastMessage = sessionStorage.getItem('toastMessage');
+    if (toastMessage) {
+      setToast({ message: toastMessage, type: 'success' });
+      sessionStorage.removeItem('toastMessage');
+    }
+  }, []);
 
   const influencers: Influencer[] = [
     {
@@ -51,6 +62,13 @@ const BrandPage: React.FC = () => {
       <div className="absolute top-2 right-36 z-50">
         <UserMenu userName="John Doe" imageSrc={''} />
       </div>
+      {toast && (
+        <div
+          className={`fixed top-4 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
+        >
+          {toast.message}
+        </div>
+      )}
       <div className="flex justify-center space-x-4 mt-4">
         <button
           onClick={() => setActiveTab('campaigns')}

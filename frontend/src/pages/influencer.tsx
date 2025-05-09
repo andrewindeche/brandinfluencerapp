@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
@@ -9,9 +9,20 @@ const InfluencerPage: React.FC = () => {
   useRoleGuard(['influencer']);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [toast, setToast] = useState<{ message: string; type: string } | null>(
+    null,
+  );
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
+
+  useEffect(() => {
+    const toastMessage = sessionStorage.getItem('toastMessage');
+    if (toastMessage) {
+      setToast({ message: toastMessage, type: 'success' });
+      sessionStorage.removeItem('toastMessage');
+    }
+  }, []);
 
   const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
 
@@ -29,6 +40,13 @@ const InfluencerPage: React.FC = () => {
       <div className="absolute top-2 right-28 z-50">
         <UserMenu userName={''} imageSrc={''} />
       </div>
+      {toast && (
+        <div
+          className={`fixed top-4 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
+        >
+          {toast.message}
+        </div>
+      )}
       <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-2 underline-offset-2 text-center ml-2 -mt-2">
         My Profile
       </h1>
