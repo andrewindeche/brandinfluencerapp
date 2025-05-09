@@ -43,14 +43,11 @@ if (process.env.JWT_SECRET) {
   ],
   providers: [
     AuthService,
-    BrandModule,
-    UserModule,
     JwtStrategy,
     ForgotPasswordService,
     RedisService,
     SendForgotPasswordEmailService,
     SessionService,
-    RedisModule,
   ],
   controllers: [AuthController],
   exports: [

@@ -14,9 +14,10 @@ import { AdminService } from './admin/admin.service';
 dotenv.config();
 
 if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined. Set it in your .env file or environment variables.');
+  throw new Error(
+    'JWT_SECRET is not defined. Set it in your .env file or environment variables.',
+  );
 }
-
 
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
