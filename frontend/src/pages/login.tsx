@@ -107,7 +107,7 @@ const LoginForm: React.FC = () => {
           Log In
         </h2>
         <form onSubmit={handleSubmit}>
-          <p className="text-2xl font-bold text-center text-yellow-400 mb-6">
+          <div className="text-2xl font-bold text-center text-yellow-400 mb-6">
             {userType === 'brand' ? (
               <div>
                 <h3 className="text-center text-xl font-bold mb-4">
@@ -137,7 +137,7 @@ const LoginForm: React.FC = () => {
                 <h3 className="text-center text-xl font-bold mb-4">Welcome</h3>
               </div>
             )}
-          </p>
+          </div>
           <div className="mb-4">
             <label
               className="block text-white text-sm font-semibold mb-2"
@@ -154,7 +154,6 @@ const LoginForm: React.FC = () => {
               placeholder="Enter your email"
             />
           </div>
-
           <div className="mb-6">
             <label
               className="block text-white text-sm font-semibold mb-2"
