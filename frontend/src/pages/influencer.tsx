@@ -20,7 +20,6 @@ const InfluencerPage: React.FC = () => {
 
   const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3'];
 
-  // Close toast after 3 seconds
   useEffect(() => {
     if (toast) {
       setTimeout(() => {
@@ -29,12 +28,10 @@ const InfluencerPage: React.FC = () => {
     }
   }, [toast, closeToast]);
 
-  // Example campaign action handler
   const handleCampaignAction = (campaign: string) => {
     showToast(`${campaign} was successfully updated!`, 'success');
   };
 
-  // Toggle expand/collapse for campaign messages
   function handleToggleExpand(title: string): void {
     setExpandedCards((prevState) => ({
       ...prevState,
