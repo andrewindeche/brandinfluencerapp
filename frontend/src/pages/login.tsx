@@ -3,22 +3,16 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { formState$, setEmail } from '../rxjs/store';
 import Toast from '../app/components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const LoginForm: React.FC = () => {
   const [userType, setUserType] = useState<
     'brand' | 'influencer' | 'admin' | 'user' | 'unknown'
   >('unknown');
-
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [toast, setToast] = useState<null | {
-    message: string;
-    type: 'success' | 'error';
-  }>(null);
-
+  const { toast, showToast, closeToast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
@@ -45,45 +39,25 @@ const LoginForm: React.FC = () => {
     setPassword(e.target.value);
   };
 
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setConfirmPassword(e.target.value);
-    setPasswordsMatch(password === e.target.value);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && password) {
       setEmailState('');
       setPassword('');
-      setConfirmPassword('');
 
       switch (userType) {
         case 'brand':
-          sessionStorage.setItem('toastMessage', 'Login successful!');
-          router.push('/brand');
-          break;
         case 'influencer':
-          sessionStorage.setItem('toastMessage', 'Login successful!');
-          router.push('/influencer');
-          break;
         case 'admin':
-          sessionStorage.setItem('toastMessage', 'Login successful!');
-          router.push('/admin');
-          break;
         case 'user':
           sessionStorage.setItem('toastMessage', 'Login successful!');
-          router.push('/dashboard');
+          router.push(`/${userType === 'user' ? 'dashboard' : userType}`);
           break;
         default:
-          setToast({ message: 'Unknown user type', type: 'error' });
+          showToast('Unknown user type', 'error');
       }
     } else {
-      setToast({
-        message: 'Please enter both email and password',
-        type: 'error',
-      });
+      showToast('Please enter both email and password', 'error');
     }
   };
 
@@ -100,7 +74,7 @@ const LoginForm: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500 transition-colors duration-500 ${backgroundColor}`}
+      className={`min-h-screen flex items-center justify-center ${backgroundColor}`}
     >
       <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-gray-200 w-96">
         <h2 className="text-3xl font-bold text-center text-white mb-6">
@@ -108,40 +82,19 @@ const LoginForm: React.FC = () => {
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="text-2xl font-bold text-center text-yellow-400 mb-6">
-            {userType === 'brand' ? (
-              <div>
-                <h3 className="text-center text-xl font-bold mb-4">
-                  Log in as a Brand!
-                </h3>
-              </div>
-            ) : userType === 'influencer' ? (
-              <div>
-                <h3 className="text-center text-xl font-bold mb-4">
-                  Log in as an Influencer!
-                </h3>
-              </div>
-            ) : userType === 'admin' ? (
-              <div>
-                <h2 className="text-center text-xl font-bold mb-4">
-                  Admin Dashboard
-                </h2>
-              </div>
-            ) : userType === 'user' ? (
-              <div>
-                <h3 className="text-center text-xl font-bold mb-4">
-                  Log in as a User!
-                </h3>
-              </div>
-            ) : (
-              <div>
-                <h3 className="text-center text-xl font-bold mb-4">Welcome</h3>
-              </div>
-            )}
+            <h3 className="text-center text-xl font-bold mb-4">
+              {userType === 'brand' && 'Log in as a Brand!'}
+              {userType === 'influencer' && 'Log in as an Influencer!'}
+              {userType === 'admin' && 'Admin Dashboard'}
+              {userType === 'user' && 'Log in as a User!'}
+              {userType === 'unknown' && 'Welcome'}
+            </h3>
           </div>
+
           <div className="mb-4">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="email"
+              className="block text-white text-sm font-semibold mb-2"
             >
               Email Address
             </label>
@@ -154,10 +107,11 @@ const LoginForm: React.FC = () => {
               placeholder="Enter your email"
             />
           </div>
+
           <div className="mb-6">
             <label
-              className="block text-white text-sm font-semibold mb-2"
               htmlFor="password"
+              className="block text-white text-sm font-semibold mb-2"
             >
               Password
             </label>
@@ -170,34 +124,11 @@ const LoginForm: React.FC = () => {
               placeholder="Enter your password"
             />
           </div>
-          <div className="mb-4">
-            <label
-              className="block text-white text-sm font-semibold mb-2"
-              htmlFor="confirmPassword"
-            >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 ${
-                passwordsMatch ? 'focus:ring-yellow-400' : 'focus:ring-red-400'
-              } shadow-lg bg-white`}
-              placeholder="Confirm your password"
-            />
-            {!passwordsMatch && (
-              <p className="text-red-400 text-sm mt-1">
-                Passwords do not match
-              </p>
-            )}
-          </div>
 
           <button
             type="submit"
             className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
-            disabled={!passwordsMatch}
+            disabled={userType === 'unknown' || !email || !password}
           >
             Log In
           </button>
@@ -240,11 +171,7 @@ const LoginForm: React.FC = () => {
       )}
 
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       )}
     </div>
   );

@@ -3,6 +3,7 @@ import axiosInstance from '../rxjs/axiosInstance';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Toast from '../app/components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const ForgotPasswordForm: React.FC = () => {
   const [state, setState] = useState({
@@ -12,20 +13,10 @@ const ForgotPasswordForm: React.FC = () => {
     confirmPassword: '',
   });
 
-  const [toast, setToast] = useState<{
-    message: string;
-    type?: 'success' | 'error';
-  } | null>(null);
+  const { toast, showToast, closeToast } = useToast();
 
   const router = useRouter();
   const token = router.query.token as string | undefined;
-
-  const showToast = (
-    message: string,
-    type: 'success' | 'error' = 'success',
-  ) => {
-    setToast({ message, type });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,11 +193,7 @@ const ForgotPasswordForm: React.FC = () => {
         </button>
       </div>
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       )}
     </div>
   );
