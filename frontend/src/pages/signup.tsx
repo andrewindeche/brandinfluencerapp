@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { AxiosError } from 'axios';
 import Toast from '../app/components/Toast';
+import { useToast } from '../hooks/useToast';
+
 import {
   formState$,
   setFormField,
@@ -14,27 +16,18 @@ const SignUpForm: React.FC = () => {
   const router = useRouter();
   const [formState, setFormState] = useState(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [toast, setToast] = useState<{
-    message: string;
-    type: 'success' | 'error';
-  } | null>(null);
+  const { toast, showToast, closeToast } = useToast();
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setFormState(state);
     });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      const timer = setTimeout(() => {
-        setErrors({});
-      }, 4000);
-
+      const timer = setTimeout(() => setErrors({}), 4000);
       return () => clearTimeout(timer);
     }
   }, [errors]);
@@ -50,33 +43,22 @@ const SignUpForm: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formState.email) {
-      newErrors.email = 'Email is required';
-    }
-    if (!formState.role || formState.role === 'unknown') {
+    if (!formState.email) newErrors.email = 'Email is required';
+    if (!formState.role || formState.role === 'unknown')
       newErrors.role = 'User type is required';
-    }
-    if (!formState.username) {
-      newErrors.username = 'Username is required';
-    }
-    if (!formState.password) {
-      newErrors.password = 'Password is required';
-    }
-    if (!formState.confirmPassword) {
+    if (!formState.username) newErrors.username = 'Username is required';
+    if (!formState.password) newErrors.password = 'Password is required';
+    if (!formState.confirmPassword)
       newErrors.confirmPassword = 'Confirm password is required';
-    }
-    if (formState.password !== formState.confirmPassword) {
+    if (formState.password !== formState.confirmPassword)
       newErrors.confirmPassword = 'Passwords do not match';
-    }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     try {
@@ -87,33 +69,20 @@ const SignUpForm: React.FC = () => {
         },
         () => {},
         setErrors,
-        (message, type = 'error') => {
-          setToast({ message, type });
-        },
+        showToast,
       );
     } catch (error) {
       if (error instanceof AxiosError) {
         const { status, data } = error.response || {};
-
         if (status === 409 && data?.code === 'DUPLICATE_USER') {
           setErrors({ email: data.message, username: data.message });
         } else {
-          setToast({
-            message: 'An unexpected error occurred. Please try again.',
-            type: 'error',
-          });
+          showToast('An unexpected error occurred. Please try again.', 'error');
         }
       } else {
-        setToast({
-          message: 'Unexpected error occurred.',
-          type: 'error',
-        });
+        showToast('Unexpected error occurred.', 'error');
       }
     }
-  };
-
-  const closeToast = () => {
-    setToast(null);
   };
 
   const { email, role, username, password, confirmPassword } = formState;
@@ -249,7 +218,6 @@ const SignUpForm: React.FC = () => {
         </p>
       </div>
 
-      {/* Toast Notification */}
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       )}

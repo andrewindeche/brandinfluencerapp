@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
+import NotificationCard from '../app/components/NotificationCard';
+import { useToast } from '../hooks/useToast';
 
 const MAX_CHAR_COUNT = 70;
 
@@ -9,47 +11,57 @@ const InfluencerPage: React.FC = () => {
   useRoleGuard(['influencer']);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [toast, setToast] = useState<{ message: string; type: string } | null>(
-    null,
-  );
+  const { toast, showToast, closeToast } = useToast();
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
-
-  useEffect(() => {
-    const toastMessage = sessionStorage.getItem('toastMessage');
-    if (toastMessage) {
-      setToast({ message: toastMessage, type: 'success' });
-      sessionStorage.removeItem('toastMessage');
-    }
-  }, []);
 
   const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
 
   const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3'];
 
-  const handleToggleExpand = (title: string) => {
+  // Close toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      setTimeout(() => {
+        closeToast();
+      }, 3000);
+    }
+  }, [toast, closeToast]);
+
+  // Example campaign action handler
+  const handleCampaignAction = (campaign: string) => {
+    showToast(`${campaign} was successfully updated!`, 'success');
+  };
+
+  // Toggle expand/collapse for campaign messages
+  function handleToggleExpand(title: string): void {
     setExpandedCards((prevState) => ({
       ...prevState,
       [title]: !prevState[title],
     }));
-  };
+  }
 
   return (
     <div className="bg-[#E8BB5B] p-12 min-h-screen">
       <div className="absolute top-2 right-28 z-50">
         <UserMenu userName={''} imageSrc={''} />
       </div>
+
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
+          className={`fixed top-4 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${
+            toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'
+          }`}
         >
           {toast.message}
         </div>
       )}
+
       <h1 className="text-3xl text-[#FFFF00] underline mb-1 pb-1 decoration-2 underline-offset-2 text-center ml-2 -mt-2">
         My Profile
       </h1>
+
       <div className="flex justify-center items-start mb-8 space-x-4">
         <div className="w-1/5 space-y-12 self-start mt-8">
           <div
@@ -94,11 +106,11 @@ const InfluencerPage: React.FC = () => {
             >
               <p className="text-center text-sm max-w-full">{message}</p>
             </div>
-
             <div className="px-2 pb-4">
               <hr className="border-t border-white my-2" />
             </div>
           </div>
+
           <div className="pb-6 px-2 py-4 border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-8 p-1 flex justify-around">
             <div className="text-center">
               <p className="text-3xl font-bold">10</p>
@@ -114,63 +126,30 @@ const InfluencerPage: React.FC = () => {
             </div>
           </div>
         </div>
+
         <div className="w-2/3 space-y-4">
           <div className="p-4 rounded-2xl shadow-lg">
             <h4 className="text-xl font-bold mb-2 text-center underline">
               Notifications
             </h4>
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-xl shadow-lg flex items-start space-x-4 text-sm">
-                <Image
-                  src="/images/fit.jpg"
-                  alt="Sports Campaign"
-                  width={150}
-                  height={200}
-                  className="w-16 h-16 rounded-lg"
-                />
-                <div className="w-full">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="font-bold text-blue-500">Sports Campaign</p>
-                    <p className="text-green-500 font-semibold">
-                      Submission Accepted
-                    </p>
-                    <p className="text-gray-500">16/01/2025</p>
-                  </div>
-                  <p className="text-gray-700 text-[12px]">
-                    I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we&lsquo;re excited to invite you to
-                    join our influencer network. We&#39;ve been following your
-                    content on [Platform] and love how it aligns with our brand!
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-gray-200 p-4 rounded-xl shadow-lg flex items-start space-x-4 text-sm">
-                <Image
-                  src="/images/images.jpg"
-                  alt="Fashion Campaign"
-                  width={150}
-                  height={200}
-                  className="w-16 h-16 rounded-lg"
-                />
-                <div className="w-full">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="font-bold text-blue-500">Fashion Campaign</p>
-                    <p className="text-red-500 font-semibold">
-                      Submission Rejected
-                    </p>
-                    <p className="text-gray-500">12/01/2025</p>
-                  </div>
-                  <p className="text-gray-700 text-[12px]">
-                    I hope this message finds you well! My name is [Your Name]
-                    from [Your Brand], and we&lsquo;re excited to invite you to
-                    join our influencer network. We&#39;ve been following your
-                    content on [Platform] and love how it aligns with our brand!
-                  </p>
-                </div>
-              </div>
+              <NotificationCard
+                imageSrc="/images/fit.jpg"
+                campaignName="Sports Campaign"
+                status="accepted"
+                date="16/01/2025"
+                message={message}
+              />
+              <NotificationCard
+                imageSrc="/images/images.jpg"
+                campaignName="Fashion Campaign"
+                status="rejected"
+                date="12/01/2025"
+                message={message}
+              />
             </div>
           </div>
+
           <div className="p-2 rounded-2xl shadow-lg">
             <h4 className="p-3 text-xl text-center underline">Campaigns</h4>
             <div className="grid grid-cols-3 gap-4">
@@ -188,7 +167,10 @@ const InfluencerPage: React.FC = () => {
                         ? 'scale-105 ring-4 ring-blue-500'
                         : 'hover:scale-105 hover:ring-2 hover:ring-blue-300'
                     }`}
-                    onClick={() => setActiveCard(title)}
+                    onClick={() => {
+                      setActiveCard(title);
+                      handleCampaignAction(title); // Call the toast notification here
+                    }}
                   >
                     <Image
                       src="/images/fit.jpg"
@@ -216,7 +198,9 @@ const InfluencerPage: React.FC = () => {
                           Deadline: 2 weeks
                         </p>
                         <p
-                          className={`text-xs font-bold ${index % 2 === 0 ? 'text-green-400' : 'text-red-400'}`}
+                          className={`text-xs font-bold ${
+                            index % 2 === 0 ? 'text-green-400' : 'text-red-400'
+                          }`}
                         >
                           {index % 2 === 0 ? 'Active' : 'Inactive'}
                         </p>
