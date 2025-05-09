@@ -59,10 +59,6 @@ export async function bootstrap() {
     credentials: true,
   });
 
-  app.use((next) => {
-    next();
-  });
-
   await app.listen(process.env.PORT ?? 4000);
 }
 
