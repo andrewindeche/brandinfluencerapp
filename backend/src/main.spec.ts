@@ -33,6 +33,12 @@ describe('Bootstrap (main.ts)', () => {
       enableCors: jest.fn(),
       useGlobalFilters: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined),
+      get: jest.fn().mockImplementation((token) => {
+        if (token.name === 'AdminService') {
+          return { bootstrapSuperUserFromEnv: jest.fn() };
+        }
+        return {};
+      }),
     };
 
     (NestFactory.create as jest.Mock).mockResolvedValue(mockApp);
