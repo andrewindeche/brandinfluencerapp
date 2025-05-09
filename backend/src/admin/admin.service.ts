@@ -12,29 +12,27 @@ export class AdminService {
     private readonly userService: UserService,
   ) {}
 
-  async createSuperUser(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<User> {
-    const superUserExists = await this.userModel
-      .findOne({ role: 'superuser' })
-      .exec();
+  async bootstrapSuperUserFromEnv(): Promise<void> {
+    const exists = await this.userModel.exists({ role: 'superuser' });
+    if (exists) return;
 
-    if (!superUserExists) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const superUser = await this.userModel.create({
-        username,
-        email,
-        password: hashedPassword,
-        role: 'superuser',
-      });
+    const username = process.env.SUPERUSER_USERNAME;
+    const email = process.env.SUPERUSER_EMAIL;
+    const password = process.env.SUPERUSER_PASSWORD;
 
-      await superUser.save();
-      return superUser;
-    } else {
-      throw new Error('Superuser already exists.');
+    if (!username || !email || !password) {
+      throw new Error('Superuser ENV vars missing');
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await this.userModel.create({
+      username,
+      email,
+      password: hashedPassword,
+      role: 'superuser',
+    });
+
+    console.log('✅ Superuser created from ENV');
   }
 
   async promoteUserToAdmin(superUserId: string, userId: string): Promise<User> {

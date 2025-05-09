@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv';
 import * as crypto from 'crypto';
 import { MongoExceptionFilter } from '../filters/mongo-exception.filter';
 import { AllExceptionsFilter } from '../filters/all-exceptions.filter';
+import { AdminService } from './admin/admin.service';
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ export async function bootstrap() {
   generateJwtSecret();
 
   const app = await NestFactory.create(AppModule);
+  const adminService = app.get(AdminService);
+  await adminService.bootstrapSuperUserFromEnv();
   const redisClient = new Redis({
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
@@ -56,7 +59,7 @@ export async function bootstrap() {
     credentials: true,
   });
 
-  app.use((req, res, next) => {
+  app.use((next) => {
     next();
   });
 
