@@ -55,7 +55,7 @@ npm install
 ## <h1> Endpoints </h1>
 
 1. Register User POST: http://localhost:4000/auth/influencer/register
-            Super User POST: http://localhost:4000/admin/create-superuser           
+            Super User : A superuser is created on server start. Use env variables.         
     {
     "username": "john_doe",
     "email": "john@example.com",
