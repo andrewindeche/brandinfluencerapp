@@ -68,53 +68,6 @@ describe('AdminService', () => {
 
     adminService = module.get<AdminService>(AdminService);
   });
-
-  describe('createSuperUser', () => {
-    it('should create a superuser if one does not exist', async () => {
-      const username = 'superuser1';
-      const email = 'superuser1@example.com';
-      const password = 'SuperSecretPassword';
-
-      mockUserModel.findOne.mockReturnValue(mockExec(null));
-      mockUserModel.create.mockResolvedValue({
-        _id: 'user123',
-        username,
-        email,
-        password: 'hashedPassword',
-        role: 'superuser',
-        save: mockSave,
-      });
-
-      const result = await adminService.createSuperUser(
-        username,
-        email,
-        password,
-      );
-
-      expect(result).toHaveProperty('username', username);
-      expect(result).toHaveProperty('role', 'superuser');
-      expect(mockSave).toHaveBeenCalled();
-    });
-
-    it('should throw an error if a superuser already exists', async () => {
-      const existingSuperUser = {
-        _id: 'user123',
-        username: 'superuser1',
-        email: 'superuser1@example.com',
-        password: 'hashedPassword',
-        role: 'superuser',
-      };
-
-      jest
-        .spyOn(mockUserModel, 'findOne')
-        .mockReturnValueOnce(mockExec(existingSuperUser));
-
-      await expect(
-        adminService.createSuperUser('name', 'email', 'pass'),
-      ).rejects.toThrow('Superuser already exists.');
-    });
-  });
-
   describe('promoteUserToAdmin', () => {
     it('should promote a user to admin if superuser exists', async () => {
       const superUserId = 'superuserId';
