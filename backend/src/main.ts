@@ -13,16 +13,12 @@ import { AdminService } from './admin/admin.service';
 
 dotenv.config();
 
-function generateJwtSecret() {
-  if (!process.env.JWT_SECRET) {
-    const secret = crypto.randomBytes(32).toString('base64');
-    process.env.JWT_SECRET = secret;
-  }
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not defined. Set it in your .env file or environment variables.');
 }
 
-export async function bootstrap() {
-  generateJwtSecret();
 
+export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const adminService = app.get(AdminService);
   await adminService.bootstrapSuperUserFromEnv();
