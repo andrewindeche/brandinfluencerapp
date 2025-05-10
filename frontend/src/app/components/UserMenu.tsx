@@ -22,13 +22,13 @@ const UserMenu: React.FC<UserMenuProps> = ({
     >
       <div className="cursor-pointer flex items-center justify-center">
         <div className="w-16 h-16 rounded-full border-2 border-black flex items-center justify-center">
-          <div className="w-12 h-12">
+          <div className="w-20 border-2 border-black h-12">
             <Image
               src={imageSrc || '/images/screenshots/HandM.jpg'}
               alt={userName || 'User'}
-              width={48}
-              height={48}
-              className="w-full h-full rounded-full object-cover"
+              width={60}
+              height={60}
+              className="w-full h-full object-cover"
             />
           </div>
         </div>
@@ -42,7 +42,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
           <hr className="border-gray-600" />
           <button
             onClick={onLogout}
-            className="block px-4 py-2 text-center text-sm hover:bg-gray-700 hover:text-yellow-400"
+            className="block px-10 py-2 text-center text-sm hover:bg-gray-700 hover:text-yellow-400"
           >
             Logout
           </button>

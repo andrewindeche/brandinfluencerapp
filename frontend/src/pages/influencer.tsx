@@ -57,7 +57,7 @@ const InfluencerPage: React.FC = () => {
 
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${
+          className={`fixed top-20 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${
             toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'
           }`}
         >
