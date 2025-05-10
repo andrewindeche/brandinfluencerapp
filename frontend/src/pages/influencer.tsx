@@ -4,7 +4,7 @@ import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import NotificationCard from '../app/components/NotificationCard';
 import { useToast } from '../hooks/useToast';
-import router, { useRouter } from 'next/router';
+import router from 'next/router';
 
 const MAX_CHAR_COUNT = 70;
 
