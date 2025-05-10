@@ -4,6 +4,7 @@ import CampaignsContent from '../app/components/CampaignsContent';
 import { Influencer } from '../types';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
+import { useRouter } from 'next/router';
 
 const BrandPage: React.FC = () => {
   useRoleGuard(['brand']);
@@ -13,6 +14,13 @@ const BrandPage: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: string } | null>(
     null,
   );
+
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    router.push('/login');
+  };
 
   useEffect(() => {
     const toastMessage = sessionStorage.getItem('toastMessage');
@@ -60,7 +68,7 @@ const BrandPage: React.FC = () => {
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center">
       <div className="absolute top-2 right-36 z-50">
-        <UserMenu userName="John Doe" imageSrc={''} />
+        <UserMenu userName="John Doe" imageSrc={''} onLogout={handleLogout} />
       </div>
       {toast && (
         <div
