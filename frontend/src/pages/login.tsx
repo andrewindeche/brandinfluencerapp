@@ -50,6 +50,8 @@ const LoginForm: React.FC = () => {
         case 'influencer':
         case 'admin':
         case 'user':
+          localStorage.setItem('userType', userType);
+          localStorage.setItem('email', email);
           sessionStorage.setItem('toastMessage', 'Login successful!');
           router.push(`/${userType === 'user' ? 'dashboard' : userType}`);
           break;
