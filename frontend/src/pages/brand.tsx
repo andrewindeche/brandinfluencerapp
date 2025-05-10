@@ -72,7 +72,7 @@ const BrandPage: React.FC = () => {
       </div>
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
+          className={`fixed top-22 right-26 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
         >
           {toast.message}
         </div>
