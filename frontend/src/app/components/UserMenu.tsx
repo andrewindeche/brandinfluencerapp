@@ -21,8 +21,8 @@ const UserMenu: React.FC<UserMenuProps> = ({
       onMouseLeave={() => setIsOpen(false)}
     >
       <div className="cursor-pointer flex items-center justify-center">
-        <div className="w-16 h-16 rounded-full border-2 border-black flex items-center justify-center">
-          <div className="w-20 border-2 border-black h-12">
+        <div className="w-16 h-16 rounded-full border-1 border-black flex items-center justify-center">
+          <div className="w-12 rounded-md border-2 border-black h-14">
             <Image
               src={imageSrc || '/images/screenshots/HandM.jpg'}
               alt={userName || 'User'}
