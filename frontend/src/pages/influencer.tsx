@@ -25,7 +25,9 @@ const InfluencerPage: React.FC = () => {
     const toastMessage = sessionStorage.getItem('toastMessage');
     if (toastMessage) {
       showToast(toastMessage, 'success');
-      sessionStorage.removeItem('toastMessage');
+      setTimeout(() => {
+        sessionStorage.removeItem('toastMessage');
+      }, 100);
     }
   }, [showToast]);
 
