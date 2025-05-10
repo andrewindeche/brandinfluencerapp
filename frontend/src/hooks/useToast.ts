@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
-export const useToast = () => {
+export const useToast = (autoCloseDelay = 3000) => {
   const [toast, setToast] = useState<{
     message: string;
     type?: 'success' | 'error';
@@ -16,6 +16,16 @@ export const useToast = () => {
   const closeToast = useCallback(() => {
     setToast(null);
   }, []);
+
+  useEffect(() => {
+    if (toast) {
+      const timeout = setTimeout(() => {
+        setToast(null);
+      }, autoCloseDelay);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [toast, autoCloseDelay]);
 
   return { toast, showToast, closeToast };
 };

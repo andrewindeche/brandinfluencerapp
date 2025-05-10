@@ -15,18 +15,19 @@ const InfluencerPage: React.FC = () => {
     [key: string]: boolean;
   }>({});
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const { toast, showToast, closeToast } = useToast();
+  const { toast, showToast } = useToast();
 
   const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
 
   const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3'];
 
   useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => closeToast(), 3000);
-      return () => clearTimeout(timer);
+    const toastMessage = sessionStorage.getItem('toastMessage');
+    if (toastMessage) {
+      showToast(toastMessage, 'success');
+      sessionStorage.removeItem('toastMessage');
     }
-  }, [toast, closeToast]);
+  }, [showToast]);
 
   const handleCampaignAction = (campaign: string) => {
     showToast(`${campaign} was successfully updated!`, 'success');
