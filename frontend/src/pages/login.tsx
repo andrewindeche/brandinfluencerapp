@@ -5,12 +5,24 @@ import { formState$, setEmail } from '../rxjs/store';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 
+// Loader component added here
+const Loader: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center space-x-2">
+      <div className="w-4 h-4 bg-yellow-400 rounded-full animate-bounce"></div>
+      <div className="w-4 h-4 bg-blue-400 rounded-full animate-bounce delay-150"></div>
+      <div className="w-4 h-4 bg-red-400 rounded-full animate-bounce delay-300"></div>
+    </div>
+  );
+};
+
 const LoginForm: React.FC = () => {
   const [userType, setUserType] = useState<
     'brand' | 'influencer' | 'admin' | 'user' | 'unknown'
   >('unknown');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // Added loading state
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
   const router = useRouter();
@@ -42,22 +54,25 @@ const LoginForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && password) {
-      setEmailState('');
-      setPassword('');
-
-      switch (userType) {
-        case 'brand':
-        case 'influencer':
-        case 'admin':
-        case 'user':
-          localStorage.setItem('userType', userType);
-          localStorage.setItem('email', email);
-          sessionStorage.setItem('toastMessage', 'Login successful!');
-          router.push(`/${userType === 'user' ? 'dashboard' : userType}`);
-          break;
-        default:
-          showToast('Unknown user type', 'error');
-      }
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        setEmailState('');
+        setPassword('');
+        switch (userType) {
+          case 'brand':
+          case 'influencer':
+          case 'admin':
+          case 'user':
+            localStorage.setItem('userType', userType);
+            localStorage.setItem('email', email);
+            sessionStorage.setItem('toastMessage', 'Login successful!');
+            router.push(`/${userType === 'user' ? 'dashboard' : userType}`);
+            break;
+          default:
+            showToast('Unknown user type', 'error');
+        }
+      }, 2000); // Simulated async delay
     } else {
       showToast('Please enter both email and password', 'error');
     }
@@ -130,9 +145,9 @@ const LoginForm: React.FC = () => {
           <button
             type="submit"
             className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
-            disabled={userType === 'unknown' || !email || !password}
+            disabled={userType === 'unknown' || !email || !password || loading}
           >
-            Log In
+            {loading ? <Loader /> : 'Log In'}
           </button>
         </form>
 
