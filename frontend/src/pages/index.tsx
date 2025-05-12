@@ -5,7 +5,28 @@ import { useRouter } from 'next/router';
 const HomePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isRouting, setIsRouting] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    const handleStart = () => setIsRouting(true);
+    const handleComplete = () => setIsRouting(false);
+
+    router.events.on('routeChangeStart', handleStart);
+    router.events.on('routeChangeComplete', handleComplete);
+    router.events.on('routeChangeError', handleComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+      router.events.off('routeChangeComplete', handleComplete);
+      router.events.off('routeChangeError', handleComplete);
+    };
+  }, [router]);
 
   const handleOpenModal = () => setShowModal(!showModal);
   const handleLoginRedirect = () => {
@@ -19,15 +40,14 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Simulate a loading delay (e.g., during server start or initial load)
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1500); // 1.5 seconds
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
+  if (loading || isRouting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 to-purple-700">
         <svg
