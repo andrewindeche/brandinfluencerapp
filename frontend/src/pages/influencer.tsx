@@ -134,7 +134,7 @@ const InfluencerPage: React.FC = () => {
 
         <div className="w-2/3 space-y-4">
           <div className="p-4 rounded-2xl shadow-lg bg-white">
-            <h4 className="text-xl font-bold mb-2 text-center underline">
+            <h4 className="text-xl text-black font-bold mb-2 text-center underline">
               Notifications
             </h4>
             <div className="space-y-4">
@@ -156,7 +156,9 @@ const InfluencerPage: React.FC = () => {
           </div>
 
           <div className="p-2 rounded-2xl shadow-lg bg-white">
-            <h4 className="p-3 text-xl text-center underline">Campaigns</h4>
+            <h4 className="p-3 text-xl text-black text-center underline">
+              Campaigns
+            </h4>
             <div className="grid grid-cols-3 gap-4">
               {campaigns.map((title, index) => {
                 const isExpanded = expandedCards[title];
