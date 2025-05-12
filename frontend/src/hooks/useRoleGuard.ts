@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 
 export const useRoleGuard = (allowedRoles: string[]) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     const userType = localStorage.getItem('userType');
@@ -16,11 +17,11 @@ export const useRoleGuard = (allowedRoles: string[]) => {
     if (!allowedRoles.includes(userType)) {
       router.replace('/unauthorized');
     } else {
-      setLoading(false);
+      setAuthorized(true);
     }
+
+    setChecked(true);
   }, [allowedRoles, router]);
 
-  if (loading) return null;
-
-  return null;
+  return { authorized, checked };
 };
