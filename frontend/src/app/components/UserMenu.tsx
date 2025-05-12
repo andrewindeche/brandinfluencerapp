@@ -40,7 +40,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ imageSrc, onLogout }) => {
     >
       <div className="cursor-pointer flex items-center justify-center">
         <div className="w-16 h-16 rounded-full border-1 border-black flex items-center justify-center">
-          <div className="w-12 rounded-md border-2 border-black h-14">
+          <div className="w-12 rounded-md border-1 border-black h-14">
             <Image
               src={imageSrc || '/images/screenshots/HandM.jpg'}
               alt={userName || 'User'}
