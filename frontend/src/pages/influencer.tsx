@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import UserMenu from '../app/components/UserMenu';
-import { useRoleGuard } from '../hooks/useRoleGuard';
 import NotificationCard from '../app/components/NotificationCard';
+import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useToast } from '../hooks/useToast';
 import router from 'next/router';
+import { formState$ } from '@/rxjs/store';
 
 const MAX_CHAR_COUNT = 70;
 
 const InfluencerPage: React.FC = () => {
-  useRoleGuard(['influencer']);
-
+  const { authorized, checked } = useRoleGuard(['influencer']);
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { toast, showToast } = useToast();
+  const [username, setUsername] = useState('');
 
   const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
-
   const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3'];
+
+  useEffect(() => {
+    const sub = formState$.subscribe((state) => {
+      setUsername(state.username);
+    });
+    return () => sub.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const toastMessage = sessionStorage.getItem('toastMessage');
@@ -47,11 +54,13 @@ const InfluencerPage: React.FC = () => {
     }));
   };
 
+  if (!checked || !authorized) return null;
+
   return (
-    <div className="bg-[#E8BB5B] p-12 min-h-screen relative">
-      <div className="absolute top-2 right-28 z-50">
+    <div className="bg-[#E8BB5B] px-4 sm:px-6 lg:px-12 py-6 min-h-screen relative max-w-screen-xl mx-auto">
+      <div className="absolute top-2 right-4 md:right-28 z-50">
         <UserMenu
-          userName="Influencer"
+          userName={username}
           imageSrc="/images/image4.png"
           onLogout={handleLogout}
         />
@@ -59,20 +68,19 @@ const InfluencerPage: React.FC = () => {
 
       {toast && (
         <div
-          className={`fixed top-20 right-4 z-50 text-white px-4 py-3 rounded shadow-lg ${
-            toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'
-          }`}
+          className={`fixed top-20 right-4 z-50 text-white px-4 py-3 rounded shadow-lg transition-all duration-300 ease-in-out ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
         >
           {toast.message}
         </div>
       )}
 
-      <h1 className="text-3xl text-[#FFFF00] underline pb-1 decoration-2 underline-offset-2 text-center -mt-2">
+      <h1 className="text-2xl md:text-3xl font-semibold text-[#FFFF00] text-center mt-4">
         My Profile
       </h1>
 
-      <div className="flex justify-center items-start mb-8 space-x-4">
-        <div className="w-1/5 mt-8 space-y-12">
+      <div className="flex flex-col lg:flex-row gap-6 mt-8">
+        {/* Sidebar */}
+        <div className="w-full lg:w-[25%] min-w-[250px] max-w-full space-y-12">
           <div
             className="p-1 bg-black text-white rounded-2xl relative shadow-lg"
             onMouseEnter={() => setIsHovered(true)}
@@ -109,14 +117,14 @@ const InfluencerPage: React.FC = () => {
             <div
               className={`h-24 px-2 mt-2 ${isHovered ? 'overflow-y-auto' : 'overflow-hidden'}`}
             >
-              <p className="text-center text-sm">{message}</p>
+              <p className="text-center text-sm md:text-base">{message}</p>
             </div>
             <div className="px-2 pb-4">
               <hr className="border-t border-white my-2" />
             </div>
           </div>
 
-          <div className="pb-6 px-2 py-4 border border-white bg-black text-white rounded-xl shadow-lg w-full max-w-xl mx-auto mt-8 flex justify-around">
+          <div className="pb-6 px-2 py-4 border border-white bg-black text-white rounded-xl shadow-lg w-full mx-auto flex justify-around">
             <div className="text-center">
               <p className="text-3xl font-bold">10</p>
               <p className="text-xs">Campaigns</p>
@@ -132,9 +140,10 @@ const InfluencerPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-2/3 space-y-4">
+        {/* Main content */}
+        <div className="w-full lg:w-4/5 space-y-6">
           <div className="p-4 rounded-2xl shadow-lg bg-white">
-            <h4 className="text-xl text-black font-bold mb-2 text-center underline">
+            <h4 className="text-xl font-bold text-center text-black mb-4">
               Notifications
             </h4>
             <div className="space-y-4">
@@ -155,18 +164,16 @@ const InfluencerPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-2 rounded-2xl shadow-lg bg-white">
-            <h4 className="p-3 text-xl text-black text-center underline">
+          <div className="p-4 rounded-2xl shadow-lg bg-white">
+            <h4 className="text-xl font-bold text-center text-black mb-4">
               Campaigns
             </h4>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {campaigns.map((title, index) => {
                 const isExpanded = expandedCards[title];
                 const displayedText = isExpanded
                   ? message
-                  : `${message.slice(0, MAX_CHAR_COUNT)}${
-                      message.length > MAX_CHAR_COUNT ? '...' : ''
-                    }`;
+                  : `${message.slice(0, MAX_CHAR_COUNT)}${message.length > MAX_CHAR_COUNT ? '...' : ''}`;
 
                 return (
                   <div
@@ -177,8 +184,8 @@ const InfluencerPage: React.FC = () => {
                     <Image
                       src="/images/fit.jpg"
                       alt={title}
-                      width={200}
-                      height={150}
+                      width={500}
+                      height={300}
                       className="rounded-2xl w-full h-[150px] object-cover"
                     />
                     <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
@@ -193,7 +200,7 @@ const InfluencerPage: React.FC = () => {
                             e.stopPropagation();
                             handleToggleExpand(title);
                           }}
-                          className="text-red-400 hover:underline"
+                          className="text-red-400 hover:underline text-xs mt-1"
                         >
                           {isExpanded ? 'Read Less' : 'Read More'}
                         </button>
