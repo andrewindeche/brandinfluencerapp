@@ -89,7 +89,6 @@ const InfluencerPage: React.FC = () => {
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-6 mt-8">
-        {/* Sidebar */}
         <div className="w-full lg:w-[25%] min-w-[250px] max-w-full space-y-12">
           <div
             className="p-1 bg-black text-white rounded-2xl relative shadow-lg"
@@ -104,16 +103,16 @@ const InfluencerPage: React.FC = () => {
                 height={150}
                 className="w-full h-auto rounded-lg"
               />
-              <div className="absolute transform -translate-x-1/2 rotate-12 bg-opacity-30 px-20 py-3 bottom-6 left-1/2 text-lg bg-[#333333] text-white p-2 rounded-full z-10">
+              <div className="absolute transform -translate-x-1/2 rotate-12 px-20 py-3 bottom-6 left-1/2 text-lg bg-black/30 text-white p-2 rounded-full z-10">
                 <span className="inline-block transform -rotate-12">BRAD</span>
               </div>
               <div className="absolute top-4 left-1 text-center z-10 space-y-1">
-                <div className="bg-[#333333] rotate-12 bg-opacity-30 text-xs p-3 rounded-full">
+                <div className="bg-black/20 text-white p-3 rounded-full rotate-12">
                   <span className="inline-block transform -rotate-12">
                     100 likes
                   </span>
                 </div>
-                <div className="bg-[#333333] rotate-12 bg-opacity-30 text-xs p-3 rounded-full">
+                <div className="bg-black/20 rotate-12 text-xs p-3 rounded-full">
                   <span className="inline-block transform -rotate-12">
                     50 shares
                   </span>
