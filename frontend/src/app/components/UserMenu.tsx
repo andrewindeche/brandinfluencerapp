@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { formState$ } from '@/rxjs/store';
 
 interface UserMenuProps {
   userName: string;
@@ -7,13 +8,18 @@ interface UserMenuProps {
   onLogout?: () => void;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({
-  userName,
-  imageSrc,
-  onLogout,
-}) => {
+const UserMenu: React.FC<UserMenuProps> = ({ imageSrc, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [userName, setUserName] = useState('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const subscription = formState$.subscribe((state) => {
+      setUserName(state.name);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -23,7 +29,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false);
-    }, 150); // Delay to prevent flickering
+    }, 150);
   };
 
   return (
