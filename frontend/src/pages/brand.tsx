@@ -7,7 +7,6 @@ import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useRouter } from 'next/router';
 
 const BrandPage: React.FC = () => {
-  useRoleGuard(['brand']);
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
     'influencers',
   );
@@ -16,6 +15,7 @@ const BrandPage: React.FC = () => {
   );
 
   const router = useRouter();
+  const { authorized, checked } = useRoleGuard(['brand']);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -29,6 +29,18 @@ const BrandPage: React.FC = () => {
       sessionStorage.removeItem('toastMessage');
     }
   }, []);
+
+  if (!checked) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!authorized) {
+    return null;
+  }
 
   const influencers: Influencer[] = [
     {
