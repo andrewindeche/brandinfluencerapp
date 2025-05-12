@@ -11,6 +11,7 @@ const ForgotPasswordForm: React.FC = () => {
     resetStatus: 'idle',
     password: '',
     confirmPassword: '',
+    loading: false,
   });
 
   const { toast, showToast, closeToast } = useToast();
@@ -20,6 +21,8 @@ const ForgotPasswordForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setState((prev) => ({ ...prev, loading: true }));
+
     try {
       const res = await axiosInstance.post('/auth/forgot-password', {
         email: state.email,
@@ -31,14 +34,15 @@ const ForgotPasswordForm: React.FC = () => {
           ...prev,
           email: '',
           resetStatus: 'success',
+          loading: false,
         }));
       } else {
-        setState((prev) => ({ ...prev, resetStatus: 'error' }));
+        setState((prev) => ({ ...prev, resetStatus: 'error', loading: false }));
         showToast('Failed to send reset email.', 'error');
       }
     } catch (error) {
       console.error('Email reset error:', error);
-      setState((prev) => ({ ...prev, resetStatus: 'error' }));
+      setState((prev) => ({ ...prev, resetStatus: 'error', loading: false }));
       showToast('Error sending reset email.', 'error');
     }
   };
@@ -50,6 +54,8 @@ const ForgotPasswordForm: React.FC = () => {
       showToast('Passwords do not match.', 'error');
       return;
     }
+
+    setState((prev) => ({ ...prev, loading: true }));
 
     try {
       const res = await axiosInstance.post(`/auth/reset-password/${token}`, {
@@ -70,6 +76,7 @@ const ForgotPasswordForm: React.FC = () => {
         ...prev,
         password: '',
         confirmPassword: '',
+        loading: false,
       }));
     }
   };
@@ -130,9 +137,33 @@ const ForgotPasswordForm: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-yellow-400 text-white font-semibold py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+              className="w-full bg-yellow-400 text-white font-semibold py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"
+              disabled={state.loading}
             >
-              Change Password
+              {state.loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 01-8 8z"
+                  ></path>
+                </svg>
+              ) : (
+                'Change Password'
+              )}
             </button>
           </form>
         ) : (
@@ -158,9 +189,33 @@ const ForgotPasswordForm: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-yellow-400 text-white font-semibold py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+              className="w-full bg-yellow-400 text-white font-semibold py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"
+              disabled={state.loading}
             >
-              Reset Password
+              {state.loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 01-8 8z"
+                  ></path>
+                </svg>
+              ) : (
+                'Reset Password'
+              )}
             </button>
           </form>
         )}
@@ -192,6 +247,7 @@ const ForgotPasswordForm: React.FC = () => {
           Back to Home
         </button>
       </div>
+
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       )}
