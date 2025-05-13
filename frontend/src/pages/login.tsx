@@ -5,11 +5,10 @@ import { formState$, setEmail } from '../rxjs/store';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 
-// Loader component added here
 const Loader: React.FC = () => {
   return (
     <div className="flex items-center justify-center space-x-2">
-      <div className="w-4 h-4 bg-yellow-400 rounded-full animate-bounce"></div>
+      <div className="w-4 h-4 bg-green-400 rounded-full animate-bounce"></div>
       <div className="w-4 h-4 bg-blue-400 rounded-full animate-bounce delay-150"></div>
       <div className="w-4 h-4 bg-red-400 rounded-full animate-bounce delay-300"></div>
     </div>
@@ -22,7 +21,7 @@ const LoginForm: React.FC = () => {
   >('unknown');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
   const router = useRouter();
@@ -72,7 +71,7 @@ const LoginForm: React.FC = () => {
           default:
             showToast('Unknown user type', 'error');
         }
-      }, 2000); // Simulated async delay
+      }, 2000);
     } else {
       showToast('Please enter both email and password', 'error');
     }
