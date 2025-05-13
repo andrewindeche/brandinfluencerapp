@@ -84,30 +84,10 @@ export const submitSignUpForm = async (
     return;
   }
 
-  const signUpData = {
-    email: formState.email,
-    role: formState.role,
-    name: formState.name,
-    username: formState.username,
-    password: formState.password,
-    confirmPassword: formState.confirmPassword,
-    category: formState.category,
-    bio: formState.bio,
-    location: formState.location,
-  };
-
   if (formState.role === 'unknown') {
     setErrors({ role: 'Please select a valid user type.' });
     return;
   }
-
-  const apiEndpoint =
-    formState.role === 'influencer'
-      ? '/auth/influencer/register'
-      : formState.role === 'brand'
-        ? '/auth/brand/register'
-        : '/auth/other/register';
-
   try {
     stateSubject.next(initialState);
     showToast('Registration successful', 'success');
