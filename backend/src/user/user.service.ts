@@ -21,6 +21,14 @@ export class UserService {
     }
   }
 
+  async findById(userId: string): Promise<User | null> {
+    try {
+      return await this.userModel.findById(userId).exec();
+    } catch (error) {
+      throw new Error('Error finding user by ID: ' + error.message);
+    }
+  }
+
   async findUserByEmail(email: string): Promise<User | null> {
     try {
       return await this.userModel.findOne({ email }).exec();
