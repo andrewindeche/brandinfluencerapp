@@ -53,7 +53,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ imageSrc, onLogout }) => {
       </div>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-32 bg-black text-white rounded-lg shadow-lg z-10">
+        <div className="absolute right-0 mt-2 w-32 bg-black/80 text-white rounded-lg shadow-lg z-10">
           <p className="px-4 py-2 text-center text-sm font-bold">
             {userName || 'User'}
           </p>
