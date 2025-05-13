@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Query,Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserService } from './user.service';
 import { User } from './user.schema';
 
@@ -9,6 +11,13 @@ export class UserController {
   @Get()
   async findAll(): Promise<User[]> {
     return this.userService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMe(@Req() req: Request) {
+    const userId = req.user?.sub;
+    return this.userService.findById(userId);
   }
 
   @Get('user-type')
