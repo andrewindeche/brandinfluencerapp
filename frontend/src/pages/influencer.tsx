@@ -42,6 +42,12 @@ const InfluencerPage: React.FC = () => {
     showToast(`${campaign} was successfully updated!`, 'success');
   };
 
+  const getRandomNumber = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+  const [likes] = useState(getRandomNumber(21, 200));
+  const [shares] = useState(getRandomNumber(21, 150));
+
   const handleLogout = () => {
     localStorage.clear();
     router.push('/login');
@@ -109,12 +115,12 @@ const InfluencerPage: React.FC = () => {
               <div className="absolute top-4 left-1 text-center z-10 space-y-1">
                 <div className="bg-black/20 text-white p-3 rounded-full rotate-12">
                   <span className="inline-block transform -rotate-12">
-                    100 likes
+                    {likes} likes
                   </span>
                 </div>
                 <div className="bg-black/20 rotate-12 text-xs p-3 rounded-full">
                   <span className="inline-block transform -rotate-12">
-                    50 shares
+                    {shares} shares
                   </span>
                 </div>
               </div>
@@ -148,8 +154,6 @@ const InfluencerPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Main content */}
         <div className="w-full lg:w-4/5 space-y-6">
           <div className="p-4 rounded-2xl shadow-lg bg-white">
             <h4 className="text-xl font-bold text-center text-black mb-4">
