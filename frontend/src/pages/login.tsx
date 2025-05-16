@@ -54,10 +54,10 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     if (email && password) {
       setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
+      setTimeout(async () => {
         setEmailState('');
         setPassword('');
+
         switch (userType) {
           case 'brand':
           case 'influencer':
@@ -66,10 +66,16 @@ const LoginForm: React.FC = () => {
             localStorage.setItem('userType', userType);
             localStorage.setItem('email', email);
             sessionStorage.setItem('toastMessage', 'Login successful!');
-            router.push(`/${userType === 'user' ? 'dashboard' : userType}`);
+
+            await router.push(
+              `/${userType === 'user' ? 'dashboard' : userType}`,
+            );
+
+            setLoading(false);
             break;
           default:
             showToast('Unknown user type', 'error');
+            setLoading(false);
         }
       }, 2000);
     } else {
