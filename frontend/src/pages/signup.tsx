@@ -1,91 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { AxiosError } from 'axios';
-import Toast from '../app/components/Toast';
-import { useToast } from '../hooks/useToast';
-
 import {
   formState$,
   setFormField,
+  setEmail,
   submitSignUpForm,
   initialState,
+  resetForm,
 } from '../rxjs/store';
+import Toast from '../app/components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
   const [formState, setFormState] = useState(initialState);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast, showToast, closeToast } = useToast();
 
   useEffect(() => {
     const subscription = formState$.subscribe((state) => {
       setFormState(state);
+      if (state.success) {
+        showToast(state.serverMessage || 'Registration successful', 'success');
+        resetForm();
+        setTimeout(() => router.push('/login?signup=success'), 1000);
+      } else if (state.serverMessage && !state.success) {
+        showToast(state.serverMessage, 'error');
+      }
     });
-    return () => subscription.unsubscribe();
-  }, []);
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const timer = setTimeout(() => setErrors({}), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [errors]);
+    return () => subscription.unsubscribe();
+  }, [router, showToast]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { id, value } = e.target;
-    setFormField(id as keyof typeof formState, value);
-    setErrors((prevErrors) => ({ ...prevErrors, [id]: '' }));
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formState.email) newErrors.email = 'Email is required';
-    if (!formState.role || formState.role === 'unknown')
-      newErrors.role = 'User type is required';
-    if (!formState.username) newErrors.username = 'Username is required';
-    if (!formState.password) newErrors.password = 'Password is required';
-    if (!formState.confirmPassword)
-      newErrors.confirmPassword = 'Confirm password is required';
-    if (formState.password !== formState.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (id === 'email') {
+      setEmail(value);
+    } else {
+      setFormField(id as keyof typeof formState, value);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      await submitSignUpForm(
-        () => {
-          setFormState(initialState);
-          router.push('/login?signup=success');
-        },
-        () => {},
-        setErrors,
-        showToast,
-      );
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        const { status, data } = error.response || {};
-        if (status === 409 && data?.code === 'DUPLICATE_USER') {
-          setErrors({ email: data.message, username: data.message });
-        } else {
-          showToast('An unexpected error occurred. Please try again.', 'error');
-        }
-      } else {
-        showToast('Unexpected error occurred.', 'error');
-      }
-    }
+    await submitSignUpForm();
   };
 
-  const { email, role, username, password, confirmPassword } = formState;
+  const { email, role, username, password, confirmPassword, errors } =
+    formState;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
@@ -94,6 +58,7 @@ const SignUpForm: React.FC = () => {
           Sign Up
         </h2>
         <form onSubmit={handleSubmit}>
+          {/* Email Field */}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -104,16 +69,17 @@ const SignUpForm: React.FC = () => {
             <input
               type="email"
               id="email"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
-              placeholder="Enter your email"
               value={email}
               onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg text-black bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              placeholder="Enter your email"
             />
             {errors.email && (
               <p className="text-red-400 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
+          {/* Role */}
           <div className="mb-4">
             <label
               htmlFor="role"
@@ -123,9 +89,9 @@ const SignUpForm: React.FC = () => {
             </label>
             <select
               id="role"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               value={role}
               onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg text-black bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
             >
               <option value="unknown">Select User Type</option>
               <option value="influencer">Influencer</option>
@@ -136,6 +102,7 @@ const SignUpForm: React.FC = () => {
             )}
           </div>
 
+          {/* Username */}
           <div className="mb-4">
             <label
               htmlFor="username"
@@ -146,10 +113,10 @@ const SignUpForm: React.FC = () => {
             <input
               type="text"
               id="username"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
-              placeholder="Enter your username"
               value={username}
               onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg text-black bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              placeholder="Enter your username"
             />
             {errors.username && (
               <p className="text-red-400 text-sm mt-1">{errors.username}</p>
@@ -166,10 +133,10 @@ const SignUpForm: React.FC = () => {
             <input
               type="password"
               id="password"
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
-              placeholder="Enter your password"
               value={password}
               onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg text-black bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              placeholder="Enter your password"
             />
             {errors.password && (
               <p className="text-red-400 text-sm mt-1">{errors.password}</p>
@@ -186,14 +153,14 @@ const SignUpForm: React.FC = () => {
             <input
               type="password"
               id="confirmPassword"
-              className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 ${
-                formState.password === confirmPassword
-                  ? 'focus:ring-yellow-400'
-                  : 'focus:ring-red-400'
-              } shadow-lg bg-white`}
-              placeholder="Confirm your password"
               value={confirmPassword}
               onChange={handleChange}
+              className={`w-full px-4 py-2 rounded-lg text-black bg-white shadow-lg focus:outline-none focus:ring-2 ${
+                password === confirmPassword
+                  ? 'focus:ring-yellow-400'
+                  : 'focus:ring-red-400'
+              }`}
+              placeholder="Confirm your password"
             />
             {errors.confirmPassword && (
               <p className="text-red-400 text-sm mt-1">
@@ -204,9 +171,10 @@ const SignUpForm: React.FC = () => {
 
           <button
             type="submit"
+            disabled={formState.submitting}
             className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
           >
-            Sign Up
+            {formState.submitting ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
 

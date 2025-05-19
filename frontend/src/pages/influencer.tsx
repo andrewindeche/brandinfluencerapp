@@ -23,6 +23,7 @@ const InfluencerPage: React.FC = () => {
 
   useEffect(() => {
     const sub = formState$.subscribe((state) => {
+      console.log('FormState emitted:', state);
       setUsername(state.username);
     });
     return () => sub.unsubscribe();

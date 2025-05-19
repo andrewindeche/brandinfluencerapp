@@ -15,6 +15,9 @@ type FormState = {
   bio?: string;
   location?: string;
   errors: Record<string, string>;
+  submitting: boolean;
+  success: boolean;
+  serverMessage: string | null;
 };
 
 export const initialState: FormState = {
@@ -23,20 +26,27 @@ export const initialState: FormState = {
   name: '',
   username: '',
   password: '',
+  confirmPassword: '',
   category: '',
   bio: '',
   location: '',
-  confirmPassword: '',
   errors: {},
+  submitting: false,
+  success: false,
+  serverMessage: null,
 };
 
 const stateSubject = new BehaviorSubject<FormState>(initialState);
+export const formState$: Observable<FormState> = stateSubject
+  .asObservable()
+  .pipe(distinctUntilChanged());
+
+export const setFormField = (field: keyof FormState, value: string) => {
+  stateSubject.next({ ...stateSubject.value, [field]: value });
+};
 
 export const setErrors = (newErrors: Record<string, string>) => {
-  stateSubject.next({
-    ...stateSubject.value,
-    errors: newErrors,
-  });
+  stateSubject.next({ ...stateSubject.value, errors: newErrors });
 };
 
 const fetchUserType = debounce(async (email: string) => {
@@ -47,70 +57,87 @@ const fetchUserType = debounce(async (email: string) => {
 
   try {
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    const role = response.data.type;
-    stateSubject.next({ ...stateSubject.value, role });
-  } catch (error) {
-    console.error('Error fetching user type:', error);
+    stateSubject.next({ ...stateSubject.value, role: response.data.type });
+  } catch {
     stateSubject.next({ ...stateSubject.value, role: 'unknown' });
   }
 }, 1000);
 
 export const setEmail = (email: string) => {
-  stateSubject.next({
-    ...stateSubject.value,
-    email,
-  });
-
+  stateSubject.next({ ...stateSubject.value, email });
   fetchUserType(email);
 };
 
-export const setFormField = (field: keyof FormState, value: string) => {
-  stateSubject.next({
-    ...stateSubject.value,
-    [field]: value,
-  });
+export const resetForm = () => {
+  stateSubject.next(initialState);
 };
 
-export const submitSignUpForm = async (
-  navigateToLogin: () => void,
-  _setShowErrorDialog: (show: boolean) => void,
-  setErrors: (errors: Record<string, string>) => void,
-  showToast: (message: string, type?: 'success' | 'error') => void,
-) => {
+export const submitSignUpForm = async () => {
   const formState = stateSubject.value;
 
   if (formState.password !== formState.confirmPassword) {
-    setErrors({ confirmPassword: 'Passwords do not match.' });
-    return;
+    return setErrors({ confirmPassword: 'Passwords do not match.' });
   }
 
   if (formState.role === 'unknown') {
-    setErrors({ role: 'Please select a valid user type.' });
-    return;
+    return setErrors({ role: 'Please select a valid user type.' });
   }
+
+  stateSubject.next({
+    ...formState,
+    submitting: true,
+    success: false,
+    serverMessage: null,
+  });
+
   try {
-    stateSubject.next(initialState);
-    showToast('Registration successful', 'success');
-    navigateToLogin();
+    const url =
+      formState.role === 'influencer'
+        ? '/auth/influencer/register'
+        : formState.role === 'brand'
+          ? '/auth/brand/register'
+          : undefined;
+    if (!url) {
+      return setErrors({ role: 'Please select a valid user type.' });
+    }
+
+    await axiosInstance.post(url, {
+      email: formState.email,
+      password: formState.password,
+      confirmPassword: formState.confirmPassword,
+      username: formState.username,
+      name: formState.name,
+      role: formState.role,
+      category: formState.category,
+      bio: formState.bio,
+      location: formState.location,
+    });
+
+    stateSubject.next({
+      ...initialState,
+      success: true,
+      serverMessage: 'Registration successful.',
+    });
   } catch (error: unknown) {
-    stateSubject.next(initialState);
+    let newErrors: Record<string, string> = {};
+    let message = 'Unexpected error occurred.';
+
     if (error instanceof AxiosError && error.response) {
       const { status, data } = error.response;
 
       if (status === 409 && data?.code === 'DUPLICATE_USER') {
-        setErrors({ email: data.message, username: data.message });
-        showToast(data.message, 'error');
+        newErrors = { email: data.message, username: data.message };
+        message = data.message;
       } else if (typeof data === 'object' && data?.message) {
-        showToast(data.message, 'error');
-      } else {
-        showToast('Unexpected error occurred.', 'error');
+        message = data.message;
       }
-    } else {
-      showToast('Unexpected error occurred.', 'error');
     }
+
+    stateSubject.next({
+      ...formState,
+      submitting: false,
+      errors: newErrors,
+      serverMessage: message,
+    });
   }
 };
-
-export const formState$: Observable<FormState> = stateSubject
-  .asObservable()
-  .pipe(distinctUntilChanged());
