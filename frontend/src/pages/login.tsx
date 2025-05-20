@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { formState$, setEmail } from '../rxjs/store';
+import { formState$, setEmail, submitLoginForm } from '../rxjs/store';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 
@@ -21,7 +21,7 @@ const LoginForm: React.FC = () => {
   >('unknown');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
   const router = useRouter();
@@ -30,6 +30,7 @@ const LoginForm: React.FC = () => {
     const subscription = formState$.subscribe((state) => {
       setEmailState(state.email);
       setUserType(state.role);
+      setSubmitting(state.submitting);
     });
 
     if (router.query.signup === 'success') {
@@ -50,34 +51,35 @@ const LoginForm: React.FC = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (email && password) {
-      setLoading(true);
-      setTimeout(async () => {
+      const result = await submitLoginForm(email, password);
+
+      if (result?.success) {
+        const type = result.role;
+
+        setEmail('');
         setEmailState('');
         setPassword('');
 
-        switch (userType) {
-          case 'brand':
-          case 'influencer':
-          case 'admin':
-          case 'user':
-            localStorage.setItem('userType', userType);
-            localStorage.setItem('email', email);
-            sessionStorage.setItem('toastMessage', 'Login successful!');
-
-            await router.push(
-              `/${userType === 'user' ? 'dashboard' : userType}`,
-            );
-
-            setLoading(false);
-            break;
-          default:
-            showToast('Unknown user type', 'error');
-            setLoading(false);
-        }
-      }, 2000);
+        setTimeout(() => {
+          switch (type) {
+            case 'user':
+              router.push('/dashboard');
+              break;
+            case 'brand':
+            case 'admin':
+              router.push(`/${type}`);
+              break;
+            default:
+              showToast('Unknown user type', 'error');
+          }
+        }, 2000);
+      } else {
+        showToast(result?.message ?? 'Login failed', 'error');
+      }
     } else {
       showToast('Please enter both email and password', 'error');
     }
@@ -150,9 +152,11 @@ const LoginForm: React.FC = () => {
           <button
             type="submit"
             className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
-            disabled={userType === 'unknown' || !email || !password || loading}
+            disabled={
+              userType === 'unknown' || !email || !password || submitting
+            }
           >
-            {loading ? <Loader /> : 'Log In'}
+            {submitting ? <Loader /> : 'Log In'}
           </button>
         </form>
 

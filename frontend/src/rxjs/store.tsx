@@ -57,7 +57,20 @@ const fetchUserType = debounce(async (email: string) => {
 
   try {
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    stateSubject.next({ ...stateSubject.value, role: response.data.type });
+    const validRoles = ['brand', 'influencer', 'admin', 'user'] as const;
+    const role = validRoles.includes(response.data.type)
+      ? response.data.type
+      : 'unknown';
+    stateSubject.next({
+      ...initialState,
+      email,
+      role,
+      submitting: false,
+      success: true,
+      serverMessage: 'Login successful!',
+    });
+
+    return { success: true, role };
   } catch {
     stateSubject.next({ ...stateSubject.value, role: 'unknown' });
   }
@@ -70,6 +83,61 @@ export const setEmail = (email: string) => {
 
 export const resetForm = () => {
   stateSubject.next(initialState);
+};
+
+export const submitLoginForm = async (email: string, password: string) => {
+  const currentState = stateSubject.value;
+
+  if (!email || !password) {
+    stateSubject.next({
+      ...currentState,
+      serverMessage: 'Email and password are required',
+    });
+    return;
+  }
+
+  stateSubject.next({
+    ...currentState,
+    submitting: true,
+    success: false,
+    serverMessage: null,
+  });
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const response = await axiosInstance.get(`/users/user-type?email=${email}`);
+
+    stateSubject.next({
+      ...initialState,
+      email,
+      role: response.data.type ?? 'unknown',
+      submitting: false,
+      success: true,
+      serverMessage: 'Login successful!',
+    });
+
+    return { success: true, role: response.data.type };
+  } catch (error: unknown) {
+    let message = 'Login failed';
+    if (
+      error instanceof AxiosError &&
+      error.response?.data &&
+      typeof error.response.data === 'object'
+    ) {
+      message =
+        (error.response.data as { message?: string })?.message ?? message;
+    }
+
+    stateSubject.next({
+      ...currentState,
+      submitting: false,
+      success: false,
+      serverMessage: message,
+    });
+
+    return { success: false, message };
+  }
 };
 
 export const submitSignUpForm = async () => {
