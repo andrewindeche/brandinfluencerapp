@@ -15,6 +15,7 @@ export interface Influencer extends User {
   submissions: Submission[];
   campaign?: MongooseSchema.Types.ObjectId;
   role: 'influencer';
+  profileImage?: string; 
 }
 
 export const InfluencerSchema = new Schema<Influencer>({
@@ -28,6 +29,7 @@ export const InfluencerSchema = new Schema<Influencer>({
   location: { type: String, required: true },
   submissions: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }],
   campaign: { type: MongooseSchema.Types.ObjectId, ref: 'Campaign' },
+  profileImage: { type: String, default: '/images/image4.png' },
 });
 
 export const InfluencerModel = UserModel.discriminator<Influencer>(
