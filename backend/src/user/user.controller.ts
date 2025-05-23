@@ -22,12 +22,17 @@ export class UserController {
   }
 
   @Get('user-type')
-  async getUserType(@Query('email') email: string): Promise<{ type: string }> {
+  async getUserType(
+    @Query('email') email: string,
+  ): Promise<{ type: string; username?: string }> {
     const user = await this.userService.findUserByEmail(email);
     const validRoles = ['influencer', 'brand', 'admin', 'superuser'] as const;
 
     if (user && validRoles.includes(user.role)) {
-      return { type: user.role };
+      return {
+        type: user.role,
+        username: user.username,
+      };
     }
 
     return { type: 'unknown' };

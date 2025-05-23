@@ -57,6 +57,7 @@ const fetchUserType = debounce(async (email: string) => {
 
   try {
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
+    console.log('User type response:', response.data);
     const validRoles = ['brand', 'influencer', 'admin', 'user'] as const;
     const role = validRoles.includes(response.data.type)
       ? response.data.type
@@ -108,21 +109,22 @@ export const submitLoginForm = async (email: string, password: string) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    const role = response.data.type ?? 'unknown';
+    const { type: role = 'unknown', username = '' } = response.data;
 
     localStorage.setItem('userType', role);
-    console.log('userType', role);
+    localStorage.setItem('username', username);
 
     stateSubject.next({
       ...initialState,
       email,
       role,
+      username,
       submitting: false,
       success: true,
       serverMessage: 'Login successful!',
     });
 
-    return { success: true, role };
+    return { success: true, role, username };
   } catch (error: unknown) {
     let message = 'Login failed';
     let isThrottleOrCors = false;

@@ -23,8 +23,7 @@ const InfluencerPage: React.FC = () => {
 
   useEffect(() => {
     const sub = formState$.subscribe((state) => {
-      console.log('FormState emitted:', state);
-      setUsername(state.username);
+      setUsername(state.username || localStorage.getItem('username') || 'User');
     });
     return () => sub.unsubscribe();
   }, []);
@@ -111,7 +110,9 @@ const InfluencerPage: React.FC = () => {
                 className="w-full h-auto rounded-lg"
               />
               <div className="absolute transform -translate-x-1/2 rotate-12 px-20 py-3 bottom-6 left-1/2 text-lg bg-black/30 text-white p-2 rounded-full z-10">
-                <span className="inline-block transform -rotate-12">BRAD</span>
+                <span className="inline-block transform -rotate-12">
+                  {username || 'User'}
+                </span>
               </div>
               <div className="absolute top-4 left-1 text-center z-10 space-y-1">
                 <div className="bg-black/20 text-white p-3 rounded-full rotate-12">

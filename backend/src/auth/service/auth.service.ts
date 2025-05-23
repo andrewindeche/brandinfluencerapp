@@ -70,11 +70,7 @@ export class AuthService {
   }
 
   async validateUserByIdAndRole(userId: string, role: string) {
-    console.log('Calling validateUserByIdAndRole with:', userId, role);
     const user = await this.userModel.findById(userId);
-    console.log('DB user:', user);
-    console.log('Payload role:', role);
-
     if (!user) return null;
 
     return user.role?.toLowerCase() === role.toLowerCase() ? user : null;
