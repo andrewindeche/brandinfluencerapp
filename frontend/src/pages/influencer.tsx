@@ -185,7 +185,7 @@ const InfluencerPage: React.FC = () => {
                     key={n.id}
                     imageSrc="/images/fit.jpg"
                     campaignName={n.campaign}
-                    status={n.status}
+                    status={n.status as 'accepted' | 'rejected'}
                     date="16/01/2025"
                     message={message}
                   />
