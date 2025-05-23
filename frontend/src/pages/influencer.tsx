@@ -51,12 +51,16 @@ const InfluencerPage: React.FC = () => {
   const [showcampaigns] = useState(getRandomNumber(0, 30));
   const [posts] = useState(getRandomNumber(0, 30));
   const [submissions] = useState(getRandomNumber(0, 30));
-  const notifications = [
+  type Notification = {
+    id: number;
+    campaign: string;
+    status: 'accepted' | 'rejected';
+  };
+
+  const notifications: Notification[] = [
     { id: 1, campaign: 'Sports Campaign', status: 'accepted' },
     { id: 2, campaign: 'Fashion Campaign', status: 'rejected' },
   ];
-
-  const notificationCount = notifications.length;
 
   const handleLogout = () => {
     localStorage.clear();
@@ -167,40 +171,12 @@ const InfluencerPage: React.FC = () => {
           </div>
         </div>
         <div className="w-full lg:w-4/5 space-y-6">
-          <div className="p-4 rounded-2xl shadow-lg bg-white relative">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-xl font-bold text-black">Notifications</h4>
-              <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="text-sm text-blue-600 hover:underline"
-              >
-                {showNotifications ? 'Hide' : 'Show'}
-              </button>
-            </div>
-
-            {showNotifications ? (
-              <div className="space-y-4 transition-all duration-300">
-                {notifications.map((n) => (
-                  <NotificationCard
-                    key={n.id}
-                    imageSrc="/images/fit.jpg"
-                    campaignName={n.campaign}
-                    status={n.status as 'accepted' | 'rejected'}
-                    date="16/01/2025"
-                    message={message}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div
-                className="absolute -top-4 -right-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-bounce cursor-pointer"
-                onClick={() => setShowNotifications(true)}
-                title="Show Notifications"
-              >
-                🔔 {notificationCount}
-              </div>
-            )}
-          </div>
+          <NotificationsSection
+            notifications={notifications}
+            show={showNotifications}
+            toggleShow={() => setShowNotifications(!showNotifications)}
+            message={message}
+          />
 
           <CampaignsSection
             campaigns={campaigns}
