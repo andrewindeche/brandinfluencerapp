@@ -71,7 +71,8 @@ const LoginForm: React.FC = () => {
       setEmailState('');
       setPassword('');
 
-      if (result?.success) {
+      if (result?.success && result.role === 'influencer') {
+        sessionStorage.setItem('toastMessage', 'Login successful!');
         const type = result.role;
 
         switch (type) {
