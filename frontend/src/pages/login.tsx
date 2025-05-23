@@ -69,8 +69,8 @@ const LoginForm: React.FC = () => {
             case 'user':
               router.push('/dashboard');
               break;
+            case 'influencer':
             case 'brand':
-            case 'admin':
               router.push(`/${type}`);
               break;
             default:
