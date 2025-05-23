@@ -10,6 +10,7 @@ type FormState = {
   role: 'brand' | 'influencer' | 'admin' | 'unknown';
   name: string;
   username: string;
+  profileImage?: string;
   password: string;
   category?: string;
   bio?: string;
@@ -26,6 +27,7 @@ export const initialState: FormState = {
   name: '',
   username: '',
   password: '',
+  profileImage: '',
   confirmPassword: '',
   category: '',
   bio: '',
@@ -109,16 +111,22 @@ export const submitLoginForm = async (email: string, password: string) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    const { type: role = 'unknown', username = '' } = response.data;
+    const {
+      type: role = 'unknown',
+      username = '',
+      profileImage = '',
+    } = response.data;
 
     localStorage.setItem('userType', role);
     localStorage.setItem('username', username);
+    localStorage.setItem('profileImage', profileImage);
 
     stateSubject.next({
       ...initialState,
       email,
       role,
       username,
+      profileImage,
       success: true,
       serverMessage: 'Login successful!',
       submitting: true,
@@ -188,6 +196,7 @@ export const submitSignUpForm = async () => {
       confirmPassword: formState.confirmPassword,
       username: formState.username,
       name: formState.name,
+      profileImage: formState.profileImage,
       role: formState.role,
       category: formState.category,
       bio: formState.bio,

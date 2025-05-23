@@ -11,7 +11,6 @@ export interface Influencer extends User {
   };
   category: string;
   bio: string;
-  location: string;
   submissions: Submission[];
   campaign?: MongooseSchema.Types.ObjectId;
   role: 'influencer';
@@ -26,7 +25,6 @@ export const InfluencerSchema = new Schema<Influencer>({
   },
   category: { type: String, required: true },
   bio: { type: String, required: true },
-  location: { type: String, required: true },
   submissions: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }],
   campaign: { type: MongooseSchema.Types.ObjectId, ref: 'Campaign' },
   profileImage: { type: String, default: '/images/image4.png' },
