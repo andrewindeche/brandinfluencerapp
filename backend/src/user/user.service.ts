@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
 import { RedisService } from '../redis/redis.service';
+import { UpdateBioDto } from 'src/auth/dto/update-bio.dto';
 
 @Injectable()
 export class UserService {
@@ -69,5 +70,17 @@ export class UserService {
     } catch (error) {
       throw new Error('Error updating password: ' + error.message);
     }
+  }
+
+  async updateBio(userId: string, { bio }: UpdateBioDto): Promise<User> {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { bio },
+      { new: true },
+    );
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }

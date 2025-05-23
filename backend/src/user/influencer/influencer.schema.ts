@@ -14,7 +14,7 @@ export interface Influencer extends User {
   submissions: Submission[];
   campaign?: MongooseSchema.Types.ObjectId;
   role: 'influencer';
-  profileImage?: string; 
+  profileImage?: string;
 }
 
 export const InfluencerSchema = new Schema<Influencer>({

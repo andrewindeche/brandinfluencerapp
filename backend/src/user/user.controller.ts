@@ -1,7 +1,16 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserService } from './user.service';
+import { UpdateBioDto } from '../auth/dto/update-bio.dto';
 import { User } from './user.schema';
 
 @Controller('users')
@@ -36,5 +45,11 @@ export class UserController {
     }
 
     return { type: 'unknown' };
+  }
+
+  @Patch('bio')
+  async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
+    const userId = req.user._id;
+    return this.userService.updateBio(userId, updateBioDto);
   }
 }
