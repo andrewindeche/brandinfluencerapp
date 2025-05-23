@@ -56,13 +56,12 @@ const LoginForm: React.FC = () => {
 
     if (email && password) {
       const result = await submitLoginForm(email, password);
+      setEmail('');
+      setEmailState('');
+      setPassword('');
 
       if (result?.success) {
         const type = result.role;
-
-        setEmail('');
-        setEmailState('');
-        setPassword('');
 
         setTimeout(() => {
           switch (type) {
@@ -77,6 +76,8 @@ const LoginForm: React.FC = () => {
               showToast('Unknown user type', 'error');
           }
         }, 2000);
+      } else if (result?.throttle) {
+        showToast(result.message, 'warning');
       } else {
         showToast(result?.message ?? 'Login failed', 'error');
       }

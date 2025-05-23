@@ -116,24 +116,28 @@ export const submitLoginForm = async (email: string, password: string) => {
     stateSubject.next({
       ...initialState,
       email,
-      role: response.data.type ?? 'unknown',
+      role,
       submitting: false,
       success: true,
       serverMessage: 'Login successful!',
     });
 
-    localStorage.setItem('userType', response.data.type ?? 'unknown');
-
-    return { success: true, role: response.data.type };
+    return { success: true, role };
   } catch (error: unknown) {
     let message = 'Login failed';
-    if (
-      error instanceof AxiosError &&
-      error.response?.data &&
-      typeof error.response.data === 'object'
-    ) {
-      message =
-        (error.response.data as { message?: string })?.message ?? message;
+    let isThrottleOrCors = false;
+
+    if (error instanceof AxiosError) {
+      if (!error.response && error.request) {
+        message = 'Too many login attempts. Please wait and try again.';
+        isThrottleOrCors = true;
+      } else if (
+        error.response?.data &&
+        typeof error.response.data === 'object'
+      ) {
+        message =
+          (error.response.data as { message?: string })?.message ?? message;
+      }
     }
 
     stateSubject.next({
@@ -143,7 +147,7 @@ export const submitLoginForm = async (email: string, password: string) => {
       serverMessage: message,
     });
 
-    return { success: false, message };
+    return { success: false, message, throttle: isThrottleOrCors };
   }
 };
 

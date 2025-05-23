@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 interface ToastProps {
   message: string;
-  type?: 'success' | 'error';
+  type?: 'success' | 'error' | 'warning';
   onClose: () => void;
 }
 
@@ -17,7 +17,7 @@ const Toast: React.FC<ToastProps> = ({
   }, [onClose]);
 
   const bgColor =
-    type === 'error'
+    type === 'error' || 'warning'
       ? 'bg-red-500'
       : type === 'success'
         ? 'bg-green-500'
