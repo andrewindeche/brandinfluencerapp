@@ -11,6 +11,7 @@ const MAX_CHAR_COUNT = 70;
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
+  const [showNotifications, setShowNotifications] = useState(true);
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
@@ -158,25 +159,34 @@ const InfluencerPage: React.FC = () => {
         </div>
         <div className="w-full lg:w-4/5 space-y-6">
           <div className="p-4 rounded-2xl shadow-lg bg-white">
-            <h4 className="text-xl font-bold text-center text-black mb-4">
-              Notifications
-            </h4>
-            <div className="space-y-4">
-              <NotificationCard
-                imageSrc="/images/fit.jpg"
-                campaignName="Sports Campaign"
-                status="accepted"
-                date="16/01/2025"
-                message={message}
-              />
-              <NotificationCard
-                imageSrc="/images/images.jpg"
-                campaignName="Fashion Campaign"
-                status="rejected"
-                date="12/01/2025"
-                message={message}
-              />
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-xl font-bold text-black">Notifications</h4>
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                {showNotifications ? 'Hide' : 'Show'}
+              </button>
             </div>
+
+            {showNotifications && (
+              <div className="space-y-4 transition-all duration-300">
+                <NotificationCard
+                  imageSrc="/images/fit.jpg"
+                  campaignName="Sports Campaign"
+                  status="accepted"
+                  date="16/01/2025"
+                  message={message}
+                />
+                <NotificationCard
+                  imageSrc="/images/images.jpg"
+                  campaignName="Fashion Campaign"
+                  status="rejected"
+                  date="12/01/2025"
+                  message={message}
+                />
+              </div>
+            )}
           </div>
 
           <div className="p-4 rounded-2xl shadow-lg bg-white">
