@@ -9,8 +9,6 @@ import { formState$ } from '@/rxjs/store';
 import NotificationsSection from '../app/components/NotificationsSection';
 import CampaignsSection from '../app/components/CampaignsSection';
 
-const MAX_CHAR_COUNT = 70;
-
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
   const [showNotifications, setShowNotifications] = useState(true);
