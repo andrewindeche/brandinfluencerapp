@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import UserMenu from '../app/components/UserMenu';
-import NotificationCard from '../app/components/NotificationCard';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useToast } from '../hooks/useToast';
 import router from 'next/router';
