@@ -19,7 +19,14 @@ const InfluencerPage: React.FC = () => {
   const [username, setUsername] = useState('');
 
   const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
-  const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3'];
+  const campaigns = [
+    'Campaign 1',
+    'Campaign 2',
+    'Campaign 3',
+    'Campaign 4',
+    'Campaign 5',
+    'Campaign 6',
+  ];
 
   useEffect(() => {
     const sub = formState$.subscribe((state) => {
@@ -183,6 +190,7 @@ const InfluencerPage: React.FC = () => {
             expanded={expandedCards}
             onExpandToggle={handleToggleExpand}
             onCampaignAction={handleCampaignAction}
+            notificationOpen={showNotifications}
           />
         </div>
       </div>
