@@ -193,7 +193,7 @@ const InfluencerPage: React.FC = () => {
               </div>
             ) : (
               <div
-                className="absolute -top-4 -right-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-bounce cursor-pointer"
+                className="absolute -top-4 -right-4 bg-red-600 text-white text-base font-bold px-2 py-1 rounded-full shadow-lg animate-bounce cursor-pointer"
                 onClick={() => setShowNotifications(true)}
                 title="Show Notifications"
               >
