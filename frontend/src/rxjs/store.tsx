@@ -69,6 +69,7 @@ const fetchUserType = debounce(async (email: string) => {
       success: true,
       serverMessage: 'Login successful!',
     });
+    localStorage.setItem('userType', role);
 
     return { success: true, role };
   } catch {
@@ -107,6 +108,10 @@ export const submitLoginForm = async (email: string, password: string) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const response = await axiosInstance.get(`/users/user-type?email=${email}`);
+    const role = response.data.type ?? 'unknown';
+
+    localStorage.setItem('userType', role);
+    console.log('userType', role);
 
     stateSubject.next({
       ...initialState,
@@ -116,6 +121,8 @@ export const submitLoginForm = async (email: string, password: string) => {
       success: true,
       serverMessage: 'Login successful!',
     });
+
+    localStorage.setItem('userType', response.data.type ?? 'unknown');
 
     return { success: true, role: response.data.type };
   } catch (error: unknown) {
