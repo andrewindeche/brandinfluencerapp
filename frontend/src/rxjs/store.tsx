@@ -119,9 +119,9 @@ export const submitLoginForm = async (email: string, password: string) => {
       email,
       role,
       username,
-      submitting: false,
       success: true,
       serverMessage: 'Login successful!',
+      submitting: true,
     });
 
     return { success: true, role, username };

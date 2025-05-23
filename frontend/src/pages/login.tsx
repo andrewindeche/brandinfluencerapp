@@ -42,6 +42,17 @@ const LoginForm: React.FC = () => {
     };
   }, [router.query]);
 
+  useEffect(() => {
+    const handleRouteChangeComplete = () => {
+      setSubmitting(false);
+    };
+
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router]);
+
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
@@ -63,23 +74,21 @@ const LoginForm: React.FC = () => {
       if (result?.success) {
         const type = result.role;
 
-        setTimeout(() => {
-          switch (type) {
-            case 'user':
-              router.push('/dashboard');
-              break;
-            case 'influencer':
-            case 'brand':
-              router.push(`/${type}`);
-              break;
-            default:
-              showToast('Unknown user type', 'error');
-          }
-        }, 2000);
+        switch (type) {
+          case 'user':
+            router.push('/dashboard');
+            break;
+          case 'influencer':
+          case 'brand':
+            router.push(`/${type}`);
+            break;
+          default:
+            showToast('Unknown user type', 'error');
+        }
       } else if (result?.throttle) {
         showToast(result.message, 'warning');
       } else {
-        showToast(result?.message ?? 'Login failed', 'error');
+        showToast(result?.message ?? 'Login failed.Try again later', 'error');
       }
     } else {
       showToast('Please enter both email and password', 'error');
