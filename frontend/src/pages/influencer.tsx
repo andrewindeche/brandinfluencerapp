@@ -48,6 +48,9 @@ const InfluencerPage: React.FC = () => {
 
   const [likes] = useState(getRandomNumber(21, 200));
   const [shares] = useState(getRandomNumber(21, 150));
+  const [showcampaigns] = useState(getRandomNumber(0, 30));
+  const [posts] = useState(getRandomNumber(0, 30));
+  const [submissions] = useState(getRandomNumber(0, 30));
 
   const handleLogout = () => {
     localStorage.clear();
@@ -144,15 +147,15 @@ const InfluencerPage: React.FC = () => {
 
           <div className="pb-6 px-2 py-4 border border-white bg-black text-white rounded-xl shadow-lg w-full mx-auto flex justify-around">
             <div className="text-center">
-              <p className="text-3xl font-bold">10</p>
+              <p className="text-3xl font-bold">{showcampaigns}</p>
               <p className="text-xs">Campaigns</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold">8</p>
+              <p className="text-3xl font-bold">{posts}</p>
               <p className="text-xs">Posts</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold">17</p>
+              <p className="text-3xl font-bold">{submissions}</p>
               <p className="text-xs">Submissions</p>
             </div>
           </div>
