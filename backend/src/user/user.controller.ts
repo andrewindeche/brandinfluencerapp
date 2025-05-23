@@ -1,4 +1,4 @@
-import { Controller, Get, Query,Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserService } from './user.service';
@@ -24,10 +24,12 @@ export class UserController {
   @Get('user-type')
   async getUserType(@Query('email') email: string): Promise<{ type: string }> {
     const user = await this.userService.findUserByEmail(email);
-    if (user) {
-      const userType = user.role === 'influencer' ? 'influencer' : 'brand';
-      return { type: userType };
+    const validRoles = ['influencer', 'brand', 'admin', 'superuser'] as const;
+
+    if (user && validRoles.includes(user.role)) {
+      return { type: user.role };
     }
+
     return { type: 'unknown' };
   }
 }
