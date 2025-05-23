@@ -4,7 +4,8 @@ import { Model } from 'mongoose';
 import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
 import { RedisService } from '../redis/redis.service';
-import { UpdateBioDto } from 'src/auth/dto/update-bio.dto';
+import { UpdateBioDto } from '../auth/dto/update-bio.dto';
+import { UpdateProfileImageDto } from '../auth/dto/update-profile-image.dto';
 
 @Injectable()
 export class UserService {
@@ -76,6 +77,21 @@ export class UserService {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       { bio },
+      { new: true },
+    );
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async updateProfileImage(
+    userId: string,
+    { profileImage }: UpdateProfileImageDto,
+  ): Promise<User> {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { profileImage },
       { new: true },
     );
     if (!user) {

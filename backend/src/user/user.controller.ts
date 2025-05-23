@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserService } from './user.service';
 import { UpdateBioDto } from '../auth/dto/update-bio.dto';
+import { UpdateProfileImageDto } from '../auth/dto/update-profile-image.dto';
 import { User } from './user.schema';
 
 @Controller('users')
@@ -51,5 +52,14 @@ export class UserController {
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
     const userId = req.user._id;
     return this.userService.updateBio(userId, updateBioDto);
+  }
+
+  @Patch('profile-image')
+  async updateProfileImage(
+    @Req() req: Request,
+    @Body() dto: UpdateProfileImageDto,
+  ) {
+    const userId = req.user._id;
+    return this.userService.updateProfileImage(userId, dto);
   }
 }
