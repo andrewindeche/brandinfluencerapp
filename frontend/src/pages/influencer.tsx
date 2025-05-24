@@ -223,11 +223,12 @@ const InfluencerPage: React.FC = () => {
               {editingBio && (
                 <>
                   <textarea
-                    rows={4}
-                    className="w-full p-2 rounded text-black"
+                    rows={6}
+                    className="w-full p-2 rounded text-white resize-y"
                     value={bioDraft}
                     onChange={(e) => setBioDraft(e.target.value)}
                     disabled={loading}
+                    placeholder="Edit your bio here..."
                   />
                   <div className="flex gap-4 mt-2 justify-center">
                     <button
@@ -245,7 +246,13 @@ const InfluencerPage: React.FC = () => {
                           setEditingBio(false);
                           setImageFile(null);
                           setImagePreview(null);
-                        } catch {
+                          showToast('Profile updated successfully!', 'success');
+                        } catch (error: any) {
+                          showToast(
+                            error?.message ||
+                              'Network error. Please try again.',
+                            'error',
+                          );
                         } finally {
                           setLoading(false);
                         }
