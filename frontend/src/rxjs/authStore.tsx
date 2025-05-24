@@ -14,7 +14,6 @@ type FormState = {
   password: string;
   category?: string;
   bio?: string;
-  location?: string;
   errors: Record<string, string>;
   submitting: boolean;
   success: boolean;
@@ -31,7 +30,6 @@ export const initialState: FormState = {
   confirmPassword: '',
   category: '',
   bio: '',
-  location: '',
   errors: {},
   submitting: false,
   success: false,
@@ -200,7 +198,6 @@ export const submitSignUpForm = async () => {
       role: formState.role,
       category: formState.category,
       bio: formState.bio,
-      location: formState.location,
     });
 
     stateSubject.next({
