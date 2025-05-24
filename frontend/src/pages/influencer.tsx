@@ -4,7 +4,8 @@ import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useToast } from '../hooks/useToast';
 import router from 'next/router';
-import { formState$ } from '@/rxjs/store';
+import { authState$ } from '../rxjs/authStore';
+import type { AuthFormState } from '../rxjs/authStore';
 import NotificationsSection from '../app/components/NotificationsSection';
 import CampaignsSection from '../app/components/CampaignsSection';
 
@@ -29,7 +30,7 @@ const InfluencerPage: React.FC = () => {
   ];
 
   useEffect(() => {
-    const sub = formState$.subscribe((state) => {
+    const sub = authState$.subscribe((state: AuthFormState) => {
       setUsername(state.username || localStorage.getItem('username') || 'User');
     });
     return () => sub.unsubscribe();
