@@ -1,39 +1,53 @@
 import { BehaviorSubject } from 'rxjs';
-import axiosInstance from '../rxjs/axiosInstance';
+import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
+import { authStore } from './authStore';
 
-type Status = 'idle' | 'loading' | 'success' | 'error';
+type ProfileUpdateStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface ProfileUpdateState {
-  status: Status;
+  status: ProfileUpdateStatus;
   error: string | null;
 }
 
-const state$ = new BehaviorSubject<ProfileUpdateState>({
+const _state$ = new BehaviorSubject<ProfileUpdateState>({
   status: 'idle',
   error: null,
 });
 
+export const profileUpdateState$ = _state$.asObservable();
+
+function setProfileUpdateState(update: Partial<ProfileUpdateState>) {
+  _state$.next({ ..._state$.value, ...update });
+}
+
 export const profileUpdateStore = {
-  state$,
+  state$: profileUpdateState$,
 
   async updateProfile(
     bio: string,
     profileImage: string,
     showToast: (msg: string, type: 'success' | 'error') => void,
   ) {
-    state$.next({ status: 'loading', error: null });
+    setProfileUpdateState({ status: 'loading', error: null });
+
     try {
       await axiosInstance.patch('/users/me', { bio, profileImage });
-      state$.next({ status: 'success', error: null });
+
+      localStorage.setItem('bio', bio);
+      localStorage.setItem('profileImage', profileImage);
+
+      authStore.updateAuthState({ bio, profileImage });
+
+      setProfileUpdateState({ status: 'success', error: null });
       showToast('Profile updated successfully!', 'success');
-    } catch (err) {
-      const error = err as AxiosError<{ message?: string }>;
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
       const message =
-        error.response?.data?.message ||
-        error.message ||
+        err.response?.data?.message ||
+        err.message ||
         'Failed to update profile.';
-      state$.next({ status: 'error', error: message });
+      setProfileUpdateState({ status: 'error', error: message });
       showToast(message, 'error');
     }
   },
