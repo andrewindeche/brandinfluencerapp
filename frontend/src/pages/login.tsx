@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { formState$, setEmail, submitLoginForm } from '../rxjs/store';
+import { authState$ } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 
@@ -27,7 +27,7 @@ const LoginForm: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const subscription = formState$.subscribe((state) => {
+    const subscription = authState$.subscribe((state) => {
       setEmailState(state.email);
       setUserType(state.role);
       setSubmitting(state.submitting);
