@@ -247,12 +247,15 @@ const InfluencerPage: React.FC = () => {
                           setImageFile(null);
                           setImagePreview(null);
                           showToast('Profile updated successfully!', 'success');
-                        } catch (error: any) {
-                          showToast(
-                            error?.message ||
+                        } catch (error: unknown) {
+                          if (error instanceof Error) {
+                            showToast(error.message, 'error');
+                          } else {
+                            showToast(
                               'Network error. Please try again.',
-                            'error',
-                          );
+                              'error',
+                            );
+                          }
                         } finally {
                           setLoading(false);
                         }
