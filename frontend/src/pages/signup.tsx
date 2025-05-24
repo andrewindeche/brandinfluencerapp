@@ -1,28 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import {
-  formState$,
-  setFormField,
-  setEmail,
-  submitSignUpForm,
-  initialState,
-  resetForm,
-} from '../rxjs/store';
+import { authState$, authStore, initialAuthState } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
-  const [formState, setFormState] = useState(initialState);
+  const [formState, setFormState] = useState(initialAuthState);
   const { toast, showToast, closeToast } = useToast();
 
   useEffect(() => {
-    const subscription = formState$.subscribe((state) => {
+    const subscription = authState$.subscribe((state) => {
       setFormState(state);
       if (state.success) {
         showToast(state.serverMessage || 'Registration successful', 'success');
-        resetForm();
+        authStore.reset();
         setTimeout(() => router.push('/login?signup=success'), 1000);
       } else if (state.serverMessage && !state.success) {
         showToast(state.serverMessage, 'error');
@@ -36,16 +29,12 @@ const SignUpForm: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { id, value } = e.target;
-    if (id === 'email') {
-      setEmail(value);
-    } else {
-      setFormField(id as keyof typeof formState, value);
-    }
+    authStore.setField(id as keyof typeof formState, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await submitSignUpForm();
+    await authStore.register();
   };
 
   const { email, role, username, password, confirmPassword, errors } =
@@ -58,7 +47,6 @@ const SignUpForm: React.FC = () => {
           Sign Up
         </h2>
         <form onSubmit={handleSubmit}>
-          {/* Email Field */}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -79,7 +67,6 @@ const SignUpForm: React.FC = () => {
             )}
           </div>
 
-          {/* Role */}
           <div className="mb-4">
             <label
               htmlFor="role"
@@ -102,7 +89,6 @@ const SignUpForm: React.FC = () => {
             )}
           </div>
 
-          {/* Username */}
           <div className="mb-4">
             <label
               htmlFor="username"
