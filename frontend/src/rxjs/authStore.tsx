@@ -1,230 +1,204 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import axiosInstance from './axiosInstance';
 import { debounce } from 'lodash';
 import { AxiosError } from 'axios';
 
-type FormState = {
-  confirmPassword: string;
+type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
+
+export type AuthFormState = {
   email: string;
-  role: 'brand' | 'influencer' | 'admin' | 'unknown';
+  role: UserRole;
   name: string;
   username: string;
-  profileImage?: string;
   password: string;
-  category?: string;
+  confirmPassword: string;
+  profileImage?: string;
   bio?: string;
+  category?: string;
   errors: Record<string, string>;
   submitting: boolean;
   success: boolean;
   serverMessage: string | null;
 };
 
-export const initialState: FormState = {
+export const initialAuthState: AuthFormState = {
   email: '',
   role: 'unknown',
   name: '',
   username: '',
   password: '',
-  profileImage: '',
   confirmPassword: '',
-  category: '',
+  profileImage: '',
   bio: '',
+  category: '',
   errors: {},
   submitting: false,
   success: false,
   serverMessage: null,
 };
 
-const stateSubject = new BehaviorSubject<FormState>(initialState);
-export const formState$: Observable<FormState> = stateSubject
+const _authState$ = new BehaviorSubject<AuthFormState>(initialAuthState);
+export const authState$ = _authState$
   .asObservable()
   .pipe(distinctUntilChanged());
 
-export const setFormField = (field: keyof FormState, value: string) => {
-  stateSubject.next({ ...stateSubject.value, [field]: value });
-};
+function updateAuthState(update: Partial<AuthFormState>) {
+  _authState$.next({ ..._authState$.value, ...update });
+}
 
-export const setErrors = (newErrors: Record<string, string>) => {
-  stateSubject.next({ ...stateSubject.value, errors: newErrors });
-};
-
-const fetchUserType = debounce(async (email: string) => {
-  if (!email) {
-    stateSubject.next({ ...stateSubject.value, role: 'unknown' });
-    return;
-  }
+const fetchUserRole = debounce(async (email: string) => {
+  if (!email) return updateAuthState({ role: 'unknown' });
 
   try {
-    const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    console.log('User type response:', response.data);
-    const validRoles = ['brand', 'influencer', 'admin', 'user'] as const;
-    const role = validRoles.includes(response.data.type)
-      ? response.data.type
+    const { data } = await axiosInstance.get(`/users/user-type?email=${email}`);
+    const role: UserRole = ['brand', 'influencer', 'admin'].includes(data.type)
+      ? data.type
       : 'unknown';
-    stateSubject.next({
-      ...initialState,
-      email,
+
+    updateAuthState({
       role,
-      submitting: false,
       success: true,
-      serverMessage: 'Login successful!',
+      serverMessage: 'User type detected.',
     });
     localStorage.setItem('userType', role);
-
-    return { success: true, role };
   } catch {
-    stateSubject.next({ ...stateSubject.value, role: 'unknown' });
+    updateAuthState({ role: 'unknown' });
   }
 }, 1000);
 
-export const setEmail = (email: string) => {
-  stateSubject.next({ ...stateSubject.value, email });
-  fetchUserType(email);
-};
+export const authStore = {
+  state$: authState$,
+  updateAuthState,
 
-export const resetForm = () => {
-  stateSubject.next(initialState);
-};
+  setField(field: keyof AuthFormState, value: string) {
+    updateAuthState({ [field]: value } as Partial<AuthFormState>);
+    if (field === 'email') fetchUserRole(value);
+  },
 
-export const submitLoginForm = async (email: string, password: string) => {
-  const currentState = stateSubject.value;
+  setErrors(errors: Record<string, string>) {
+    updateAuthState({ errors });
+  },
 
-  if (!email || !password) {
-    stateSubject.next({
-      ...currentState,
-      serverMessage: 'Email and password are required',
-    });
-    return;
-  }
+  reset() {
+    _authState$.next(initialAuthState);
+  },
 
-  stateSubject.next({
-    ...currentState,
-    submitting: true,
-    success: false,
-    serverMessage: null,
-  });
+  async login(email: string, password: string) {
+    if (!email || !password) {
+      return updateAuthState({
+        serverMessage: 'Email and password are required',
+      });
+    }
 
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    updateAuthState({ submitting: true, success: false, serverMessage: null });
 
-    const response = await axiosInstance.get(`/users/user-type?email=${email}`);
-    const {
-      type: role = 'unknown',
-      username = '',
-      profileImage = '',
-    } = response.data;
+    try {
+      const { data } = await axiosInstance.get(
+        `/users/user-type?email=${email}`,
+      );
+      const { type: role = 'unknown', username = '', profileImage = '' } = data;
 
-    localStorage.setItem('userType', role);
-    localStorage.setItem('username', username);
-    localStorage.setItem('profileImage', profileImage);
+      localStorage.setItem('userType', role);
+      localStorage.setItem('username', username);
+      localStorage.setItem('profileImage', profileImage);
 
-    stateSubject.next({
-      ...initialState,
-      email,
-      role,
-      username,
-      profileImage,
-      success: true,
-      serverMessage: 'Login successful!',
-      submitting: true,
-    });
+      _authState$.next({
+        ...initialAuthState,
+        email,
+        role,
+        username,
+        profileImage,
+        submitting: false,
+        success: true,
+        serverMessage: 'Login successful!',
+      });
 
-    return { success: true, role, username };
-  } catch (error: unknown) {
-    let message = 'Login failed';
-    let isThrottleOrCors = false;
+      return { success: true, role, username };
+    } catch (error) {
+      let message = 'Login failed';
+      let isThrottle = false;
 
-    if (error instanceof AxiosError) {
-      if (!error.response && error.request) {
-        message = 'Too many login attempts. Please wait and try again.';
-        isThrottleOrCors = true;
-      } else if (
-        error.response?.data &&
-        typeof error.response.data === 'object'
-      ) {
-        message =
-          (error.response.data as { message?: string })?.message ?? message;
+      if (error instanceof AxiosError) {
+        if (!error.response && error.request) {
+          message = 'Too many attempts. Please try again later.';
+          isThrottle = true;
+        } else {
+          message = error.response?.data?.message || message;
+        }
       }
+
+      updateAuthState({
+        submitting: false,
+        success: false,
+        serverMessage: message,
+      });
+
+      return { success: false, message, throttle: isThrottle };
+    }
+  },
+
+  async register() {
+    const state = _authState$.value;
+
+    if (state.password !== state.confirmPassword) {
+      return authStore.setErrors({
+        confirmPassword: 'Passwords do not match.',
+      });
     }
 
-    stateSubject.next({
-      ...currentState,
-      submitting: false,
-      success: false,
-      serverMessage: message,
-    });
-
-    return { success: false, message, throttle: isThrottleOrCors };
-  }
-};
-
-export const submitSignUpForm = async () => {
-  const formState = stateSubject.value;
-
-  if (formState.password !== formState.confirmPassword) {
-    return setErrors({ confirmPassword: 'Passwords do not match.' });
-  }
-
-  if (formState.role === 'unknown') {
-    return setErrors({ role: 'Please select a valid user type.' });
-  }
-
-  stateSubject.next({
-    ...formState,
-    submitting: true,
-    success: false,
-    serverMessage: null,
-  });
-
-  try {
-    const url =
-      formState.role === 'influencer'
-        ? '/auth/influencer/register'
-        : formState.role === 'brand'
-          ? '/auth/brand/register'
-          : undefined;
-    if (!url) {
-      return setErrors({ role: 'Please select a valid user type.' });
+    if (state.role === 'unknown') {
+      return authStore.setErrors({ role: 'Please select a valid user type.' });
     }
 
-    await axiosInstance.post(url, {
-      email: formState.email,
-      password: formState.password,
-      confirmPassword: formState.confirmPassword,
-      username: formState.username,
-      name: formState.name,
-      profileImage: formState.profileImage,
-      role: formState.role,
-      category: formState.category,
-      bio: formState.bio,
-    });
+    updateAuthState({ submitting: true, success: false, serverMessage: null });
 
-    stateSubject.next({
-      ...initialState,
-      success: true,
-      serverMessage: 'Registration successful.',
-    });
-  } catch (error: unknown) {
-    let newErrors: Record<string, string> = {};
-    let message = 'Unexpected error occurred.';
+    try {
+      const url =
+        state.role === 'influencer'
+          ? '/auth/influencer/register'
+          : state.role === 'brand'
+            ? '/auth/brand/register'
+            : '';
 
-    if (error instanceof AxiosError && error.response) {
-      const { status, data } = error.response;
+      if (!url) return authStore.setErrors({ role: 'Invalid role.' });
 
-      if (status === 409 && data?.code === 'DUPLICATE_USER') {
-        newErrors = { email: data.message, username: data.message };
-        message = data.message;
-      } else if (typeof data === 'object' && data?.message) {
-        message = data.message;
+      await axiosInstance.post(url, {
+        email: state.email,
+        password: state.password,
+        confirmPassword: state.confirmPassword,
+        username: state.username,
+        name: state.name,
+        profileImage: state.profileImage,
+        category: state.category,
+        bio: state.bio,
+      });
+
+      _authState$.next({
+        ...initialAuthState,
+        success: true,
+        serverMessage: 'Registration successful.',
+      });
+    } catch (err) {
+      let errors: Record<string, string> = {};
+      let message = 'Unexpected error occurred.';
+
+      if (err instanceof AxiosError && err.response) {
+        if (
+          err.response.status === 409 &&
+          err.response.data?.code === 'DUPLICATE_USER'
+        ) {
+          errors = {
+            email: err.response.data.message,
+            username: err.response.data.message,
+          };
+          message = err.response.data.message;
+        } else {
+          message = err.response.data?.message || message;
+        }
       }
-    }
 
-    stateSubject.next({
-      ...formState,
-      submitting: false,
-      errors: newErrors,
-      serverMessage: message,
-    });
-  }
+      updateAuthState({ submitting: false, errors, serverMessage: message });
+    }
+  },
 };
