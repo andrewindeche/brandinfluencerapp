@@ -18,13 +18,20 @@ const CampaignsSection: React.FC<Props> = ({
   onExpandToggle,
   onCampaignAction,
   maxCharCount = 70,
+  notificationOpen,
 }) => {
   return (
     <div className="p-4 rounded-2xl shadow-lg bg-white">
       <h4 className="text-xl font-bold text-center text-black mb-4">
         Campaigns
       </h4>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        className={`gap-4 ${
+          notificationOpen
+            ? 'flex overflow-x-auto gap-4 scrollbar-thin scrollbar-thumb-blue-500'
+            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
+        }`}
+      >
         {campaigns.map((title, index) => {
           const isExpanded = expanded[title];
           const displayedText = isExpanded
@@ -34,7 +41,9 @@ const CampaignsSection: React.FC<Props> = ({
           return (
             <div
               key={index}
-              className="relative bg-black text-white p-1 rounded-xl shadow-lg transform transition duration-300 hover:scale-105 hover:ring-2 hover:ring-blue-300"
+              className={`${
+                notificationOpen ? 'min-w-[32%] max-w-[32%]' : ''
+              } flex-shrink-0 bg-black text-white p-1 rounded-xl shadow-lg transform transition duration-300 hover:scale-105 hover:ring-2 hover:ring-blue-300`}
               onClick={() => onCampaignAction(title)}
             >
               <Image
