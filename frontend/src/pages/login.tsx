@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { authState$ } from '../rxjs/authStore';
+import { authState$, authStore } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 
@@ -55,7 +55,8 @@ const LoginForm: React.FC = () => {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
-    setEmail(newEmail);
+    setEmailState(newEmail);
+    authStore.setField('email', newEmail);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,8 +67,7 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     if (email && password) {
-      const result = await submitLoginForm(email, password);
-      setEmail('');
+      const result = await authStore.login(email, password);
       setEmailState('');
       setPassword('');
 
@@ -89,7 +89,7 @@ const LoginForm: React.FC = () => {
       } else if (result?.throttle) {
         showToast(result.message, 'warning');
       } else {
-        showToast(result?.message ?? 'Login failed.Try again later', 'error');
+        showToast(result?.message ?? 'Login failed. Try again later.', 'error');
       }
     } else {
       showToast('Please enter both email and password', 'error');
