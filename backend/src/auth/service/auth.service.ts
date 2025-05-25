@@ -2,7 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { Influencer } from '../../user/influencer/influencer.schema';
+import {
+  Influencer,
+  InfluencerModel,
+} from '../../user/influencer/influencer.schema';
 import * as bcryptjs from 'bcryptjs';
 import { User } from '../../user/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -20,9 +23,20 @@ export class AuthService {
       sub: influencer.id,
       role: 'influencer',
     };
+    const fullUser = await InfluencerModel.findById(influencer._id).lean();
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '20m' }),
       refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      user: {
+        id: fullUser._id,
+        username: fullUser.username,
+        email: fullUser.email,
+        bio: fullUser.bio,
+        profileImage: fullUser.profileImage,
+        category: fullUser.category,
+        socialMediaHandles: fullUser.socialMediaHandles,
+        role: fullUser.role,
+      },
     };
   }
 
