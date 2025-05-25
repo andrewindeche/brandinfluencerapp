@@ -48,6 +48,7 @@ export class UserController {
     return { type: 'unknown' };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('bio')
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
     console.log('REQ USER:', req.user); 
@@ -55,6 +56,7 @@ export class UserController {
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('profile-image')
   async updateProfileImage(
     @Req() req: Request,
