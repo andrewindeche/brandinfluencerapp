@@ -7,10 +7,19 @@ import { useToast } from '../hooks/useToast';
 
 const Loader: React.FC = () => {
   return (
-    <div className="flex items-center justify-center space-x-2">
-      <div className="w-4 h-4 bg-green-400 rounded-full animate-bounce"></div>
-      <div className="w-4 h-4 bg-blue-400 rounded-full animate-bounce delay-150"></div>
-      <div className="w-4 h-4 bg-red-400 rounded-full animate-bounce delay-300"></div>
+    <div className="flex items-center justify-center space-x-2 h-6">
+      <div
+        className="w-3 h-3 bg-green-400 rounded-full animate-bounce"
+        style={{ animationDelay: '0s' }}
+      />
+      <div
+        className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"
+        style={{ animationDelay: '0.15s' }}
+      />
+      <div
+        className="w-3 h-3 bg-red-400 rounded-full animate-bounce"
+        style={{ animationDelay: '0.3s' }}
+      />
     </div>
   );
 };
