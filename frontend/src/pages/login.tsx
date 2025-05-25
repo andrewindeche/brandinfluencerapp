@@ -67,6 +67,7 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     if (email && password) {
+      setSubmitting(true);
       const result = await authStore.login(email, password);
       setEmailState('');
       setPassword('');
@@ -85,11 +86,14 @@ const LoginForm: React.FC = () => {
             break;
           default:
             showToast('Unknown user type', 'error');
+            setSubmitting(false);
         }
       } else if (result?.throttle) {
         showToast(result.message, 'warning');
+        setSubmitting(false);
       } else {
         showToast(result?.message ?? 'Login failed. Try again later.', 'error');
+        setSubmitting(false);
       }
     } else {
       showToast('Please enter both email and password', 'error');
