@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
 import { RedisService } from '../redis/redis.service';
-import { UpdateBioDto } from '../auth/dto/update-bio.dto';
-import { UpdateProfileImageDto } from '../auth/dto/update-profile-image.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -73,30 +72,22 @@ export class UserService {
     }
   }
 
-  async updateBio(userId: string, { bio }: UpdateBioDto): Promise<User> {
-    const user = await this.userModel.findByIdAndUpdate(
-      userId,
-      { bio },
-      { new: true },
-    );
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    return user;
-  }
+    async updateUser(userId: string, dto: UpdateUserDto) {
+    try {
+      const updatedUser = await this.userModel.findByIdAndUpdate(userId, dto, {
+        new: true,
+        runValidators: true,
+      });
 
-  async updateProfileImage(
-    userId: string,
-    { profileImage }: UpdateProfileImageDto,
-  ): Promise<User> {
-    const user = await this.userModel.findByIdAndUpdate(
-      userId,
-      { profileImage },
-      { new: true },
-    );
-    if (!user) {
-      throw new NotFoundException('User not found');
+      if (!updatedUser) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      return updatedUser;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while updating the profile.',
+      );
     }
-    return user;
   }
 }
