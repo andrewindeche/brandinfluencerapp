@@ -20,6 +20,13 @@ if (!process.env.JWT_SECRET) {
 
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+    app.enableCors({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
+  
   const adminService = app.get(AdminService);
   await adminService.bootstrapSuperUserFromEnv();
   const redisClient = new Redis({
@@ -47,14 +54,6 @@ export async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.useGlobalFilters(new MongoExceptionFilter(), new AllExceptionsFilter());
-
-  app.enableCors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-    methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
-
   await app.listen(process.env.PORT ?? 4000);
 }
 
