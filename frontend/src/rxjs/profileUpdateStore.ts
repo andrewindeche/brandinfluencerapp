@@ -38,15 +38,24 @@ export const profileUpdateStore = {
     }
 
     setProfileUpdateState({ status: 'loading', error: null });
+    const token = localStorage.getItem('token');
+    const authHeaders = token
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : {};
 
     try {
       if (bio !== currentBio) {
-        await axiosInstance.patch('/users/bio', { bio });
+        await axiosInstance.patch('/users/bio', { bio }, authHeaders);
       }
 
       if (profileImage !== currentImage) {
-        await axiosInstance.patch('/users/profile-image', { profileImage });
+        await axiosInstance.patch(
+          '/users/profile-image',
+          { profileImage },
+          authHeaders,
+        );
       }
+
       if (bio !== currentBio) {
         localStorage.setItem('bio', bio);
       }
