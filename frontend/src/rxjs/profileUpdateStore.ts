@@ -40,10 +40,19 @@ export const profileUpdateStore = {
     setProfileUpdateState({ status: 'loading', error: null });
 
     try {
-      await axiosInstance.patch('/users/me', { bio, profileImage });
+      if (bio !== currentBio) {
+        await axiosInstance.patch('/users/bio', { bio });
+      }
 
-      localStorage.setItem('bio', bio);
-      localStorage.setItem('profileImage', profileImage);
+      if (profileImage !== currentImage) {
+        await axiosInstance.patch('/users/profile-image', { profileImage });
+      }
+      if (bio !== currentBio) {
+        localStorage.setItem('bio', bio);
+      }
+      if (profileImage !== currentImage) {
+        localStorage.setItem('profileImage', profileImage);
+      }
 
       authStore.updateAuthState({ bio, profileImage });
 
