@@ -29,6 +29,14 @@ export const profileUpdateStore = {
     profileImage: string,
     showToast: (msg: string, type: 'success' | 'error') => void,
   ) {
+    const currentBio = localStorage.getItem('bio');
+    const currentImage = localStorage.getItem('profileImage');
+
+    if (bio === currentBio && profileImage === currentImage) {
+      showToast('No changes detected.', 'error');
+      return;
+    }
+
     setProfileUpdateState({ status: 'loading', error: null });
 
     try {
@@ -42,13 +50,20 @@ export const profileUpdateStore = {
       setProfileUpdateState({ status: 'success', error: null });
       showToast('Profile updated successfully!', 'success');
     } catch (error) {
+      console.error('Profile update failed:', error);
+
       const err = error as AxiosError<{ message?: string }>;
       const message =
         err.response?.data?.message ||
         err.message ||
         'Failed to update profile.';
+
       setProfileUpdateState({ status: 'error', error: message });
       showToast(message, 'error');
     }
+  },
+
+  resetState() {
+    setProfileUpdateState({ status: 'idle', error: null });
   },
 };
