@@ -10,9 +10,9 @@ import {
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserService } from './user.service';
-import { UpdateBioDto } from '../auth/dto/update-bio.dto';
-import { UpdateProfileImageDto } from '../auth/dto/update-profile-image.dto';
 import { User } from './user.schema';
+import { UpdateBioDto } from './dto/update-bio.dto';
+import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
 
 @Controller('users')
 export class UserController {
@@ -50,16 +50,20 @@ export class UserController {
 
   @Patch('bio')
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
+    console.log('REQ USER:', req.user); 
     const userId = req.user._id;
-    return this.userService.updateBio(userId, updateBioDto);
+    return this.userService.updateBio(userId, updateBioDto.bio);
   }
 
   @Patch('profile-image')
   async updateProfileImage(
     @Req() req: Request,
-    @Body() dto: UpdateProfileImageDto,
+    @Body() updateProfileImageDto: UpdateProfileImageDto,
   ) {
     const userId = req.user._id;
-    return this.userService.updateProfileImage(userId, dto);
+    return this.userService.updateProfileImage(
+      userId,
+      updateProfileImageDto.profileImage,
+    );
   }
 }
