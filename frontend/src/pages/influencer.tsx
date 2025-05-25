@@ -162,11 +162,25 @@ const InfluencerPage: React.FC = () => {
 
               <label
                 htmlFor="profileImageUpload"
-                className="absolute bottom-4 right-4 bg-yellow-400 p-1 rounded cursor-pointer text-black text-sm select-none"
+                className="absolute top-2 right-2 bg-black/50 hover:bg-yellow-400 text-white hover:text-black p-2 rounded-full cursor-pointer transition-colors"
                 title="Change profile image"
               >
-                Edit Image
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 10l4.553-4.553a1.414 1.414 0 10-2-2L13 8m2 2l-6 6M3 21h18"
+                  />
+                </svg>
               </label>
+
               <input
                 id="profileImageUpload"
                 type="file"
