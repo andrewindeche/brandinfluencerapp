@@ -51,7 +51,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Patch('bio')
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
-    console.log('REQ USER:', req.user); 
+    console.log('REQ USER:', req.user);
     const userId = req.user._id;
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
