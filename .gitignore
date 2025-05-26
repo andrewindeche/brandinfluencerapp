@@ -6,3 +6,10 @@ backend/dist
 backend/.env
 backend/.env.test
 backend/.env.local
+# Cypress test artifacts
+cypress/screenshots/
+cypress/videos/
+
+# Cypress cache and binary
+node_modules/
+.cypress/
