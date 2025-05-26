@@ -88,16 +88,18 @@ const InfluencerPage: React.FC = () => {
     router.push('/login');
   };
 
-  const handleToggleExpand = (title: string): void => {
-    setExpandedCards((prevState) => ({
-      ...prevState,
-      [title]: !prevState[title],
-    }));
-  };
-
   const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      const MAX_SIZE_MB = 5;
+      const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+      if (file.size > MAX_SIZE_BYTES) {
+        showToast(`Image must be smaller than ${MAX_SIZE_MB}MB.`, 'error');
+        return;
+      }
+
       setImageFile(file);
 
       const reader = new FileReader();
@@ -106,6 +108,13 @@ const InfluencerPage: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleToggleExpand = (title: string): void => {
+    setExpandedCards((prevState) => ({
+      ...prevState,
+      [title]: !prevState[title],
+    }));
   };
 
   if (!checked) {
