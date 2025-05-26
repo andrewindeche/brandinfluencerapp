@@ -16,6 +16,7 @@
 | 12.Prometheus | Monitoring system & time series database | [monitoring]; [metrics]; |
 | 13.Grafana | Data visualization & analytics | [dashboard]; [visualization]; |
 | 14.Kubernetes | Container orchestration | [deployment]; [scaling]; |
+| 15.Cypress | End to End Testing | [E2E]; [component]; |
 
 ## <h1> Description</h1>
 <p>The aim of the project is to build a brand-influencer app that allow brands to connect to influencers to monitor active campaigns so that an influencer can view ongoing campaigns, track submission statuses, and monitor their performance while brands/SMEs to monitor influencers' participation in campaigns and approve/reject submissions..</p>
