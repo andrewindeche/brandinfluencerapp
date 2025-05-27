@@ -10,15 +10,15 @@ const Loader: React.FC = () => {
     <div className="flex items-center justify-center space-x-2 h-6">
       <div
         className="w-3 h-3 bg-green-400 rounded-full animate-bounce"
-        style={{ animationDelay: '0s' }}
+        style={{ animationDelay: '4s' }}
       />
       <div
         className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"
-        style={{ animationDelay: '0.15s' }}
+        style={{ animationDelay: '4s' }}
       />
       <div
         className="w-3 h-3 bg-red-400 rounded-full animate-bounce"
-        style={{ animationDelay: '0.3s' }}
+        style={{ animationDelay: '4s' }}
       />
     </div>
   );
