@@ -74,11 +74,6 @@ export const profileUpdateStore = {
         await axiosInstance.patch('/users/bio', { bio }, authHeaders);
       }
 
-      if (bio !== currentBio) localStorage.setItem('bio', bio);
-      if (typeof profileImage === 'string' && profileImage !== currentImage) {
-        localStorage.setItem('profileImage', profileImage);
-      }
-
       authStore.updateAuthState({
         bio,
         profileImage:
