@@ -21,6 +21,16 @@ function setProfileUpdateState(update: Partial<ProfileUpdateState>) {
   _state$.next({ ..._state$.value, ...update });
 }
 
+function getAuthHeaders(contentType?: string) {
+  const token = localStorage.getItem('token');
+
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (contentType) headers['Content-Type'] = contentType;
+
+  return { headers };
+}
+
 export const profileUpdateStore = {
   state$: profileUpdateState$,
 
@@ -29,8 +39,8 @@ export const profileUpdateStore = {
     profileImage: File | string,
     showToast: (msg: string, type: 'success' | 'error') => void,
   ) {
-    const currentBio = localStorage.getItem('bio');
-    const currentImage = localStorage.getItem('profileImage');
+    const { bio: currentBio, profileImage: currentImage } =
+      authStore.getCurrentUser();
 
     const token = localStorage.getItem('token');
     const authHeaders = token
@@ -44,12 +54,11 @@ export const profileUpdateStore = {
         const formData = new FormData();
         formData.append('profileImage', profileImage as File);
 
-        await axiosInstance.patch('/users/profile-image', formData, {
-          headers: {
-            ...authHeaders.headers,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await axiosInstance.patch(
+          '/users/profile-image',
+          formData,
+          getAuthHeaders('multipart/form-data'),
+        );
       } else if (
         typeof profileImage === 'string' &&
         profileImage !== currentImage
