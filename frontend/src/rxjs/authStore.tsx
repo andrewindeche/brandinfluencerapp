@@ -6,6 +6,12 @@ import { AxiosError } from 'axios';
 
 type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
+interface ErrorResponseData {
+  code?: string;
+  message?: string;
+  [key: string]: unknown;
+}
+
 export type AuthFormState = {
   email: string;
   role: UserRole;
@@ -47,6 +53,15 @@ function updateAuthState(update: Partial<AuthFormState>) {
   _authState$.next({ ..._authState$.value, ...update });
 }
 
+function isAxiosError(error: unknown): error is AxiosError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'isAxiosError' in error &&
+    (error as { isAxiosError?: boolean }).isAxiosError === true
+  );
+}
+
 const fetchUserRole = debounce(async (email: string) => {
   if (!email) return updateAuthState({ role: 'unknown' });
 
@@ -84,11 +99,16 @@ export const authStore = {
     _authState$.next(initialAuthState);
   },
 
+  getCurrentUser() {
+    return _authState$.value;
+  },
+
   async login(email: string, password: string) {
     if (!email || !password) {
-      return updateAuthState({
+      updateAuthState({
         serverMessage: 'Email and password are required',
       });
+      return { success: false, message: 'Email and password are required' };
     }
 
     updateAuthState({ submitting: true, success: false, serverMessage: null });
@@ -115,17 +135,25 @@ export const authStore = {
       });
 
       return { success: true, role, username };
-    } catch (error) {
+    } catch (error: unknown) {
       let message = 'Login failed';
       let isThrottle = false;
 
-      if (error instanceof AxiosError) {
-        if (!error.response && error.request) {
-          message = 'Too many attempts. Please try again later.';
-          isThrottle = true;
-        } else {
-          message = error.response?.data?.message || message;
+      if (isAxiosError(error)) {
+        if (error.response) {
+          const data = error.response.data as ErrorResponseData;
+          if (error.response.status === 429) {
+            message =
+              'Too many login attempts. Please wait and try again later.';
+            isThrottle = true;
+          } else {
+            message = data.message || message;
+          }
+        } else if (error.request) {
+          message = 'No response from server. Please check your connection.';
         }
+      } else if (error instanceof Error) {
+        message = error.message;
       }
 
       updateAuthState({
@@ -179,22 +207,21 @@ export const authStore = {
         success: true,
         serverMessage: 'Registration successful.',
       });
-    } catch (err) {
+    } catch (err: unknown) {
       let errors: Record<string, string> = {};
       let message = 'Unexpected error occurred.';
 
-      if (err instanceof AxiosError && err.response) {
-        if (
-          err.response.status === 409 &&
-          err.response.data?.code === 'DUPLICATE_USER'
-        ) {
+      if (isAxiosError(err) && err.response) {
+        const data = err.response.data as ErrorResponseData;
+
+        if (err.response.status === 409 && data.code === 'DUPLICATE_USER') {
           errors = {
-            email: err.response.data.message,
-            username: err.response.data.message,
+            email: data.message || 'Duplicate user',
+            username: data.message || 'Duplicate user',
           };
-          message = err.response.data.message;
+          message = data.message || message;
         } else {
-          message = err.response.data?.message || message;
+          message = data.message || message;
         }
       }
 
