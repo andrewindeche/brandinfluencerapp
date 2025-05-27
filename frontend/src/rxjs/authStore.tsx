@@ -50,7 +50,18 @@ export const authState$ = _authState$
   .pipe(distinctUntilChanged());
 
 function updateAuthState(update: Partial<AuthFormState>) {
-  _authState$.next({ ..._authState$.value, ...update });
+  const newState = { ..._authState$.value, ...update };
+  _authState$.next(newState);
+
+  if (update.profileImage) {
+    localStorage.setItem('profileImage', update.profileImage);
+  }
+  if (update.bio !== undefined) {
+    localStorage.setItem('bio', update.bio);
+  }
+  if (update.username) {
+    localStorage.setItem('username', update.username);
+  }
 }
 
 function isAxiosError(error: unknown): error is AxiosError {
