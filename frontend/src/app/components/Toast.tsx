@@ -20,7 +20,7 @@ const Toast: React.FC<ToastProps> = ({
     type === 'error' || 'warning'
       ? 'bg-red-500'
       : type === 'success'
-        ? 'bg-green-500'
+        ? 'bg-yellow-500'
         : 'bg-gray-500';
 
   return (
