@@ -10,15 +10,15 @@ const Loader: React.FC = () => {
     <div className="flex items-center justify-center space-x-2 h-6">
       <div
         className="w-3 h-3 bg-green-400 rounded-full animate-bounce"
-        style={{ animationDelay: '4s' }}
+        style={{ animationDelay: '0s' }}
       />
       <div
         className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"
-        style={{ animationDelay: '4s' }}
+        style={{ animationDelay: '0s' }}
       />
       <div
         className="w-3 h-3 bg-red-400 rounded-full animate-bounce"
-        style={{ animationDelay: '4s' }}
+        style={{ animationDelay: '0s' }}
       />
     </div>
   );
@@ -80,6 +80,12 @@ const LoginForm: React.FC = () => {
       const result = await authStore.login(email, password);
       setEmailState('');
       setPassword('');
+
+      if (result?.throttle) {
+        showToast(result.message, 'warning');
+        setSubmitting(false);
+        return;
+      }
 
       if (result?.success && result.role === 'influencer') {
         sessionStorage.setItem('toastMessage', 'Login successful!');
@@ -175,7 +181,8 @@ const LoginForm: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
+            className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform ${
+    submitting ? 'animate-pulse' : 'hover:shadow-lg hover:scale-105"
             disabled={
               userType === 'unknown' || !email || !password || submitting
             }
