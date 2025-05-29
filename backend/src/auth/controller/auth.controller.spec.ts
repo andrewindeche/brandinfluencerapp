@@ -82,6 +82,19 @@ describe('AuthController', () => {
       const mockTokens = {
         access_token: 'accessToken',
         refresh_token: 'refreshToken',
+        user: {
+          id: '1234567890abcdef',
+          username: 'influencer123',
+          email: 'influencer@example.com',
+          bio: 'Lifestyle and travel content creator.',
+          profileImage: '/uploads/influencer.jpg',
+          category: 'travel',
+          socialMediaHandles: {
+            instagram: '@influencer',
+            youtube: 'InfluencerYT',
+          },
+          role: 'influencer',
+        },
       };
 
       jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser);
@@ -116,6 +129,19 @@ describe('AuthController', () => {
       const mockTokens = {
         access_token: 'accessToken',
         refresh_token: 'refreshToken',
+        user: {
+          id: '1234567890abcdef',
+          username: 'influencer123',
+          email: 'influencer@example.com',
+          bio: 'Lifestyle and travel content creator.',
+          profileImage: '/uploads/influencer.jpg',
+          category: 'travel',
+          socialMediaHandles: {
+            instagram: '@influencer',
+            youtube: 'InfluencerYT',
+          },
+          role: 'influencer',
+        },
       };
 
       jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser);
