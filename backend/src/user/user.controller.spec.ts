@@ -18,6 +18,8 @@ describe('UserController', () => {
             findAll: jest.fn(),
             createUser: jest.fn(),
             findUserByEmail: jest.fn(),
+            updateBio: jest.fn(),
+            updateProfileImage: jest.fn(),
           },
         },
       ],
@@ -77,6 +79,60 @@ describe('UserController', () => {
 
       const result = await controller.getUserType('unknown@example.com');
       expect(result).toEqual({ type: 'unknown' });
+    });
+  });
+
+  describe('updateBio', () => {
+    it('should update the user bio and return updated user', async () => {
+      const userId = new mongoose.Types.ObjectId();
+      const req = {
+        user: { _id: userId },
+      } as any;
+
+      const updateBioDto = { bio: 'Updated bio content' };
+
+      const expectedUser = {
+        _id: userId,
+        bio: updateBioDto.bio,
+      };
+
+      jest.spyOn(service, 'updateBio').mockResolvedValue(expectedUser as any);
+
+      const result = await controller.updateBio(req, updateBioDto);
+
+      expect(service.updateBio).toHaveBeenCalledWith(userId, updateBioDto.bio);
+      expect(result).toEqual(expectedUser);
+    });
+  });
+
+  describe('updateProfileImage', () => {
+    it('should update the user profile image and return updated user', async () => {
+      const userId = new mongoose.Types.ObjectId();
+      const req = {
+        user: { _id: userId },
+      } as any;
+
+      const updateProfileImageDto = { profileImage: '/uploads/test-image.jpg' };
+
+      const expectedUser = {
+        _id: userId,
+        profileImage: updateProfileImageDto.profileImage,
+      };
+
+      jest
+        .spyOn(service, 'updateProfileImage')
+        .mockResolvedValue(expectedUser as any);
+
+      const result = await controller.updateProfileImage(
+        req,
+        updateProfileImageDto,
+      );
+
+      expect(service.updateProfileImage).toHaveBeenCalledWith(
+        userId,
+        updateProfileImageDto.profileImage,
+      );
+      expect(result).toEqual(expectedUser);
     });
   });
 });
