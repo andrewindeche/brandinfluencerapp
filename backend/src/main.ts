@@ -53,7 +53,13 @@ export async function bootstrap() {
     }),
   );
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
   app.use(cookieParser());
   app.useGlobalFilters(new MongoExceptionFilter(), new AllExceptionsFilter());
   await app.listen(process.env.PORT ?? 4000);

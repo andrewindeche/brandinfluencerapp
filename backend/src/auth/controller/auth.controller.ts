@@ -8,6 +8,7 @@ import {
   Res,
   NotFoundException,
   Param,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { SessionService } from '../../session/session.service';
@@ -134,6 +135,13 @@ export class AuthController {
 
   @Post('refresh')
   async refreshToken(@Body('refreshToken') refreshToken: string) {
+    if (
+      !refreshToken ||
+      typeof refreshToken !== 'string' ||
+      refreshToken.trim() === ''
+    ) {
+      throw new BadRequestException('Refresh token is required');
+    }
     const user = await this.authService.validateRefreshToken(refreshToken);
 
     if (!user) throw new UnauthorizedException('Invalid refresh token');
@@ -160,6 +168,12 @@ export class AuthController {
     @Param('token') token: string,
     @Body('password') password: string,
   ) {
+    if (!password || typeof password !== 'string' || password.length < 8) {
+      throw new BadRequestException(
+        'Password must be at least 8 characters long',
+      );
+    }
+
     const email = await this.forgotPasswordService.validateToken(token);
     const user = await this.usersService.findUserByEmail(email);
     if (!user) throw new NotFoundException('User not found');
