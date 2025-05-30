@@ -127,12 +127,8 @@ export const authStore = {
     });
 
     const errors: Record<string, string> = {};
-    if (!email) {
-      errors.email = 'Email cannot be empty';
-    }
-    if (!password) {
-      errors.password = 'Password cannot be empty';
-    }
+    if (!email) errors.email = 'Email cannot be empty';
+    if (!password) errors.password = 'Password cannot be empty';
 
     if (Object.keys(errors).length > 0) {
       updateAuthState({ errors });
@@ -156,6 +152,7 @@ export const authStore = {
 
       return { success: true, role: user.role };
     } catch (error) {
+      const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const errMessage = isAxiosError(error)
         ? ((error.response?.data as ErrorResponseData)?.message ??
           'Login failed')
@@ -168,7 +165,11 @@ export const authStore = {
         errors: { server: errMessage },
       });
 
-      return { success: false, message: errMessage };
+      return {
+        success: false,
+        message: errMessage,
+        ...(isThrottle ? { throttle: true } : {}),
+      };
     }
   },
 
