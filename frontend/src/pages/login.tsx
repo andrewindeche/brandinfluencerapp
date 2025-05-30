@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { authState$, authStore } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
+import { useFormValidation } from '@/hooks/useFormValidation';
 
 const Loader: React.FC = () => {
   return (
@@ -26,13 +27,15 @@ const Loader: React.FC = () => {
 
 const LoginForm: React.FC = () => {
   const [userType, setUserType] = useState<
-    'brand' | 'influencer' | 'admin' | 'user' | 'unknown'
+    'brand' | 'influencer' | 'admin' | 'unknown'
   >('unknown');
   const [email, setEmailState] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
+  const { validate } = useFormValidation();
   const router = useRouter();
 
   useEffect(() => {
@@ -40,16 +43,21 @@ const LoginForm: React.FC = () => {
       setEmailState(state.email);
       setUserType(state.role);
       setSubmitting(state.submitting);
+      setErrors(state.errors);
+
+      if (state.success) {
+        showToast('Login successful', 'success');
+      } else if (state.serverMessage) {
+        showToast(state.serverMessage, 'error');
+      }
     });
 
     if (router.query.signup === 'success') {
       setShowSuccessDialog(true);
     }
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router.query]);
+    return () => subscription.unsubscribe();
+  }, [router.query, showToast]);
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -71,47 +79,42 @@ const LoginForm: React.FC = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (email && password) {
-      setSubmitting(true);
-      const result = await authStore.login(email, password);
+    const { isValid } = validate({
+      fields: ['email', 'password'],
+      values: { email, password },
+      labels: {
+        email: 'Email',
+        password: 'Password',
+      },
+    });
+
+    if (!isValid) {
+      showToast('Please fix the errors in the form.', 'error');
+      return;
+    }
+
+    const result = await authStore.login(email.trim(), password.trim());
+
+    if (!result.success) {
+      const { message, throttle } = result as {
+        message: string;
+        throttle?: boolean;
+      };
+      showToast(message, throttle ? 'warning' : 'error');
+      return;
+    }
+
+    const { role } = result;
+    if (['brand', 'influencer', 'admin'].includes(role)) {
+      sessionStorage.setItem('toastMessage', 'Login successful!');
       setEmailState('');
       setPassword('');
-
-      if (result?.throttle) {
-        showToast(result.message, 'warning');
-        setSubmitting(false);
-        return;
-      }
-
-      if (result?.success && result.role === 'influencer') {
-        sessionStorage.setItem('toastMessage', 'Login successful!');
-        const type = result.role;
-
-        switch (type) {
-          case 'user':
-            router.push('/dashboard');
-            break;
-          case 'influencer':
-          case 'brand':
-            router.push(`/${type}`);
-            break;
-          default:
-            showToast('Unknown user type', 'error');
-            setSubmitting(false);
-        }
-      } else if (result?.throttle) {
-        showToast(result.message, 'warning');
-        setSubmitting(false);
-      } else {
-        showToast(result?.message ?? 'Login failed. Try again later.', 'error');
-        setSubmitting(false);
-      }
+      router.push(`/${role}`);
     } else {
-      showToast('Please enter both email and password', 'error');
+      showToast('Login failed: invalid role.', 'error');
     }
   };
 
@@ -140,7 +143,6 @@ const LoginForm: React.FC = () => {
               {userType === 'brand' && 'Log in as a Brand!'}
               {userType === 'influencer' && 'Log in as an Influencer!'}
               {userType === 'admin' && 'Admin Dashboard'}
-              {userType === 'user' && 'Log in as a User!'}
               {userType === 'unknown' && 'Welcome'}
             </h3>
           </div>
@@ -160,6 +162,9 @@ const LoginForm: React.FC = () => {
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your email"
             />
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div className="mb-6">
@@ -177,18 +182,30 @@ const LoginForm: React.FC = () => {
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your password"
             />
+            {errors.password && (
+              <p className="text-red-400 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform ${
-    submitting ? 'animate-pulse' : 'hover:shadow-lg hover:scale-105"
+            className={`w-full text-white py-2 rounded-lg transition-transform transform ${
+              submitting ? 'animate-pulse' : 'hover:shadow-lg hover:scale-105'
+            }`}
             disabled={
-              userType === 'unknown' || !email || !password || submitting
+              userType === 'unknown' ||
+              !email.trim() ||
+              !password.trim() ||
+              submitting
             }
           >
             {submitting ? <Loader /> : 'Log In'}
           </button>
+          {errors.server && (
+            <p className="text-red-400 text-sm mt-2 text-center">
+              {errors.server}
+            </p>
+          )}
         </form>
 
         <p className="text-white text-center mt-4">
