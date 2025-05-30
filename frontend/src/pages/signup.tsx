@@ -4,11 +4,13 @@ import { useRouter } from 'next/router';
 import { authState$, authStore, initialAuthState } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
+import { useFormValidation } from '../hooks/useFormValidation';
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
   const [formState, setFormState] = useState(initialAuthState);
   const { toast, showToast, closeToast } = useToast();
+  const { validate } = useFormValidation();
 
   useEffect(() => {
     const subscription = authState$.subscribe((state) => {
@@ -34,22 +36,29 @@ const SignUpForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await authStore.register();
 
-    if (
-      !email.trim() ||
-      !username.trim() ||
-      !password.trim() ||
-      !confirmPassword.trim()
-    ) {
-      showToast('Please fill in all required fields', 'error');
-      return;
-    }
+    const { isValid, errors } = validate({
+      fields: ['email', 'username', 'password', 'confirmPassword', 'role'],
+      values: { email, username, password, confirmPassword, role },
+      labels: {
+        email: 'Email',
+        username: 'Username',
+        password: 'Password',
+        confirmPassword: 'Confirm Password',
+        role: 'User Type',
+      },
+    });
 
-    if (password !== confirmPassword) {
+    authStore.setField('errors', errors);
+
+    if (!isValid) return;
+
+    if (formState.password !== formState.confirmPassword) {
       showToast('Passwords do not match', 'error');
       return;
     }
+
+    await authStore.register();
   };
 
   const { email, role, username, password, confirmPassword, errors } =
