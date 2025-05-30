@@ -26,6 +26,7 @@ export type AuthFormState = {
   submitting: boolean;
   success: boolean;
   serverMessage: string | null;
+  roleDetected: boolean;
 };
 
 export type LoginResult =
@@ -46,6 +47,7 @@ export const initialAuthState: AuthFormState = {
   submitting: false,
   success: false,
   serverMessage: null,
+  roleDetected: false,
 };
 
 const _authState$ = new BehaviorSubject<AuthFormState>(initialAuthState);
@@ -77,33 +79,41 @@ function isAxiosError(error: unknown): error is AxiosError {
   );
 }
 
-const fetchUserRole = debounce(async (email: string) => {
-  if (!email) return updateAuthState({ role: 'unknown' });
-
-  try {
-    const { data } = await axiosInstance.get(`/users/user-type?email=${email}`);
-    const role: UserRole = ['brand', 'influencer', 'admin'].includes(data.type)
-      ? data.type
-      : 'unknown';
-
-    updateAuthState({
-      role,
-      success: true,
-      serverMessage: 'User type detected.',
-    });
-    localStorage.setItem('userType', role);
-  } catch {
-    updateAuthState({ role: 'unknown' });
-  }
-}, 1000);
-
 export const authStore = {
   state$: authState$,
   updateAuthState,
 
   setField(field: keyof AuthFormState, value: string | Record<string, string>) {
     updateAuthState({ [field]: value } as Partial<AuthFormState>);
-    if (field === 'email' && typeof value === 'string') fetchUserRole(value);
+
+    if (field === 'email' && typeof value === 'string') {
+      debounce(async (email: string) => {
+        if (!email) {
+          updateAuthState({ role: 'unknown' });
+          return;
+        }
+
+        try {
+          const { data } = await axiosInstance.get(
+            `/users/user-type?email=${email}`,
+          );
+          const role: UserRole = ['brand', 'influencer', 'admin'].includes(
+            data.type,
+          )
+            ? data.type
+            : 'unknown';
+
+          updateAuthState({
+            role,
+            success: true,
+            serverMessage: 'User type detected.',
+          });
+          localStorage.setItem('userType', role);
+        } catch {
+          updateAuthState({ role: 'unknown' });
+        }
+      }, 1000)(value);
+    }
   },
 
   setErrors(errors: Record<string, string>) {
@@ -114,11 +124,19 @@ export const authStore = {
     _authState$.next(initialAuthState);
   },
 
+  logout() {
+    localStorage.removeItem('profileImage');
+    localStorage.removeItem('bio');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userType');
+    _authState$.next(initialAuthState);
+  },
+
   getCurrentUser() {
     return _authState$.value;
   },
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<LoginResult> {
     updateAuthState({
       submitting: true,
       success: false,
@@ -139,6 +157,9 @@ export const authStore = {
         submitting: false,
         serverMessage: 'Login successful!',
         errors: {},
+        roleDetected: false,
+        password: '',
+        confirmPassword: '',
       });
 
       return { success: true, role: user.role };
@@ -154,6 +175,8 @@ export const authStore = {
         submitting: false,
         serverMessage: errMessage,
         errors: { server: errMessage },
+        password: '',
+        confirmPassword: '',
       });
 
       return {
@@ -173,7 +196,7 @@ export const authStore = {
       });
     }
 
-    if (state.role === 'unknown') {
+    if (!['influencer', 'brand'].includes(state.role)) {
       return authStore.setErrors({ role: 'Please select a valid user type.' });
     }
 
@@ -183,11 +206,7 @@ export const authStore = {
       const url =
         state.role === 'influencer'
           ? '/auth/influencer/register'
-          : state.role === 'brand'
-            ? '/auth/brand/register'
-            : '';
-
-      if (!url) return authStore.setErrors({ role: 'Invalid role.' });
+          : '/auth/brand/register';
 
       await axiosInstance.post(url, {
         email: state.email,
@@ -223,7 +242,13 @@ export const authStore = {
         }
       }
 
-      updateAuthState({ submitting: false, errors, serverMessage: message });
+      updateAuthState({
+        submitting: false,
+        errors,
+        serverMessage: message,
+        password: '',
+        confirmPassword: '',
+      });
     }
   },
 };
