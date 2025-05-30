@@ -94,6 +94,13 @@ const LoginForm: React.FC = () => {
     if (!isValid) {
       authStore.setErrors(errors);
       showToast('Please fix the errors in the form.', 'error');
+      setTimeout(() => {
+        const current = authStore.getCurrentUser().errors;
+        if (JSON.stringify(current) === JSON.stringify(errors)) {
+          authStore.setErrors({});
+        }
+      }, 7000);
+
       return;
     }
 
