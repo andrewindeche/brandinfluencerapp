@@ -45,8 +45,13 @@ const LoginForm: React.FC = () => {
       setSubmitting(state.submitting);
       setErrors(state.errors);
 
-      if (state.success && router.pathname === '/login') {
-        showToast('Login successful', 'success');
+      if (
+        state.success &&
+        router.pathname !== '/login' &&
+        sessionStorage.getItem('toastMessage')
+      ) {
+        showToast(sessionStorage.getItem('toastMessage') || '', 'success');
+        sessionStorage.removeItem('toastMessage');
       } else if (state.serverMessage) {
         showToast(state.serverMessage, 'error');
       }
