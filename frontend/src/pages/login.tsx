@@ -99,7 +99,7 @@ const LoginForm: React.FC = () => {
         if (JSON.stringify(current) === JSON.stringify(errors)) {
           authStore.setErrors({});
         }
-      }, 7000);
+      }, 4000);
 
       return;
     }
