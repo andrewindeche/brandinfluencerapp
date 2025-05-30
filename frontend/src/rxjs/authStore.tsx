@@ -109,8 +109,18 @@ export const authStore = {
             serverMessage: 'User type detected.',
           });
           localStorage.setItem('userType', role);
-        } catch {
-          updateAuthState({ role: 'unknown' });
+        } catch (err: unknown) {
+          let message = 'Failed to detect user type.';
+
+          if (isAxiosError(err) && err.response?.status === 429) {
+            message = 'Too many attempts. Try again later.';
+          }
+
+          updateAuthState({
+            role: 'unknown',
+            serverMessage: message,
+            errors: { server: message },
+          });
         }
       }, 1000)(value);
     }
@@ -165,10 +175,16 @@ export const authStore = {
       return { success: true, role: user.role };
     } catch (error) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
-      const errMessage = isAxiosError(error)
-        ? ((error.response?.data as ErrorResponseData)?.message ??
-          'Login failed')
-        : 'Something went wrong';
+      let errMessage = 'Something went wrong';
+      if (isAxiosError(error)) {
+        if (error.response?.status === 429) {
+          errMessage = 'Too many login attempts. Try again later.';
+        } else {
+          errMessage =
+            (error.response?.data as ErrorResponseData)?.message ??
+            'Login failed';
+        }
+      }
 
       updateAuthState({
         success: false,
