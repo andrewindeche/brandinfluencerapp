@@ -51,7 +51,12 @@ const SignUpForm: React.FC = () => {
 
     authStore.setField('errors', errors);
 
-    if (!isValid) return;
+    if (!isValid) {
+      setTimeout(() => {
+        authStore.setField('errors', {});
+      }, 5000);
+      return;
+    }
 
     if (formState.password !== formState.confirmPassword) {
       showToast('Passwords do not match', 'error');
