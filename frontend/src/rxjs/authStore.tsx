@@ -126,15 +126,6 @@ export const authStore = {
       errors: {},
     });
 
-    const errors: Record<string, string> = {};
-    if (!email) errors.email = 'Email cannot be empty';
-    if (!password) errors.password = 'Password cannot be empty';
-
-    if (Object.keys(errors).length > 0) {
-      updateAuthState({ errors });
-      return { success: false, message: 'Validation failed' };
-    }
-
     try {
       const response = await axiosInstance.post('/auth/login', {
         email,
