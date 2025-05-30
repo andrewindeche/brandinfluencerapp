@@ -17,11 +17,13 @@ const Toast: React.FC<ToastProps> = ({
   }, [onClose]);
 
   const bgColor =
-    type === 'error' || 'warning'
+    type === 'error'
       ? 'bg-red-500'
-      : type === 'success'
-        ? 'bg-yellow-500'
-        : 'bg-gray-500';
+      : type === 'warning'
+        ? 'bg-orange-400'
+        : type === 'success'
+          ? 'bg-green-500'
+          : 'bg-gray-500';
 
   return (
     <div
