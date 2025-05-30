@@ -28,6 +28,10 @@ export type AuthFormState = {
   serverMessage: string | null;
 };
 
+export type LoginResult =
+  | { success: true; role: 'brand' | 'influencer' | 'admin' }
+  | { success: false; message: string; throttle?: true };
+
 export const initialAuthState: AuthFormState = {
   email: '',
   role: 'unknown',
@@ -115,65 +119,56 @@ export const authStore = {
   },
 
   async login(email: string, password: string) {
-    if (!email || !password) {
-      updateAuthState({
-        serverMessage: 'Email and password are required',
-      });
-      return { success: false, message: 'Email and password are required' };
+    updateAuthState({
+      submitting: true,
+      success: false,
+      serverMessage: null,
+      errors: {},
+    });
+
+    const errors: Record<string, string> = {};
+    if (!email) {
+      errors.email = 'Email cannot be empty';
+    }
+    if (!password) {
+      errors.password = 'Password cannot be empty';
     }
 
-    updateAuthState({ submitting: true, success: false, serverMessage: null });
+    if (Object.keys(errors).length > 0) {
+      updateAuthState({ errors });
+      return { success: false, message: 'Validation failed' };
+    }
 
     try {
-      const { data } = await axiosInstance.get(
-        `/users/user-type?email=${email}`,
-      );
-      const { type: role = 'unknown', username = '', profileImage = '' } = data;
-
-      localStorage.setItem('userType', role);
-      localStorage.setItem('username', username);
-      localStorage.setItem('profileImage', profileImage);
-
-      _authState$.next({
-        ...initialAuthState,
+      const response = await axiosInstance.post('/auth/login', {
         email,
-        role,
-        username,
-        profileImage,
-        submitting: false,
-        success: true,
-        serverMessage: 'Login successful!',
+        password,
       });
-
-      return { success: true, role, username };
-    } catch (error: unknown) {
-      let message = 'Login failed';
-      let isThrottle = false;
-
-      if (isAxiosError(error)) {
-        if (error.response) {
-          const data = error.response.data as ErrorResponseData;
-          if (error.response.status === 429) {
-            message =
-              'Too many login attempts. Please wait and try again later.';
-            isThrottle = true;
-          } else {
-            message = data.message || message;
-          }
-        } else if (error.request) {
-          message = 'No response from server. Please check your connection.';
-        }
-      } else if (error instanceof Error) {
-        message = error.message;
-      }
+      const user = response.data;
 
       updateAuthState({
+        role: user.role,
+        success: true,
         submitting: false,
-        success: false,
-        serverMessage: message,
+        serverMessage: 'Login successful!',
+        errors: {},
       });
 
-      return { success: false, message, throttle: isThrottle };
+      return { success: true, role: user.role };
+    } catch (error) {
+      const errMessage = isAxiosError(error)
+        ? ((error.response?.data as ErrorResponseData)?.message ??
+          'Login failed')
+        : 'Something went wrong';
+
+      updateAuthState({
+        success: false,
+        submitting: false,
+        serverMessage: errMessage,
+        errors: { server: errMessage },
+      });
+
+      return { success: false, message: errMessage };
     }
   },
 
