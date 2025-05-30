@@ -101,9 +101,9 @@ export const authStore = {
   state$: authState$,
   updateAuthState,
 
-  setField(field: keyof AuthFormState, value: string) {
+  setField(field: keyof AuthFormState, value: string | Record<string, string>) {
     updateAuthState({ [field]: value } as Partial<AuthFormState>);
-    if (field === 'email') fetchUserRole(value);
+    if (field === 'email' && typeof value === 'string') fetchUserRole(value);
   },
 
   setErrors(errors: Record<string, string>) {
