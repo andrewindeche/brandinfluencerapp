@@ -45,7 +45,7 @@ const LoginForm: React.FC = () => {
       setSubmitting(state.submitting);
       setErrors(state.errors);
 
-      if (state.success) {
+      if (state.success && router.pathname === '/login') {
         showToast('Login successful', 'success');
       } else if (state.serverMessage) {
         showToast(state.serverMessage, 'error');
@@ -57,7 +57,7 @@ const LoginForm: React.FC = () => {
     }
 
     return () => subscription.unsubscribe();
-  }, [router.query, showToast]);
+  }, [router.query, router.pathname, showToast]);
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -82,7 +82,7 @@ const LoginForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { isValid } = validate({
+    const { isValid, errors } = validate({
       fields: ['email', 'password'],
       values: { email, password },
       labels: {
@@ -92,17 +92,17 @@ const LoginForm: React.FC = () => {
     });
 
     if (!isValid) {
+      authStore.setErrors(errors);
       showToast('Please fix the errors in the form.', 'error');
       return;
     }
 
+    authStore.setErrors({});
     const result = await authStore.login(email.trim(), password.trim());
 
     if (!result.success) {
-      const { message, throttle } = result as {
-        message: string;
-        throttle?: boolean;
-      };
+      const message = 'message' in result ? result.message : 'Login failed';
+      const throttle = 'throttle' in result ? result.throttle : false;
       showToast(message, throttle ? 'warning' : 'error');
       return;
     }
@@ -192,12 +192,6 @@ const LoginForm: React.FC = () => {
             className={`w-full text-white py-2 rounded-lg transition-transform transform ${
               submitting ? 'animate-pulse' : 'hover:shadow-lg hover:scale-105'
             }`}
-            disabled={
-              userType === 'unknown' ||
-              !email.trim() ||
-              !password.trim() ||
-              submitting
-            }
           >
             {submitting ? <Loader /> : 'Log In'}
           </button>
