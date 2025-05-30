@@ -35,6 +35,21 @@ const SignUpForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await authStore.register();
+
+    if (
+      !email.trim() ||
+      !username.trim() ||
+      !password.trim() ||
+      !confirmPassword.trim()
+    ) {
+      showToast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showToast('Passwords do not match', 'error');
+      return;
+    }
   };
 
   const { email, role, username, password, confirmPassword, errors } =
