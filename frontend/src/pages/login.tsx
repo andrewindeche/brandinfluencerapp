@@ -25,6 +25,12 @@ const Loader: React.FC = () => {
   );
 };
 
+function isValidRole(role: unknown): role is 'brand' | 'influencer' | 'admin' {
+  return (
+    typeof role === 'string' && ['brand', 'influencer', 'admin'].includes(role)
+  );
+}
+
 const LoginForm: React.FC = () => {
   const [userType, setUserType] = useState<
     'brand' | 'influencer' | 'admin' | 'unknown'
@@ -84,6 +90,7 @@ const LoginForm: React.FC = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -113,14 +120,16 @@ const LoginForm: React.FC = () => {
     const result = await authStore.login(email.trim(), password.trim());
 
     if (!result.success) {
-      const message = 'message' in result ? result.message : 'Login failed';
+      const message =
+        ('message' in result ? result.message : undefined) ?? 'Login failed';
       const throttle = 'throttle' in result ? result.throttle : false;
       showToast(message, throttle ? 'warning' : 'error');
+
       return;
     }
 
     const { role } = result;
-    if (['brand', 'influencer', 'admin'].includes(role)) {
+    if (isValidRole(role)) {
       sessionStorage.setItem('toastMessage', 'Login successful!');
       setEmailState('');
       setPassword('');
