@@ -59,14 +59,14 @@ function updateAuthState(update: Partial<AuthFormState>) {
   const newState = { ..._authState$.value, ...update };
   _authState$.next(newState);
 
-  if (update.profileImage) {
-    localStorage.setItem('profileImage', update.profileImage);
+  if (update.profileImage !== undefined) {
+    localStorage.setItem('profileImage', update.profileImage || '');
   }
   if (update.bio !== undefined) {
-    localStorage.setItem('bio', update.bio);
+    localStorage.setItem('bio', update.bio || '');
   }
-  if (update.username) {
-    localStorage.setItem('username', update.username);
+  if (update.username !== undefined) {
+    localStorage.setItem('username', update.username || '');
   }
 }
 
@@ -79,6 +79,41 @@ function isAxiosError(error: unknown): error is AxiosError {
   );
 }
 
+const debouncedDetectUserRole = debounce(async (email: string) => {
+  if (!email) {
+    updateAuthState({ role: 'unknown' });
+    return;
+  }
+
+  try {
+    const { data } = await axiosInstance.get(
+      `/users/user-type?email=${encodeURIComponent(email)}`,
+    );
+    const role: UserRole = ['brand', 'influencer', 'admin'].includes(data.type)
+      ? data.type
+      : 'unknown';
+
+    updateAuthState({
+      role,
+      success: true,
+      serverMessage: 'User type detected.',
+    });
+    localStorage.setItem('userType', role);
+  } catch (err: unknown) {
+    let message = 'Failed to detect user type.';
+
+    if (isAxiosError(err) && err.response?.status === 429) {
+      message = 'Too many attempts. Try again later.';
+    }
+
+    updateAuthState({
+      role: 'unknown',
+      serverMessage: message,
+      errors: { server: message },
+    });
+  }
+}, 1000);
+
 export const authStore = {
   state$: authState$,
   updateAuthState,
@@ -87,42 +122,7 @@ export const authStore = {
     updateAuthState({ [field]: value } as Partial<AuthFormState>);
 
     if (field === 'email' && typeof value === 'string') {
-      debounce(async (email: string) => {
-        if (!email) {
-          updateAuthState({ role: 'unknown' });
-          return;
-        }
-
-        try {
-          const { data } = await axiosInstance.get(
-            `/users/user-type?email=${email}`,
-          );
-          const role: UserRole = ['brand', 'influencer', 'admin'].includes(
-            data.type,
-          )
-            ? data.type
-            : 'unknown';
-
-          updateAuthState({
-            role,
-            success: true,
-            serverMessage: 'User type detected.',
-          });
-          localStorage.setItem('userType', role);
-        } catch (err: unknown) {
-          let message = 'Failed to detect user type.';
-
-          if (isAxiosError(err) && err.response?.status === 429) {
-            message = 'Too many attempts. Try again later.';
-          }
-
-          updateAuthState({
-            role: 'unknown',
-            serverMessage: message,
-            errors: { server: message },
-          });
-        }
-      }, 1000)(value);
+      debouncedDetectUserRole(value);
     }
   },
 
@@ -175,7 +175,7 @@ export const authStore = {
       return { success: true, role: user.role };
     } catch (error) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
-      let errMessage = 'Something went wrong';
+      let errMessage = 'Something went wrong. Try Again Later';
       if (isAxiosError(error)) {
         if (error.response?.status === 429) {
           errMessage = 'Too many login attempts. Try again later.';
