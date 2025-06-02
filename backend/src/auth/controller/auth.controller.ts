@@ -38,7 +38,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.authService.validateUser(
-      loginDto.username,
+      loginDto.email,
       loginDto.password,
       'influencer',
     );
@@ -66,7 +66,7 @@ export class AuthController {
   ) {
     try {
       const user = await this.authService.validateUser(
-        loginDto.username,
+        loginDto.email,
         loginDto.password,
         'brand',
       );
