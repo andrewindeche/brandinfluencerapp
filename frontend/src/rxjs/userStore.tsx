@@ -1,7 +1,7 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
-type User = {
+export type User = {
   username: string;
   name: string;
   email: string;
@@ -20,15 +20,11 @@ export const clearUser = () => {
   localStorage.removeItem('user');
 };
 
-export const getUser = (): User | null => {
-  return userSubject.value;
-};
+export const getUser = (): User | null => userSubject.value;
 
-const saved = localStorage.getItem('user');
-if (saved) {
-  userSubject.next(JSON.parse(saved));
+const savedUser = localStorage.getItem('user');
+if (savedUser) {
+  userSubject.next(JSON.parse(savedUser));
 }
 
-export const user$: Observable<User | null> = userSubject
-  .asObservable()
-  .pipe(distinctUntilChanged());
+export const user$ = userSubject.asObservable().pipe(distinctUntilChanged());

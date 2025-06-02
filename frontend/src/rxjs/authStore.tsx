@@ -1,10 +1,11 @@
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import axiosInstance from './axiosInstance';
 import { debounce } from 'lodash';
+import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
+import { setUser } from './userStore';
 
-type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
+export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
 interface ErrorResponseData {
   code?: string;
@@ -30,10 +31,10 @@ export type AuthFormState = {
 };
 
 export type LoginResult =
-  | { success: true; role: 'brand' | 'influencer' | 'admin' }
+  | { success: true; role: Exclude<UserRole, 'unknown'> }
   | { success: false; message: string; throttle?: true };
 
-export const initialAuthState: AuthFormState = {
+const initialAuthState: AuthFormState = {
   email: '',
   role: 'unknown',
   name: '',
@@ -56,37 +57,17 @@ export const authState$ = _authState$
   .pipe(distinctUntilChanged());
 
 function updateAuthState(update: Partial<AuthFormState>) {
-  const newState = { ..._authState$.value, ...update };
-  _authState$.next(newState);
-
-  if (update.profileImage !== undefined) {
-    localStorage.setItem('profileImage', update.profileImage || '');
-  }
-  if (update.bio !== undefined) {
-    localStorage.setItem('bio', update.bio || '');
-  }
-  if (update.username !== undefined) {
-    localStorage.setItem('username', update.username || '');
-  }
+  _authState$.next({ ..._authState$.value, ...update });
 }
 
 function isAxiosError(error: unknown): error is AxiosError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'isAxiosError' in error &&
-    (error as { isAxiosError?: boolean }).isAxiosError === true
-  );
+  return (error as AxiosError).isAxiosError;
 }
 
 let lastDetectedRole: UserRole = 'unknown';
 
 const debouncedDetectUserRole = debounce(async (email: string) => {
-  if (!email) {
-    updateAuthState({ role: 'unknown', serverMessage: null });
-    lastDetectedRole = 'unknown';
-    return;
-  }
+  if (!email) return updateAuthState({ role: 'unknown' });
 
   try {
     const { data } = await axiosInstance.get(
@@ -95,33 +76,26 @@ const debouncedDetectUserRole = debounce(async (email: string) => {
     const role: UserRole = ['brand', 'influencer', 'admin'].includes(data.type)
       ? data.type
       : 'unknown';
-
-    const showMessage = role !== lastDetectedRole;
-    lastDetectedRole = role;
-
     updateAuthState({
       role,
       success: true,
-      serverMessage: showMessage ? 'User type detected.' : null,
+      serverMessage: role !== lastDetectedRole ? 'User type detected.' : null,
     });
-
+    lastDetectedRole = role;
     localStorage.setItem('userType', role);
-  } catch (err: unknown) {
-    let message = 'Failed to detect user type.';
-
-    if (isAxiosError(err) && err.response?.status === 429) {
-      message = 'Too many attempts. Try again later.';
-    }
-
+  } catch (err) {
+    const message =
+      isAxiosError(err) && err.response?.status === 429
+        ? 'Too many attempts. Try again later.'
+        : 'Failed to detect user type.';
     updateAuthState({
       role: 'unknown',
       serverMessage: message,
       errors: { server: message },
     });
-
     lastDetectedRole = 'unknown';
   }
-}, 5000);
+}, 3000);
 
 export const authStore = {
   state$: authState$,
@@ -129,7 +103,6 @@ export const authStore = {
 
   setField(field: keyof AuthFormState, value: string | Record<string, string>) {
     updateAuthState({ [field]: value } as Partial<AuthFormState>);
-
     if (field === 'email' && typeof value === 'string') {
       debouncedDetectUserRole(value);
     }
@@ -144,10 +117,7 @@ export const authStore = {
   },
 
   logout() {
-    localStorage.removeItem('profileImage');
-    localStorage.removeItem('bio');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userType');
+    localStorage.clear();
     _authState$.next(initialAuthState);
   },
 
@@ -162,16 +132,15 @@ export const authStore = {
       serverMessage: null,
       errors: {},
     });
-
     try {
-      const response = await axiosInstance.post('/auth/login', {
+      const { role } = _authState$.value;
+      const rolePath = role === 'influencer' ? 'influencer' : 'brand';
+      const { data } = await axiosInstance.post(`/auth/${rolePath}/login`, {
         email,
         password,
       });
-      const user = response.data;
-
       updateAuthState({
-        role: user.role,
+        role: data.role,
         success: true,
         submitting: false,
         serverMessage: 'Login successful!',
@@ -180,33 +149,24 @@ export const authStore = {
         password: '',
         confirmPassword: '',
       });
-
-      return { success: true, role: user.role };
+      setUser(data);
+      return { success: true, role: data.role };
     } catch (error) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
-      let errMessage = 'Something went wrong. Try Again Later';
-      if (isAxiosError(error)) {
-        if (error.response?.status === 429) {
-          errMessage = 'Too many login attempts. Try again later.';
-        } else {
-          errMessage =
-            (error.response?.data as ErrorResponseData)?.message ??
-            'Login failed';
-        }
-      }
-
+      const message = isAxiosError(error)
+        ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'
+        : 'Something went wrong';
       updateAuthState({
-        success: false,
         submitting: false,
-        serverMessage: errMessage,
-        errors: { server: errMessage },
+        success: false,
+        serverMessage: message,
+        errors: { server: message },
         password: '',
         confirmPassword: '',
       });
-
       return {
         success: false,
-        message: errMessage,
+        message,
         ...(isThrottle ? { throttle: true } : {}),
       };
     }
@@ -214,25 +174,18 @@ export const authStore = {
 
   async register() {
     const state = _authState$.value;
-
     if (state.password !== state.confirmPassword) {
-      return authStore.setErrors({
-        confirmPassword: 'Passwords do not match.',
-      });
+      return this.setErrors({ confirmPassword: 'Passwords do not match.' });
     }
-
-    if (!['influencer', 'brand'].includes(state.role)) {
-      return authStore.setErrors({ role: 'Please select a valid user type.' });
+    if (!['brand', 'influencer'].includes(state.role)) {
+      return this.setErrors({ role: 'Please select a valid user type.' });
     }
-
-    updateAuthState({ submitting: true, success: false, serverMessage: null });
-
+    updateAuthState({ submitting: true, success: false });
     try {
       const url =
         state.role === 'influencer'
           ? '/auth/influencer/register'
           : '/auth/brand/register';
-
       await axiosInstance.post(url, {
         email: state.email,
         password: state.password,
@@ -243,30 +196,24 @@ export const authStore = {
         category: state.category,
         bio: state.bio,
       });
-
       _authState$.next({
         ...initialAuthState,
         success: true,
         serverMessage: 'Registration successful.',
       });
-    } catch (err: unknown) {
+    } catch (err) {
       let errors: Record<string, string> = {};
       let message = 'Unexpected error occurred.';
-
       if (isAxiosError(err) && err.response) {
         const data = err.response.data as ErrorResponseData;
-
         if (err.response.status === 409 && data.code === 'DUPLICATE_USER') {
           errors = {
-            email: data.message || 'Duplicate user',
-            username: data.message || 'Duplicate user',
+            email: data.message || 'Duplicate',
+            username: data.message || 'Duplicate',
           };
-          message = data.message || message;
-        } else {
-          message = data.message || message;
         }
+        message = data.message || message;
       }
-
       updateAuthState({
         submitting: false,
         errors,
