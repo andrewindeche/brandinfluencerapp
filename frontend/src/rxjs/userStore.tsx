@@ -22,9 +22,11 @@ export const clearUser = () => {
 
 export const getUser = (): User | null => userSubject.value;
 
-const savedUser = localStorage.getItem('user');
-if (savedUser) {
-  userSubject.next(JSON.parse(savedUser));
+if (typeof window !== 'undefined') {
+  const savedUser = localStorage.getItem('user');
+  if (savedUser) {
+    userSubject.next(JSON.parse(savedUser));
+  }
 }
 
 export const user$ = userSubject.asObservable().pipe(distinctUntilChanged());

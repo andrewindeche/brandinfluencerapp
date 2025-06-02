@@ -67,32 +67,42 @@ function isAxiosError(error: unknown): error is AxiosError {
 let lastDetectedRole: UserRole = 'unknown';
 
 const debouncedDetectUserRole = debounce(async (email: string) => {
-  if (!email) return updateAuthState({ role: 'unknown' });
+  if (!email) {
+    updateAuthState({ role: 'unknown' });
+    return;
+  }
 
   try {
     const { data } = await axiosInstance.get(
       `/users/user-type?email=${encodeURIComponent(email)}`,
     );
+
     const role: UserRole = ['brand', 'influencer', 'admin'].includes(data.type)
       ? data.type
       : 'unknown';
-    updateAuthState({
-      role,
-      success: true,
-      serverMessage: role !== lastDetectedRole ? 'User type detected.' : null,
-    });
-    lastDetectedRole = role;
-    localStorage.setItem('userType', role);
+
+    if (role !== lastDetectedRole) {
+      updateAuthState({
+        role,
+        success: true,
+        serverMessage: null,
+        errors: {},
+      });
+      lastDetectedRole = role;
+      localStorage.setItem('userType', role);
+    }
   } catch (err) {
     const message =
       isAxiosError(err) && err.response?.status === 429
         ? 'Too many attempts. Try again later.'
         : 'Failed to detect user type.';
+
     updateAuthState({
       role: 'unknown',
       serverMessage: message,
       errors: { server: message },
     });
+
     lastDetectedRole = 'unknown';
   }
 }, 3000);
