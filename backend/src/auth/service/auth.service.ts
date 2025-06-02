@@ -66,11 +66,11 @@ export class AuthService {
   }
 
   async validateUser(
-    username: string,
+    email: string,
     password: string,
     role: 'brand' | 'influencer' | 'admin' | 'superuser',
   ): Promise<any> {
-    const user = await this.userModel.findOne({ username, role }).exec();
+    const user = await this.userModel.findOne({ email, role }).exec();
     if (!user) {
       throw new UnauthorizedException('User not found or role mismatch');
     }
