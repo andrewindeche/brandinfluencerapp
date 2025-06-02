@@ -50,7 +50,7 @@ const LoginForm: React.FC = () => {
       setUserType(state.role);
       setSubmitting(state.submitting);
       setErrors(state.errors);
-
+      setUserType(state.role);
       if (
         state.success &&
         router.pathname !== '/login' &&
@@ -133,6 +133,7 @@ const LoginForm: React.FC = () => {
       sessionStorage.setItem('toastMessage', 'Login successful!');
       setEmailState('');
       setPassword('');
+      setUserType(role);
       router.push(`/${role}`);
     } else {
       showToast('Login failed: invalid role.', 'error');
