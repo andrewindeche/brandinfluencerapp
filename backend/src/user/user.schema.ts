@@ -5,6 +5,7 @@ export interface User extends Document {
   password: string;
   email: string;
   role: 'brand' | 'influencer' | 'admin' | 'superuser';
+  refreshToken?: string;
 }
 
 export const UserSchema = new Schema(
@@ -18,7 +19,7 @@ export const UserSchema = new Schema(
       default: 'user',
     },
   },
-  { timestamps: true },
+  { timestamps: true, discriminatorKey: '__t'  },
 );
 
 export const UserModel = model<User>('User', UserSchema);
