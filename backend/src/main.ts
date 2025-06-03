@@ -14,23 +14,27 @@ import * as bodyParser from 'body-parser';
 dotenv.config();
 
 if (!process.env.JWT_SECRET) {
-  throw new Error(
-    'JWT_SECRET is not defined. Set it in your .env file or environment variables.',
-  );
+  throw new Error('JWT_SECRET is not defined. Set it in your .env file.');
 }
 
-export async function bootstrap() {
+async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000','http://localhost:3001', 'http://127.0.0.1:3001'],
+    origin: [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3001',
+    ],
     methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
+
   app.use(bodyParser.json({ limit: '5mb' }));
   app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
-  const adminService = app.get(AdminService);
-  await adminService.bootstrapSuperUserFromEnv();
+
   const redisClient = new Redis({
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
@@ -40,10 +44,7 @@ export async function bootstrap() {
   app.use(
     rateLimit({
       store: new RateLimitRedisStore({
-        sendCommand: async (
-          command: string,
-          ...args: string[]
-        ): Promise<RedisReply> => {
+        sendCommand: async (command: string, ...args: string[]) => {
           return (await redisClient.call(command, ...args)) as RedisReply;
         },
       }),
@@ -62,6 +63,10 @@ export async function bootstrap() {
   );
   app.use(cookieParser());
   app.useGlobalFilters(new MongoExceptionFilter(), new AllExceptionsFilter());
+
+  const adminService = app.get(AdminService);
+  await adminService.bootstrapSuperUserFromEnv();
+
   await app.listen(process.env.PORT ?? 4000);
 }
 
