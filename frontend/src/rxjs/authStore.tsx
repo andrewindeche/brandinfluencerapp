@@ -105,7 +105,7 @@ const debouncedDetectUserRole = debounce(async (email: string) => {
 
     lastDetectedRole = 'unknown';
   }
-}, 3000);
+}, 1000);
 
 export const authStore = {
   state$: authState$,
