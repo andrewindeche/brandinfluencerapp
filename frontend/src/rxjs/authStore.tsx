@@ -1,6 +1,10 @@
-import { BehaviorSubject } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
-import { debounce } from 'lodash';
+import {
+  BehaviorSubject,
+  filter,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+} from 'rxjs';
 import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
 import { setUser } from './userStore';
@@ -34,7 +38,7 @@ export type LoginResult =
   | { success: true; role: Exclude<UserRole, 'unknown'> }
   | { success: false; message: string; throttle?: true };
 
-const initialAuthState: AuthFormState = {
+export const initialAuthState: AuthFormState = {
   email: '',
   role: 'unknown',
   name: '',
@@ -48,7 +52,7 @@ const initialAuthState: AuthFormState = {
   submitting: false,
   success: false,
   serverMessage: null,
-  roleDetected: false,
+  roleDetected: true,
 };
 
 const _authState$ = new BehaviorSubject<AuthFormState>(initialAuthState);
@@ -65,47 +69,47 @@ function isAxiosError(error: unknown): error is AxiosError {
 }
 
 let lastDetectedRole: UserRole = 'unknown';
+const email$ = new BehaviorSubject<string>('');
 
-const debouncedDetectUserRole = debounce(async (email: string) => {
-  if (!email) {
-    updateAuthState({ role: 'unknown' });
-    return;
-  }
-
-  try {
-    const { data } = await axiosInstance.get(
-      `/users/user-type?email=${encodeURIComponent(email)}`,
-    );
-
-    const role: UserRole = ['brand', 'influencer', 'admin'].includes(data.type)
-      ? data.type
-      : 'unknown';
-
-    if (role !== lastDetectedRole) {
+email$
+  .pipe(
+    debounceTime(600),
+    distinctUntilChanged(),
+    filter((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)),
+    switchMap((email) =>
+      axiosInstance
+        .get(`/users/user-type?email=${encodeURIComponent(email)}`)
+        .then((res) => ({ type: res.data.type as UserRole }))
+        .catch((err) => {
+          const message =
+            isAxiosError(err) && err.response?.status === 429
+              ? 'Too many attempts. Try again later.'
+              : 'Failed to detect user type.';
+          return { error: message };
+        }),
+    ),
+  )
+  .subscribe((result) => {
+    if ('error' in result) {
       updateAuthState({
-        role,
-        success: true,
-        serverMessage: null,
-        errors: {},
+        role: 'unknown',
+        serverMessage: result.error,
+        errors: { server: result.error },
       });
-      lastDetectedRole = role;
-      localStorage.setItem('userType', role);
+      lastDetectedRole = 'unknown';
+    } else if (['brand', 'influencer', 'admin'].includes(result.type)) {
+      if (result.type !== lastDetectedRole) {
+        updateAuthState({
+          role: result.type,
+          success: true,
+          serverMessage: null,
+          errors: {},
+        });
+        lastDetectedRole = result.type;
+        localStorage.setItem('userType', result.type);
+      }
     }
-  } catch (err) {
-    const message =
-      isAxiosError(err) && err.response?.status === 429
-        ? 'Too many attempts. Try again later.'
-        : 'Failed to detect user type.';
-
-    updateAuthState({
-      role: 'unknown',
-      serverMessage: message,
-      errors: { server: message },
-    });
-
-    lastDetectedRole = 'unknown';
-  }
-}, 1000);
+  });
 
 export const authStore = {
   state$: authState$,
@@ -113,8 +117,12 @@ export const authStore = {
 
   setField(field: keyof AuthFormState, value: string | Record<string, string>) {
     updateAuthState({ [field]: value } as Partial<AuthFormState>);
-    if (field === 'email' && typeof value === 'string') {
-      debouncedDetectUserRole(value);
+    if (
+      field === 'email' &&
+      typeof value === 'string' &&
+      _authState$.value.roleDetected
+    ) {
+      email$.next(value);
     }
   },
 
