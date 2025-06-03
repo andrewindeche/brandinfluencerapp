@@ -31,10 +31,6 @@ export class AuthService {
         id: fullUser._id,
         username: fullUser.username,
         email: fullUser.email,
-        bio: fullUser.bio,
-        profileImage: fullUser.profileImage,
-        category: fullUser.category,
-        socialMediaHandles: fullUser.socialMediaHandles,
         role: fullUser.role,
       },
     };
@@ -102,7 +98,7 @@ export class AuthService {
   }
 
   async registerInfluencer(createUserDto: CreateUserDto): Promise<User> {
-    const { username, email, password, category, bio, location } =
+    const { username, email, password } =
       createUserDto;
 
     const existingUser = await this.userModel
@@ -119,9 +115,6 @@ export class AuthService {
       email,
       password: hashedPassword,
       role: 'influencer',
-      category,
-      bio,
-      location,
     });
 
     return newUser.save();
