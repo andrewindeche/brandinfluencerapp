@@ -93,7 +93,7 @@ describe('AuthController', () => {
             instagram: '@influencer',
             youtube: 'InfluencerYT',
           },
-          role: 'influencer',
+          role: 'influencer' as const,
         },
       };
 

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { getModelToken } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 import * as bcryptjs from 'bcryptjs';
 import { UnauthorizedException } from '@nestjs/common';
 
@@ -38,8 +39,10 @@ describe('AuthService', () => {
 
   describe('loginInfluencer', () => {
     it('should return access and refresh tokens', async () => {
+      
+      const influencerId = new Types.ObjectId();
       const influencer: any = {
-        _id: 'influencerId',
+        _id: influencerId,
         username: 'influencer1',
         socialMediaHandles: {
           instagram: 'influencer_instagram',

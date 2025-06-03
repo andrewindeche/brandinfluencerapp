@@ -57,7 +57,7 @@ describe('UserController', () => {
       } as unknown as User;
       jest.spyOn(service, 'findUserByEmail').mockResolvedValue(user);
       const result = await controller.getUserType('test@example.com');
-      expect(result).toEqual({ type: 'brand' });
+      expect(result).toEqual({ type: 'brand', username: 'testuser' });
     });
 
     it('should return "brand" if user role is not influencer', async () => {
@@ -71,7 +71,7 @@ describe('UserController', () => {
 
       jest.spyOn(service, 'findUserByEmail').mockResolvedValue(user);
       const result = await controller.getUserType('test@example.com');
-      expect(result).toEqual({ type: 'brand' });
+      expect(result).toEqual({ type: 'brand', username: 'testuser' });
     });
 
     it('should return "unknown" if user is not found', async () => {
