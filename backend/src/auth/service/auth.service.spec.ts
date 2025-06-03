@@ -31,7 +31,6 @@ jest.mock('../../user/influencer/influencer.schema', () => {
   };
 });
 
-
 describe('AuthService', () => {
   let authService: AuthService;
   let userModel: any;
@@ -62,7 +61,6 @@ describe('AuthService', () => {
 
   describe('loginInfluencer', () => {
     it('should return access and refresh tokens', async () => {
-      
       const influencerId = new Types.ObjectId();
       const influencer: any = {
         _id: influencerId,
