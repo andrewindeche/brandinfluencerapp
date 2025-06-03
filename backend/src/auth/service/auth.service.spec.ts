@@ -8,6 +8,29 @@ import { UnauthorizedException } from '@nestjs/common';
 
 jest.mock('bcryptjs');
 jest.mock('@nestjs/jwt');
+jest.mock('../../user/influencer/influencer.schema', () => {
+  const mockLeanResult = {
+    _id: 'mock-id',
+    username: 'testinfluencer',
+    email: 'test@example.com',
+    bio: 'test bio',
+    profileImage: '/images/image4.png',
+    category: 'fashion',
+    socialMediaHandles: { instagram: '@inf', youtube: 'yt' },
+    role: 'influencer',
+  };
+
+  const findByIdMock = jest.fn().mockReturnThis();
+  const leanMock = jest.fn().mockResolvedValue(mockLeanResult);
+
+  return {
+    InfluencerModel: {
+      findById: findByIdMock,
+      lean: leanMock,
+    },
+  };
+});
+
 
 describe('AuthService', () => {
   let authService: AuthService;
