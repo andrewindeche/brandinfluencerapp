@@ -2,7 +2,6 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsOptional,
   MinLength,
   MaxLength,
   Matches,
@@ -51,16 +50,4 @@ export class CreateUserDto {
       'Role must be one of the following: brand, influencer, admin, superuser',
   })
   role: 'influencer' | 'brand' | 'admin' | 'superuser';
-
-  @IsOptional()
-  @IsString()
-  category?: string;
-
-  @IsOptional()
-  @IsString()
-  bio?: string;
-
-  @IsOptional()
-  @IsString()
-  location?: string;
 }
