@@ -209,10 +209,7 @@ export const authStore = {
         password: state.password,
         confirmPassword: state.confirmPassword,
         username: state.username,
-        name: state.name,
-        profileImage: state.profileImage,
-        category: state.category,
-        bio: state.bio,
+        role: state.role,
       });
       _authState$.next({
         ...initialAuthState,
