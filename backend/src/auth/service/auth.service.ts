@@ -23,7 +23,7 @@ export class AuthService {
       sub: influencer.id,
       role: 'influencer',
     };
-    const fullUser = await InfluencerModel.findById(influencer._id).lean();
+    const fullUser = await this.userModel.findById(influencer._id).lean();
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '20m' }),
       refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
@@ -52,13 +52,14 @@ export class AuthService {
   }
 
   async validateRefreshToken(refreshToken: string): Promise<User> {
-    const user = await this.userModel.findOne({ refreshToken }).exec();
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid refresh token');
+    const users = await this.userModel
+      .find({ refreshToken: { $exists: true } })
+      .exec();
+    for (const user of users) {
+      const isMatch = await bcryptjs.compare(refreshToken, user.refreshToken);
+      if (isMatch) return user;
     }
-
-    return user;
+    throw new UnauthorizedException('Invalid refresh token');
   }
 
   async validateUser(
@@ -98,8 +99,7 @@ export class AuthService {
   }
 
   async registerInfluencer(createUserDto: CreateUserDto): Promise<User> {
-    const { username, email, password } =
-      createUserDto;
+    const { username, email, password } = createUserDto;
 
     const existingUser = await this.userModel
       .findOne({ $or: [{ username }, { email }] })
