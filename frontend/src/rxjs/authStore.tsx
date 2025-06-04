@@ -144,6 +144,12 @@ export const authStore = {
   },
 
   async login(email: string, password: string): Promise<LoginResult> {
+    if (_authState$.value.role === 'unknown') {
+      return {
+        success: false,
+        message: 'Please wait until your role is detected before logging in.',
+      };
+    }
     updateAuthState({
       submitting: true,
       success: false,
@@ -153,12 +159,14 @@ export const authStore = {
     try {
       const { role } = _authState$.value;
       const rolePath = role === 'influencer' ? 'influencer' : 'brand';
+      console.log('Detected role before login:', role);
+      console.log('POSTing to:', `/auth/${rolePath}/login`);
       const { data } = await axiosInstance.post(`/auth/${rolePath}/login`, {
         email,
         password,
       });
       updateAuthState({
-        role: data.role,
+        role: data.user.role,
         success: true,
         submitting: false,
         serverMessage: 'Login successful!',
@@ -167,8 +175,8 @@ export const authStore = {
         password: '',
         confirmPassword: '',
       });
-      setUser(data);
-      return { success: true, role: data.role };
+      setUser(data.user);
+      return { success: true, role: data.user.role };
     } catch (error) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const message = isAxiosError(error)
