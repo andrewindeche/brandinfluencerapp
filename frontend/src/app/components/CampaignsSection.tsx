@@ -74,7 +74,6 @@ const CampaignsSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Campaign Cards */}
       <div
         className={`transition-all duration-500 ease-in-out ${
           notificationOpen
