@@ -1,4 +1,3 @@
-// components/CampaignsSection.tsx
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
