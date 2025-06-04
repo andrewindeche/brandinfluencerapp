@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 
 interface Props {
   campaigns: string[];
@@ -21,12 +22,59 @@ const CampaignsSection: React.FC<Props> = ({
   maxCharCount = 70,
   notificationOpen,
 }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'inactive'
+  >('all');
+
+  const filteredCampaigns = useMemo(() => {
+    return campaigns.filter((title, index) => {
+      const matchesSearch = title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const isActive = index % 2 === 0;
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && isActive) ||
+        (statusFilter === 'inactive' && !isActive);
+      return matchesSearch && matchesStatus;
+    });
+  }, [campaigns, searchQuery, statusFilter]);
+
   return (
     <div className="p-4 rounded-2xl shadow-lg bg-white">
       <h4 className="text-xl font-bold text-center text-black mb-4">
         Campaigns
       </h4>
 
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Search campaigns..."
+          className="w-full sm:w-1/2 px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="relative w-full sm:w-[200px]">
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')
+            }
+            className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <ChevronDown
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none"
+            size={16}
+          />
+        </div>
+      </div>
+
+      {/* Campaign Cards */}
       <div
         className={`transition-all duration-500 ease-in-out ${
           notificationOpen
@@ -35,13 +83,12 @@ const CampaignsSection: React.FC<Props> = ({
         }`}
       >
         <AnimatePresence>
-          {campaigns.map((title, index) => {
+          {filteredCampaigns.map((title, index) => {
             const isExpanded = expanded[title];
             const displayedText = isExpanded
               ? message
-              : `${message.slice(0, maxCharCount)}${
-                  message.length > maxCharCount ? '...' : ''
-                }`;
+              : `${message.slice(0, maxCharCount)}${message.length > maxCharCount ? '...' : ''}`;
+            const isActive = index % 2 === 0;
 
             return (
               <motion.div
@@ -86,10 +133,10 @@ const CampaignsSection: React.FC<Props> = ({
                     <p className="text-xs font-semibold">Deadline: 2 weeks</p>
                     <p
                       className={`text-xs font-bold ${
-                        index % 2 === 0 ? 'text-green-400' : 'text-red-400'
+                        isActive ? 'text-green-400' : 'text-red-400'
                       }`}
                     >
-                      {index % 2 === 0 ? 'Active' : 'Inactive'}
+                      {isActive ? 'Active' : 'Inactive'}
                     </p>
                   </div>
                 </div>
