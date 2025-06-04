@@ -63,9 +63,14 @@ const CampaignsSection: React.FC<Props> = ({
 
       <TipBox
         tip="💡 Click 'Submit' to send your entry or tap on a campaign card to expand."
-        notice="You have open campaigns awaiting submission!"
         duration={10000}
       />
+
+      {campaigns.length > 0 && (
+        <div className="mb-4 font-medium text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded">
+          You have open campaigns awaiting submission!
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
         <input

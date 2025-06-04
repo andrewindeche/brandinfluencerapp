@@ -3,11 +3,10 @@ import { Info } from 'lucide-react';
 
 interface TipBoxProps {
   tip: string;
-  notice?: string;
   duration?: number;
 }
 
-const TipBox: React.FC<TipBoxProps> = ({ tip, notice, duration = 10000 }) => {
+const TipBox: React.FC<TipBoxProps> = ({ tip, duration = 10000 }) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -32,12 +31,7 @@ const TipBox: React.FC<TipBoxProps> = ({ tip, notice, duration = 10000 }) => {
 
       {open && (
         <div className="mt-2 bg-white shadow-lg border border-blue-300 rounded-lg p-4 text-sm text-blue-800">
-          {notice && (
-            <div className="mb-2 font-medium text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-2 rounded">
-              {notice}
-            </div>
-          )}
-          <div>{tip}</div>
+          {tip}
         </div>
       )}
     </div>
