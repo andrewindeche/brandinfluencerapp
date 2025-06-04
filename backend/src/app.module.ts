@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -19,6 +19,7 @@ import { SessionService } from './session/session.service';
 import { SendForgotPasswordEmailService } from './send-forgot-password-email/send-forgot-password-email.service';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { RedisModule } from './redis/redis.module';
+import mongoose from 'mongoose';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RedisModule } from './redis/redis.module';
     MongooseModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
+        bufferCommands: false,
       }),
       inject: [ConfigService],
     }),
@@ -79,4 +81,18 @@ import { RedisModule } from './redis/redis.module';
     ForgotPasswordService,
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  onModuleInit() {
+    mongoose.connection.on('connected', () => {
+      console.log('[MongoDB] Connected');
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('[MongoDB] Error:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.warn('[MongoDB] Disconnected');
+    });
+  }
+}
