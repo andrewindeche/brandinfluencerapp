@@ -31,7 +31,7 @@ const CampaignsSection: React.FC<Props> = ({
   const [submissionNoticeVisible, setSubmissionNoticeVisible] = useState(true);
   const [showTip, setShowTip] = useState(true);
   useEffect(() => {
-    const timer = setTimeout(() => setShowTip(false), 3000);
+    const timer = setTimeout(() => setShowTip(false), 9000);
     return () => clearTimeout(timer);
   }, []);
 
