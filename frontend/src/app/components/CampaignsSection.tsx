@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import SubmissionModal from './SubmissionModal';
 
 interface Props {
   campaigns: string[];
@@ -18,7 +19,6 @@ const CampaignsSection: React.FC<Props> = ({
   message,
   expanded,
   onExpandToggle,
-  onCampaignAction,
   maxCharCount = 70,
   notificationOpen,
 }) => {
@@ -26,6 +26,24 @@ const CampaignsSection: React.FC<Props> = ({
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  const [submissionNoticeVisible, setSubmissionNoticeVisible] = useState(true);
+  const [showTip, setShowTip] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTip(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleCardClick = (title: string) => {
+    setSelectedCampaign(title);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = (text: string) => {
+    console.log(`Submission for ${selectedCampaign}:`, text);
+    setSubmissionNoticeVisible(false);
+  };
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((title, index) => {
@@ -46,6 +64,19 @@ const CampaignsSection: React.FC<Props> = ({
       <h4 className="text-xl font-bold text-center text-black mb-4">
         Campaigns
       </h4>
+
+      {submissionNoticeVisible && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 rounded-lg mb-4">
+          You have open campaigns awaiting submission!
+        </div>
+      )}
+
+      {showTip && (
+        <div className="bg-blue-100 border border-blue-400 text-blue-800 p-3 rounded-lg mb-4 text-center select-none pointer-events-none">
+          💡 Click &quot;Submit&quot; to send your entry or tap on a campaign
+          card to expand.
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
         <input
@@ -97,12 +128,8 @@ const CampaignsSection: React.FC<Props> = ({
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
                 key={title}
-                className={`${
-                  notificationOpen ? 'min-w-[32%] max-w-[32%] snap-start' : ''
-                } flex-shrink-0 bg-black text-white p-1 rounded-xl shadow-lg
-                  transform transition-transform duration-300 ease-in-out
-                  hover:scale-105 active:scale-100 hover:ring-2 hover:ring-blue-300 cursor-pointer`}
-                onClick={() => onCampaignAction(title)}
+                className={`relative ${notificationOpen ? 'min-w-[32%] max-w-[32%] snap-start' : ''} flex-shrink-0 bg-black text-white p-1 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100 hover:ring-2 hover:ring-blue-300 cursor-pointer`}
+                onClick={() => handleCardClick(title)}
               >
                 <Image
                   src="/images/fit.jpg"
@@ -110,6 +137,14 @@ const CampaignsSection: React.FC<Props> = ({
                   width={500}
                   height={300}
                   className="rounded-2xl w-full h-[150px] object-cover"
+                />
+                <SubmissionModal
+                  isOpen={modalOpen}
+                  onClose={() => setModalOpen(false)}
+                  campaignTitle={selectedCampaign ?? ''}
+                  imageSrc="/images/fit.jpg"
+                  message={message}
+                  onSubmit={handleSubmit}
                 />
                 <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
                   <div className="flex justify-between items-center">
@@ -131,13 +166,20 @@ const CampaignsSection: React.FC<Props> = ({
                   <div className="flex justify-between items-center mt-2">
                     <p className="text-xs font-semibold">Deadline: 2 weeks</p>
                     <p
-                      className={`text-xs font-bold ${
-                        isActive ? 'text-green-400' : 'text-red-400'
-                      }`}
+                      className={`text-xs font-bold ${isActive ? 'text-green-400' : 'text-red-400'}`}
                     >
                       {isActive ? 'Active' : 'Inactive'}
                     </p>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCardClick(title);
+                    }}
+                    className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
+                  >
+                    Submit
+                  </button>
                 </div>
               </motion.div>
             );
