@@ -27,7 +27,7 @@ const TipBox: React.FC<TipBoxProps> = ({ tip, notice, duration = 10000 }) => {
         className="flex items-center gap-2 text-blue-800 text-sm bg-blue-100 border border-blue-400 p-2 rounded-lg hover:bg-blue-200 transition"
       >
         <Info className="w-4 h-4" />
-        Show Tip
+        Show Tips
       </button>
 
       {open && (
