@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { authState$, authStore, initialAuthState } from '../rxjs/authStore';
@@ -15,6 +15,7 @@ const SignUpForm: React.FC = () => {
   useEffect(() => {
     const subscription = authState$.subscribe((state) => {
       setFormState(state);
+
       if (state.success) {
         showToast(state.serverMessage || 'Registration successful', 'success');
         authStore.reset();
@@ -34,10 +35,10 @@ const SignUpForm: React.FC = () => {
     authStore.setField(id as keyof typeof formState, value);
   };
 
-  const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const { email, username, password, confirmPassword, role } = formState;
 
     const { isValid, errors } = validate({
       fields: ['email', 'username', 'password', 'confirmPassword', 'role'],
@@ -54,15 +55,13 @@ const SignUpForm: React.FC = () => {
     authStore.setField('errors', errors);
 
     if (!isValid) {
-      if (errorClearTimeoutRef.current)
-        clearTimeout(errorClearTimeoutRef.current);
-      errorClearTimeoutRef.current = setTimeout(() => {
+      setTimeout(() => {
         authStore.setField('errors', {});
       }, 5000);
       return;
     }
 
-    if (formState.password !== formState.confirmPassword) {
+    if (password !== confirmPassword) {
       showToast('Passwords do not match', 'error');
       return;
     }
@@ -70,8 +69,15 @@ const SignUpForm: React.FC = () => {
     await authStore.register();
   };
 
-  const { email, role, username, password, confirmPassword, errors } =
-    formState;
+  const {
+    email,
+    role,
+    username,
+    password,
+    confirmPassword,
+    errors,
+    submitting,
+  } = formState;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
@@ -79,6 +85,7 @@ const SignUpForm: React.FC = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-6">
           Sign Up
         </h2>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -190,10 +197,10 @@ const SignUpForm: React.FC = () => {
 
           <button
             type="submit"
-            disabled={formState.submitting}
+            disabled={submitting}
             className="w-full text-white py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
           >
-            {formState.submitting ? 'Signing Up...' : 'Sign Up'}
+            {submitting ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
 
@@ -206,7 +213,11 @@ const SignUpForm: React.FC = () => {
       </div>
 
       {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={closeToast} />
+        <Toast
+          message={toast.message}
+          type={toast.type ?? undefined}
+          onClose={closeToast}
+        />
       )}
     </div>
   );
