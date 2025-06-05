@@ -19,7 +19,7 @@ export const UserSchema = new Schema(
       default: 'user',
     },
   },
-  { timestamps: true, discriminatorKey: '__t'  },
+  { timestamps: true, discriminatorKey: '__t' },
 );
 
 export const UserModel = model<User>('User', UserSchema);
