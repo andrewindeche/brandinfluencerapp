@@ -13,19 +13,27 @@ const SignUpForm: React.FC = () => {
   const { validate } = useFormValidation();
 
   useEffect(() => {
+    let handled = false;
+    let timeoutId: string | number | NodeJS.Timeout | undefined;
     const subscription = authState$.subscribe((state) => {
       setFormState(state);
-
-      if (state.success) {
+      if (!handled && state.success) {
+        handled = true;
         showToast(state.serverMessage || 'Registration successful', 'success');
         authStore.reset();
-        setTimeout(() => router.push('/login?signup=success'), 1000);
+        timeoutId = setTimeout(
+          () => router.push('/login?signup=success'),
+          1000,
+        );
       } else if (state.serverMessage && !state.success) {
         showToast(state.serverMessage, 'error');
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [router, showToast]);
 
   const handleChange = (
