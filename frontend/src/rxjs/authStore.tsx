@@ -8,6 +8,7 @@ import {
 import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
 import { setUser } from './userStore';
+import { z } from 'zod';
 
 export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
@@ -37,6 +38,65 @@ export type AuthFormState = {
 export type LoginResult =
   | { success: true; role: Exclude<UserRole, 'unknown'> }
   | { success: false; message: string; throttle?: true };
+
+const loginSchemaBase = z.object({
+  email: z
+    .string()
+    .trim()
+    .nonempty('Email is required')
+    .email('Invalid email format')
+    .regex(/^[a-zA-Z0-9@._-]+$/, 'Invalid characters in email'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .regex(/^(?=.*[A-Z])(?=.*\d).+$/, {
+      message:
+        'Password must contain at least one uppercase letter and one number',
+    })
+    .refine((val) => !['password', '123456', 'qwerty'].includes(val), {
+      message: 'Password is too common',
+    }),
+});
+
+const loginSchema = loginSchemaBase.refine(
+  (data: z.infer<typeof loginSchemaBase>) => data.email !== data.password,
+  {
+    message: 'Username and password must not match!',
+    path: ['credentials'],
+  },
+);
+
+const registerSchema = loginSchemaBase
+  .extend({
+    username: z
+      .string()
+      .min(3, 'Username must be at least 3 characters long')
+      .max(20, 'Username must be at most 20 characters long')
+      .regex(/^[a-zA-Z0-9._-]+$/, {
+        message:
+          'Username can only contain letters, numbers, dots, underscores, and hyphens',
+      }),
+    confirmPassword: z.string().nonempty('Confirmation password is required'),
+    role: z.enum(['brand', 'influencer', 'admin', 'superuser'], {
+      errorMap: () => ({ message: 'Please select a valid user type.' }),
+    }),
+  })
+  .refine(
+    (data: z.infer<typeof loginSchemaBase> & { confirmPassword: string }) =>
+      data.password === data.confirmPassword,
+    {
+      message: 'Confirmation password must match the password',
+      path: ['confirmPassword'],
+    },
+  )
+  .refine(
+    (data: z.infer<typeof loginSchemaBase> & { username: string }) =>
+      data.username !== data.password,
+    {
+      message: 'Username and password must not match!',
+      path: ['credentials'],
+    },
+  );
 
 export const initialAuthState: AuthFormState = {
   email: '',
@@ -71,6 +131,8 @@ function isAxiosError(error: unknown): error is AxiosError {
 let lastDetectedRole: UserRole = 'unknown';
 const email$ = new BehaviorSubject<string>('');
 
+authState$.subscribe();
+
 email$
   .pipe(
     debounceTime(600),
@@ -80,7 +142,7 @@ email$
       axiosInstance
         .get(`/users/user-type?email=${encodeURIComponent(email)}`)
         .then((res) => ({ type: res.data.type as UserRole }))
-        .catch((err) => {
+        .catch((err: unknown) => {
           const message =
             isAxiosError(err) && err.response?.status === 429
               ? 'Too many attempts. Try again later.'
@@ -144,12 +206,24 @@ export const authStore = {
   },
 
   async login(email: string, password: string): Promise<LoginResult> {
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const key = err.path[0]?.toString() || 'form';
+        fieldErrors[key] = err.message;
+      });
+      this.setErrors(fieldErrors);
+      return { success: false, message: 'Validation failed' };
+    }
+
     if (_authState$.value.role === 'unknown') {
       return {
         success: false,
         message: 'Please wait until your role is detected before logging in.',
       };
     }
+
     updateAuthState({
       submitting: true,
       success: false,
@@ -157,10 +231,8 @@ export const authStore = {
       errors: {},
     });
     try {
-      const { role } = _authState$.value;
-      const rolePath = role === 'influencer' ? 'influencer' : 'brand';
-      console.log('Detected role before login:', role);
-      console.log('POSTing to:', `/auth/${rolePath}/login`);
+      const rolePath =
+        _authState$.value.role === 'influencer' ? 'influencer' : 'brand';
       const { data } = await axiosInstance.post(`/auth/${rolePath}/login`, {
         email,
         password,
@@ -177,7 +249,7 @@ export const authStore = {
       });
       setUser(data.user);
       return { success: true, role: data.user.role };
-    } catch (error) {
+    } catch (error: unknown) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const message = isAxiosError(error)
         ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'
@@ -200,12 +272,16 @@ export const authStore = {
 
   async register() {
     const state = _authState$.value;
-    if (state.password !== state.confirmPassword) {
-      return this.setErrors({ confirmPassword: 'Passwords do not match.' });
+    const result = registerSchema.safeParse(state);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const key = err.path[0]?.toString() || 'form';
+        fieldErrors[key] = err.message;
+      });
+      return this.setErrors(fieldErrors);
     }
-    if (!['brand', 'influencer'].includes(state.role)) {
-      return this.setErrors({ role: 'Please select a valid user type.' });
-    }
+
     updateAuthState({ submitting: true, success: false });
     try {
       const url =
@@ -224,7 +300,7 @@ export const authStore = {
         success: true,
         serverMessage: 'Registration successful.',
       });
-    } catch (err) {
+    } catch (err: unknown) {
       let errors: Record<string, string> = {};
       let message = 'Unexpected error occurred.';
       if (isAxiosError(err) && err.response) {
