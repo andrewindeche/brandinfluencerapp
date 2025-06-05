@@ -18,6 +18,20 @@ interface ErrorResponseData {
   [key: string]: unknown;
 }
 
+interface AxiosCustomError {
+  message: string;
+  code?: string;
+}
+
+function isAxiosCustomError(err: unknown): err is AxiosCustomError {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'message' in err &&
+    typeof (err as Record<string, unknown>).message === 'string'
+  );
+}
+
 export type AuthFormState = {
   email: string;
   role: UserRole;
@@ -253,7 +267,7 @@ export const authStore = {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const message = isAxiosError(error)
         ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'
-        : 'Something went wrong';
+        : 'Too many Login Attempts.Try Again Later';
       updateAuthState({
         submitting: false,
         success: false,
@@ -303,16 +317,23 @@ export const authStore = {
     } catch (err: unknown) {
       let errors: Record<string, string> = {};
       let message = 'Unexpected error occurred.';
-      if (isAxiosError(err) && err.response) {
-        const data = err.response.data as ErrorResponseData;
-        if (err.response.status === 409 && data.code === 'DUPLICATE_USER') {
+      let code: string | undefined;
+
+      if (isAxiosCustomError(err)) {
+        message = err.message || message;
+        code = err.code;
+
+        if (
+          code === 'DUPLICATE_USER' ||
+          message.toLowerCase().includes('exists')
+        ) {
           errors = {
-            email: data.message || 'Duplicate',
-            username: data.message || 'Duplicate',
+            email: message,
+            username: message,
           };
         }
-        message = data.message || message;
       }
+
       updateAuthState({
         submitting: false,
         errors,
