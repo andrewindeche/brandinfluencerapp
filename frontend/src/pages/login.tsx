@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { authState$, authStore } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
@@ -91,6 +91,8 @@ const LoginForm: React.FC = () => {
     setPassword(e.target.value);
   };
 
+  const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -106,13 +108,15 @@ const LoginForm: React.FC = () => {
     if (!isValid) {
       authStore.setErrors(errors);
       showToast('Please fix the errors in the form.', 'error');
-      setTimeout(() => {
+
+      if (errorClearTimeoutRef.current)
+        clearTimeout(errorClearTimeoutRef.current);
+      errorClearTimeoutRef.current = setTimeout(() => {
         const current = authStore.getCurrentUser().errors;
         if (JSON.stringify(current) === JSON.stringify(errors)) {
           authStore.setErrors({});
         }
       }, 4000);
-
       return;
     }
 

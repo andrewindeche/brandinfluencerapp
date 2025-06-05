@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { authState$, authStore, initialAuthState } from '../rxjs/authStore';
@@ -34,6 +34,8 @@ const SignUpForm: React.FC = () => {
     authStore.setField(id as keyof typeof formState, value);
   };
 
+  const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -52,7 +54,9 @@ const SignUpForm: React.FC = () => {
     authStore.setField('errors', errors);
 
     if (!isValid) {
-      setTimeout(() => {
+      if (errorClearTimeoutRef.current)
+        clearTimeout(errorClearTimeoutRef.current);
+      errorClearTimeoutRef.current = setTimeout(() => {
         authStore.setField('errors', {});
       }, 5000);
       return;
