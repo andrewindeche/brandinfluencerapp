@@ -24,7 +24,7 @@ export class CreateUserDto {
 
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Invalid email address' })
-  @Transform(({ value }) => value.trim()) // Remove unnecessary whitespace
+  @Transform(({ value }) => value.trim())
   email: string;
 
   @IsNotEmpty({ message: 'Password is required' })
