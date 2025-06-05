@@ -1,4 +1,8 @@
-import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationArguments,
+  ValidationOptions,
+} from 'class-validator';
 
 export function IsMatchingCredentials(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
