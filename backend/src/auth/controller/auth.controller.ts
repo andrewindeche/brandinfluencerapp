@@ -6,6 +6,8 @@ import {
   InternalServerErrorException,
   ConflictException,
   Res,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
   BadRequestException,
@@ -104,7 +106,12 @@ export class AuthController {
         error.message.toLowerCase().includes('email') &&
         error.message.toLowerCase().includes('exists')
       ) {
-        throw new ConflictException('Username or email already exists.');
+        throw new ConflictException({
+          statusCode: 409,
+          error: 'Conflict',
+          message: 'Username or email already exists.',
+          code: 'DUPLICATE_USER',
+        });
       }
     }
   }
@@ -124,7 +131,12 @@ export class AuthController {
         message.includes('email') &&
         message.includes('exists')
       ) {
-        throw new ConflictException('Username or email already exists.');
+        throw new ConflictException({
+          statusCode: 409,
+          error: 'Conflict',
+          message: 'Username or email already exists.',
+          code: 'DUPLICATE_USER', // custom code
+        });
       }
 
       throw new InternalServerErrorException(
