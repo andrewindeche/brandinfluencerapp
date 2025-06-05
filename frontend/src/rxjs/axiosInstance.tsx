@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 interface ErrorResponse {
-  code: string;
-  message: string;
+  code?: string;
+  message?: string;
 }
 
 const axiosInstance = axios.create({
@@ -18,22 +18,11 @@ axiosInstance.interceptors.response.use(
   },
   (error: AxiosError<ErrorResponse>) => {
     if (error.response) {
-      const { status, data } = error.response;
-
-      let errorMessage = 'An unexpected error occurred.';
-      let errorCode = 'UNKNOWN_ERROR';
-
-      if (status === 409 && data?.code === 'DUPLICATE_USER') {
-        errorMessage = 'Username or email already exists.';
-        errorCode = 'DUPLICATE_USER';
-      } else {
-        errorMessage = data?.message || errorMessage;
-        errorCode = data?.code || errorCode;
-      }
+      const { data } = error.response;
 
       return Promise.reject({
-        message: errorMessage,
-        code: errorCode,
+        message: data?.message || 'An unexpected error occurred.',
+        code: data?.code || 'UNKNOWN_ERROR',
       });
     }
 
