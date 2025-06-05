@@ -33,5 +33,5 @@ export const InfluencerSchema = new Schema<Influencer>({
 export const InfluencerModel = UserModel.discriminator<Influencer>(
   'Influencer',
   InfluencerSchema,
-  'influencer'
+  'influencer',
 );
