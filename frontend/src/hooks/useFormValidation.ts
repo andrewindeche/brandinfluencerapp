@@ -38,5 +38,25 @@ export const useFormValidation = () => {
     };
   };
 
-  return { validate };
+  const setErrors = (
+    fields: string[],
+    values: FieldValues,
+    labels?: Record<string, string>,
+  ) => {
+    return validate({ fields, values, labels }).errors;
+  };
+
+  const validateFields = (
+    fields: string[],
+    values: FieldValues,
+    labels?: Record<string, string>,
+  ) => {
+    return validate({ fields, values, labels }).isValid;
+  };
+
+  return {
+    validate,
+    setErrors,
+    validateFields,
+  };
 };
