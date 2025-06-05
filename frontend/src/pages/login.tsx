@@ -1,29 +1,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { authState$, authStore } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
 
-const Loader: React.FC = () => {
-  return (
-    <div className="flex items-center justify-center space-x-2 h-6">
-      <div
-        className="w-3 h-3 bg-green-400 rounded-full animate-bounce"
-        style={{ animationDelay: '0s' }}
-      />
-      <div
-        className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"
-        style={{ animationDelay: '0s' }}
-      />
-      <div
-        className="w-3 h-3 bg-red-400 rounded-full animate-bounce"
-        style={{ animationDelay: '0s' }}
-      />
-    </div>
-  );
-};
+const Loader: React.FC = () => (
+  <div className="flex items-center justify-center space-x-2 h-6">
+    <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" />
+    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" />
+    <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" />
+  </div>
+);
 
 function isValidRole(role: unknown): role is 'brand' | 'influencer' | 'admin' {
   return (
@@ -36,12 +25,12 @@ const LoginForm: React.FC = () => {
     'brand' | 'influencer' | 'admin' | 'unknown'
   >('unknown');
   const [email, setEmailState] = useState('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [password, setPassword] = useState('');
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [errors, setLocalErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
-  const { validate } = useFormValidation();
+  const { setErrors } = useFormValidation();
   const router = useRouter();
 
   useEffect(() => {
@@ -49,8 +38,8 @@ const LoginForm: React.FC = () => {
       setEmailState(state.email);
       setUserType(state.role);
       setSubmitting(state.submitting);
-      setErrors(state.errors);
-      setUserType(state.role);
+      setLocalErrors(state.errors);
+
       if (
         state.success &&
         router.pathname !== '/login' &&
@@ -71,14 +60,10 @@ const LoginForm: React.FC = () => {
   }, [router.query, router.pathname, showToast]);
 
   useEffect(() => {
-    const handleRouteChangeComplete = () => {
-      setSubmitting(false);
-    };
-
+    const handleRouteChangeComplete = () => setSubmitting(false);
     router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    return () => {
+    return () =>
       router.events.off('routeChangeComplete', handleRouteChangeComplete);
-    };
   }, [router]);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,36 +76,31 @@ const LoginForm: React.FC = () => {
     setPassword(e.target.value);
   };
 
-  const errorClearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { isValid, errors } = validate({
-      fields: ['email', 'password'],
-      values: { email, password },
-      labels: {
-        email: 'Email',
-        password: 'Password',
-      },
-    });
+    const validationErrors = setErrors(
+      ['email', 'password'],
+      { email, password },
+      { email: 'Email', password: 'Password' },
+    );
 
-    if (!isValid) {
-      authStore.setErrors(errors);
+    if (Object.keys(validationErrors).length > 0) {
+      setLocalErrors(validationErrors);
+      authStore.setErrors(validationErrors);
       showToast('Please fix the errors in the form.', 'error');
 
-      if (errorClearTimeoutRef.current)
-        clearTimeout(errorClearTimeoutRef.current);
-      errorClearTimeoutRef.current = setTimeout(() => {
-        const current = authStore.getCurrentUser().errors;
-        if (JSON.stringify(current) === JSON.stringify(errors)) {
-          authStore.setErrors({});
-        }
+      setTimeout(() => {
+        setLocalErrors({});
+        authStore.setErrors({});
       }, 4000);
+
       return;
     }
 
+    setLocalErrors({});
     authStore.setErrors({});
+
     const result = await authStore.login(email.trim(), password.trim());
 
     if (!result.success) {
@@ -128,7 +108,6 @@ const LoginForm: React.FC = () => {
         ('message' in result ? result.message : undefined) ?? 'Login failed';
       const throttle = 'throttle' in result ? result.throttle : false;
       showToast(message, throttle ? 'warning' : 'error');
-
       return;
     }
 
@@ -144,9 +123,7 @@ const LoginForm: React.FC = () => {
     }
   };
 
-  const closeDialog = () => {
-    setShowSuccessDialog(false);
-  };
+  const closeDialog = () => setShowSuccessDialog(false);
 
   const backgroundColor =
     userType === 'brand'
@@ -221,6 +198,7 @@ const LoginForm: React.FC = () => {
           >
             {submitting ? <Loader /> : 'Log In'}
           </button>
+
           {errors.server && (
             <p className="text-red-400 text-sm mt-2 text-center">
               {errors.server}
@@ -265,7 +243,11 @@ const LoginForm: React.FC = () => {
       )}
 
       {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={closeToast} />
+        <Toast
+          message={toast.message}
+          type={toast.type ?? undefined}
+          onClose={closeToast}
+        />
       )}
     </div>
   );
