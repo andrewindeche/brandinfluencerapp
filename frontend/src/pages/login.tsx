@@ -7,10 +7,10 @@ import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
 
 const Loader: React.FC = () => (
-  <div className="flex items-center justify-center space-x-2 h-6">
-    <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" />
-    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" />
-    <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" />
+  <div className="flex items-center justify-center space-x-2 h-6 animate-fade-in">
+    <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce [animation-delay:0ms]" />
+    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce [animation-delay:100ms]" />
+    <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce [animation-delay:200ms]" />
   </div>
 );
 
@@ -37,7 +37,6 @@ const LoginForm: React.FC = () => {
     const subscription = authState$.subscribe((state) => {
       setEmailState(state.email);
       setUserType(state.role);
-      setSubmitting(state.submitting);
       setLocalErrors(state.errors);
 
       if (
@@ -60,11 +59,19 @@ const LoginForm: React.FC = () => {
   }, [router.query, router.pathname, showToast]);
 
   useEffect(() => {
-    const handleRouteChangeComplete = () => setSubmitting(false);
+    const handleRouteChangeComplete = () => {
+      setEmailState('');
+      setPassword('');
+    };
+
     router.events.on('routeChangeComplete', handleRouteChangeComplete);
     return () =>
       router.events.off('routeChangeComplete', handleRouteChangeComplete);
   }, [router]);
+
+  useEffect(() => {
+    setSubmitting(false);
+  }, []);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
@@ -100,6 +107,7 @@ const LoginForm: React.FC = () => {
 
     setLocalErrors({});
     authStore.setErrors({});
+    setSubmitting(true);
 
     const result = await authStore.login(email.trim(), password.trim());
 
@@ -108,18 +116,21 @@ const LoginForm: React.FC = () => {
         ('message' in result ? result.message : undefined) ?? 'Login failed';
       const throttle = 'throttle' in result ? result.throttle : false;
       showToast(message, throttle ? 'warning' : 'error');
+      setSubmitting(false);
       return;
     }
 
     const { role } = result;
+
     if (isValidRole(role)) {
-      sessionStorage.setItem('toastMessage', 'Login successful!');
       setEmailState('');
       setPassword('');
-      setUserType(role);
+
+      sessionStorage.setItem('toastMessage', 'Login successful!');
       router.push(`/${role}`);
     } else {
       showToast('Login failed: invalid role.', 'error');
+      setSubmitting(false);
     }
   };
 
