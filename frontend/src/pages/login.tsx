@@ -36,7 +36,7 @@ const LoginForm: React.FC = () => {
   useEffect(() => {
     const subscription = authState$.subscribe((state) => {
       setEmailState(state.email);
-      setUserType(state.role);
+      setUserType(state.role || 'unknown');
       setLocalErrors(state.errors);
     });
 
@@ -66,6 +66,10 @@ const LoginForm: React.FC = () => {
     const newEmail = e.target.value;
     setEmailState(newEmail);
     authStore.setField('email', newEmail);
+    if (newEmail.trim() === '') {
+      authStore.setField('role', 'unknown');
+      setUserType('unknown');
+    }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
