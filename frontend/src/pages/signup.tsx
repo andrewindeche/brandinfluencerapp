@@ -23,16 +23,29 @@ const SignUpForm: React.FC = () => {
     let timeoutId: string | number | NodeJS.Timeout | undefined;
     const subscription = authState$.subscribe((state) => {
       setFormState(state);
-      if (!handled && state.success) {
+      if (!handled) {
         handled = true;
-        showToast(state.serverMessage || 'Registration successful', 'success');
-        authStore.reset();
-        timeoutId = setTimeout(
-          () => router.push('/login?signup=success'),
-          1000,
-        );
-      } else if (state.serverMessage && !state.success) {
-        showToast(state.serverMessage, 'error');
+
+        if (state.success) {
+          showToast(
+            state.serverMessage?.toLowerCase().includes('exist')
+              ? 'User already exists'
+              : state.serverMessage || 'Registration successful',
+            state.serverMessage?.toLowerCase().includes('exist')
+              ? 'error'
+              : 'success',
+          );
+
+          if (!state.serverMessage?.toLowerCase().includes('exist')) {
+            authStore.reset();
+            timeoutId = setTimeout(
+              () => router.push('/login?signup=success'),
+              1000,
+            );
+          }
+        } else if (state.serverMessage) {
+          showToast(state.serverMessage, 'error');
+        }
       }
     });
 
