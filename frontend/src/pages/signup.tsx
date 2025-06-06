@@ -5,6 +5,8 @@ import { authState$, authStore, initialAuthState } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '../hooks/useFormValidation';
+import PageSpinner from '../app/components/PageSpinner';
+import { useRouteLoading } from '../hooks/useRouteLoading';
 
 const SignUpForm: React.FC = () => {
   useEffect(() => {
@@ -14,6 +16,7 @@ const SignUpForm: React.FC = () => {
   const [formState, setFormState] = useState(initialAuthState);
   const { toast, showToast, closeToast } = useToast();
   const { validate } = useFormValidation();
+  const isRouteLoading = useRouteLoading(300);
 
   useEffect(() => {
     let handled = false;
@@ -89,6 +92,10 @@ const SignUpForm: React.FC = () => {
     errors,
     submitting,
   } = formState;
+
+  if (isRouteLoading) {
+    return <PageSpinner />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-600 to-blue-500">
