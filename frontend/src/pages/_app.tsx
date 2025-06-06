@@ -3,6 +3,8 @@ import type { AppProps } from 'next/app';
 import { Irish_Grover, Joti_One, Kaushan_Script } from 'next/font/google';
 import Toast from '../app/components/Toast';
 import { useState, useCallback } from 'react';
+import { useInactivityLogout } from '@/hooks/useInactivityLogout';
+import { InactivityModal } from '@/app/components/InactivityModal';
 
 const irishGrover = Irish_Grover({
   weight: '400',
@@ -23,6 +25,7 @@ const kaushanScript = Kaushan_Script({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { showWarning } = useInactivityLogout();
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error';
@@ -47,6 +50,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           onClose={() => setToast(null)}
         />
       )}
+      <InactivityModal visible={showWarning} />
       <Component {...pageProps} showToast={showToast} />
     </main>
   );
