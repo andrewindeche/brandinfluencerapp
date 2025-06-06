@@ -39,12 +39,15 @@ const LoginForm: React.FC = () => {
       setUserType(state.role);
       setLocalErrors(state.errors);
 
+      const toastMessage = sessionStorage.getItem('toastMessage');
+
       if (
         state.success &&
+        toastMessage &&
         router.pathname !== '/login' &&
-        sessionStorage.getItem('toastMessage')
+        typeof window !== 'undefined'
       ) {
-        showToast(sessionStorage.getItem('toastMessage') || '', 'success');
+        showToast(toastMessage, 'success');
         sessionStorage.removeItem('toastMessage');
       } else if (state.serverMessage) {
         showToast(state.serverMessage, 'error');
