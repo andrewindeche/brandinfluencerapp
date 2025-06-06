@@ -215,6 +215,7 @@ export const authStore = {
 
   logout() {
     localStorage.clear();
+    sessionStorage.removeItem('toastMessage');
     _authState$.next(initialAuthState);
   },
 
