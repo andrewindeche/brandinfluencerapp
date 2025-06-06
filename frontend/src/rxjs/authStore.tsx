@@ -155,7 +155,12 @@ email$
     switchMap((email) =>
       axiosInstance
         .get(`/users/user-type?email=${encodeURIComponent(email)}`)
-        .then((res) => ({ type: res.data.type as UserRole }))
+        .then((res) => {
+          if (!res.data || typeof res.data.type !== 'string') {
+            throw new Error('Invalid response format from user-type endpoint');
+          }
+          return { type: res.data.type as UserRole };
+        })
         .catch((err: unknown) => {
           const message =
             isAxiosError(err) && err.response?.status === 429
@@ -169,6 +174,7 @@ email$
     if ('error' in result) {
       updateAuthState({
         role: 'unknown',
+        roleDetected: false,
         serverMessage: result.error,
         errors: { server: result.error },
       });
@@ -180,6 +186,7 @@ email$
           success: true,
           serverMessage: null,
           errors: {},
+          roleDetected: true,
         });
         lastDetectedRole = result.type;
         localStorage.setItem('userType', result.type);
@@ -193,11 +200,7 @@ export const authStore = {
 
   setField(field: keyof AuthFormState, value: string | Record<string, string>) {
     updateAuthState({ [field]: value } as Partial<AuthFormState>);
-    if (
-      field === 'email' &&
-      typeof value === 'string' &&
-      _authState$.value.roleDetected
-    ) {
+    if (field === 'email' && typeof value === 'string') {
       email$.next(value);
     }
   },
@@ -231,7 +234,10 @@ export const authStore = {
       return { success: false, message: 'Validation failed' };
     }
 
-    if (_authState$.value.role === 'unknown') {
+    if (
+      _authState$.value.role === 'unknown' ||
+      !_authState$.value.roleDetected
+    ) {
       return {
         success: false,
         message: 'Please wait until your role is detected before logging in.',
