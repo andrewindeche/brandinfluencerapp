@@ -1,32 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useRouteLoading } from '@/hooks/useRouteLoading';
+import PageSpinner from '@/app/components/PageSpinner';
 
 const HomePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isRouting, setIsRouting] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const isRouteLoading = useRouteLoading();
   const router = useRouter();
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 1000);
+    const timeout = setTimeout(() => setInitialLoading(false), 1500);
     return () => clearTimeout(timeout);
   }, []);
-
-  useEffect(() => {
-    const handleStart = () => setIsRouting(true);
-    const handleComplete = () => setIsRouting(false);
-
-    router.events.on('routeChangeStart', handleStart);
-    router.events.on('routeChangeComplete', handleComplete);
-    router.events.on('routeChangeError', handleComplete);
-
-    return () => {
-      router.events.off('routeChangeStart', handleStart);
-      router.events.off('routeChangeComplete', handleComplete);
-      router.events.off('routeChangeError', handleComplete);
-    };
-  }, [router]);
 
   const handleOpenModal = () => setShowModal(!showModal);
   const handleLoginRedirect = () => {
@@ -39,39 +26,8 @@ const HomePage: React.FC = () => {
     setShowModal(false);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading || isRouting) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 to-purple-700">
-        <svg
-          className="animate-spin h-12 w-12 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 01-8 8z"
-          ></path>
-        </svg>
-      </div>
-    );
+  if (initialLoading || isRouteLoading) {
+    return <PageSpinner />;
   }
 
   return (
