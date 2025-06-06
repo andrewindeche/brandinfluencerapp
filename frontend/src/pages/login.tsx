@@ -192,6 +192,9 @@ const LoginForm: React.FC = () => {
 
           <button
             type="submit"
+            disabled={
+              userType === 'unknown' || !authStore.getCurrentUser().roleDetected
+            }
             className={`w-full text-white py-2 rounded-lg transition-transform transform ${
               submitting ? 'animate-pulse' : 'hover:shadow-lg hover:scale-105'
             }`}
