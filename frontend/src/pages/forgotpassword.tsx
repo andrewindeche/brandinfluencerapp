@@ -252,7 +252,7 @@ const ForgotPasswordForm: React.FC = () => {
         </button>
       </div>
 
-      {toast && (
+      {toast?.message && toast?.type && (
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       )}
     </div>
