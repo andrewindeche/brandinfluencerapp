@@ -12,6 +12,7 @@ const ForgotPasswordForm: React.FC = () => {
     password: '',
     confirmPassword: '',
     loading: false,
+    isNavigating: false,
   });
 
   const { toast, showToast, closeToast } = useToast();
@@ -64,7 +65,10 @@ const ForgotPasswordForm: React.FC = () => {
 
       if (res.status === 201 || res.status === 200) {
         showToast('Password reset successful!');
-        router.push('/login');
+        setState((prev) => ({ ...prev, isNavigating: true }));
+        setTimeout(() => {
+          router.push('/login');
+        }, 500);
       } else {
         showToast('Failed to reset password.', 'error');
       }
