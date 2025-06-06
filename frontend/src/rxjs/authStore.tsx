@@ -95,22 +95,14 @@ const registerSchema = loginSchemaBase
       errorMap: () => ({ message: 'Please select a valid user type.' }),
     }),
   })
-  .refine(
-    (data: z.infer<typeof loginSchemaBase> & { confirmPassword: string }) =>
-      data.password === data.confirmPassword,
-    {
-      message: 'Confirmation password must match the password',
-      path: ['confirmPassword'],
-    },
-  )
-  .refine(
-    (data: z.infer<typeof loginSchemaBase> & { username: string }) =>
-      data.username !== data.password,
-    {
-      message: 'Username and password must not match!',
-      path: ['credentials'],
-    },
-  );
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Confirmation password must match the password',
+    path: ['confirmPassword'],
+  })
+  .refine((data) => data.username !== data.password, {
+    message: 'Username and password must not match!',
+    path: ['credentials'],
+  });
 
 export const initialAuthState: AuthFormState = {
   email: '',
@@ -143,18 +135,23 @@ function isAxiosError(error: unknown): error is AxiosError {
 }
 
 let lastDetectedRole: UserRole = 'unknown';
+console.log('Last detected role:', lastDetectedRole);
 const email$ = new BehaviorSubject<string>('');
-
-authState$.subscribe();
 
 email$
   .pipe(
     debounceTime(600),
-    distinctUntilChanged(),
-    filter((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)),
-    switchMap((email) =>
-      axiosInstance
-        .get(`/users/user-type?email=${encodeURIComponent(email)}`)
+    filter((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())),
+    switchMap((email) => {
+      updateAuthState({
+        roleDetected: false,
+        role: 'unknown',
+        serverMessage: null,
+        errors: {},
+      });
+
+      return axiosInstance
+        .get(`/users/user-type?email=${encodeURIComponent(email.trim())}`)
         .then((res) => {
           if (!res.data || typeof res.data.type !== 'string') {
             throw new Error('Invalid response format from user-type endpoint');
@@ -165,10 +162,10 @@ email$
           const message =
             isAxiosError(err) && err.response?.status === 429
               ? 'Too many attempts. Try again later.'
-              : 'Failed to detect user type. Try again later';
+              : 'Request timeout. Try again later';
           return { error: message };
-        }),
-    ),
+        });
+    }),
   )
   .subscribe((result) => {
     if ('error' in result) {
@@ -180,17 +177,15 @@ email$
       });
       lastDetectedRole = 'unknown';
     } else if (['brand', 'influencer', 'admin'].includes(result.type)) {
-      if (result.type !== lastDetectedRole) {
-        updateAuthState({
-          role: result.type,
-          success: true,
-          serverMessage: null,
-          errors: {},
-          roleDetected: true,
-        });
-        lastDetectedRole = result.type;
-        localStorage.setItem('userType', result.type);
-      }
+      updateAuthState({
+        role: result.type,
+        success: true,
+        serverMessage: null,
+        errors: {},
+        roleDetected: true,
+      });
+      lastDetectedRole = result.type;
+      localStorage.setItem('userType', result.type);
     }
   });
 
@@ -251,6 +246,7 @@ export const authStore = {
       serverMessage: null,
       errors: {},
     });
+
     try {
       const rolePath =
         _authState$.value.role === 'influencer' ? 'influencer' : 'brand';
@@ -258,6 +254,7 @@ export const authStore = {
         email,
         password,
       });
+
       updateAuthState({
         role: data.user.role,
         success: true,
@@ -268,13 +265,15 @@ export const authStore = {
         password: '',
         confirmPassword: '',
       });
+
       setUser(data.user);
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const message = isAxiosError(error)
         ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'
-        : 'Too many Login Attempts.Try Again Later';
+        : 'Too many Login Attempts. Try Again Later';
+
       updateAuthState({
         submitting: false,
         success: false,
@@ -283,6 +282,7 @@ export const authStore = {
         password: '',
         confirmPassword: '',
       });
+
       return {
         success: false,
         message,
@@ -309,6 +309,7 @@ export const authStore = {
         state.role === 'influencer'
           ? '/auth/influencer/register'
           : '/auth/brand/register';
+
       await axiosInstance.post(url, {
         email: state.email,
         password: state.password,
@@ -316,6 +317,7 @@ export const authStore = {
         username: state.username,
         role: state.role,
       });
+
       _authState$.next({
         ...initialAuthState,
         success: true,
