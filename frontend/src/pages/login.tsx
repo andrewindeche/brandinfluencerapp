@@ -38,20 +38,6 @@ const LoginForm: React.FC = () => {
       setEmailState(state.email);
       setUserType(state.role);
       setLocalErrors(state.errors);
-
-      const toastMessage = sessionStorage.getItem('toastMessage');
-
-      if (
-        state.success &&
-        toastMessage &&
-        router.pathname !== '/login' &&
-        typeof window !== 'undefined'
-      ) {
-        showToast(toastMessage, 'success');
-        sessionStorage.removeItem('toastMessage');
-      } else if (state.serverMessage) {
-        showToast(state.serverMessage, 'error');
-      }
     });
 
     if (router.query.signup === 'success') {

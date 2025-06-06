@@ -165,7 +165,7 @@ email$
           const message =
             isAxiosError(err) && err.response?.status === 429
               ? 'Too many attempts. Try again later.'
-              : 'Failed to detect user type.';
+              : 'Failed to detect user type. Try again later';
           return { error: message };
         }),
     ),
