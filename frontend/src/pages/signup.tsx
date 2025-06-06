@@ -7,6 +7,9 @@ import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '../hooks/useFormValidation';
 
 const SignUpForm: React.FC = () => {
+  useEffect(() => {
+    authStore.reset();
+  }, []);
   const router = useRouter();
   const [formState, setFormState] = useState(initialAuthState);
   const { toast, showToast, closeToast } = useToast();

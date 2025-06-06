@@ -32,6 +32,7 @@ const LoginForm: React.FC = () => {
   const { toast, showToast, closeToast } = useToast();
   const { setErrors } = useFormValidation();
   const router = useRouter();
+  const { query, pathname, replace } = router;
 
   useEffect(() => {
     const subscription = authState$.subscribe((state) => {
@@ -40,12 +41,15 @@ const LoginForm: React.FC = () => {
       setLocalErrors(state.errors);
     });
 
-    if (router.query.signup === 'success') {
+    if (query.signup === 'success') {
       setShowSuccessDialog(true);
+
+      delete query.signup;
+      replace({ pathname, query }, undefined, { shallow: true });
     }
 
     return () => subscription.unsubscribe();
-  }, [router.query, router.pathname, showToast]);
+  }, [query, pathname, replace]);
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
