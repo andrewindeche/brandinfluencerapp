@@ -5,6 +5,8 @@ import { authState$, authStore } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { useRouteLoading } from '../hooks/useRouteLoading';
+import PageSpinner from '../app/components/PageSpinner';
 
 const Loader: React.FC = () => (
   <div className="flex items-center justify-center space-x-2 h-6 animate-fade-in">
@@ -31,8 +33,8 @@ const LoginForm: React.FC = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
   const { setErrors } = useFormValidation();
+  const isRouteLoading = useRouteLoading(300);
   const router = useRouter();
-  const { query, pathname, replace } = router;
 
   useEffect(() => {
     const subscription = authState$.subscribe((state) => {
@@ -41,15 +43,16 @@ const LoginForm: React.FC = () => {
       setLocalErrors(state.errors);
     });
 
-    if (query.signup === 'success') {
+    if (router.query.signup === 'success') {
       setShowSuccessDialog(true);
 
+      const { pathname, query } = router;
       delete query.signup;
-      replace({ pathname, query }, undefined, { shallow: true });
+      router.replace({ pathname, query }, undefined, { shallow: true });
     }
 
     return () => subscription.unsubscribe();
-  }, [query, pathname, replace]);
+  }, [router]);
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -139,6 +142,10 @@ const LoginForm: React.FC = () => {
       : userType === 'influencer'
         ? 'bg-gradient-to-r from-pink-600 to-blue-500'
         : 'bg-gradient-to-r from-purple-600 to-blue-500';
+
+  if (isRouteLoading) {
+    return <PageSpinner />;
+  }
 
   return (
     <div
