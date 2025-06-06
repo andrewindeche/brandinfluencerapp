@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { authStore } from '@/rxjs/authStore';
 
-const INACTIVITY_LIMIT = 20 * 60 * 1000;
+const INACTIVITY_LIMIT = 25 * 60 * 1000;
 const WARNING_TIME = 1 * 60 * 1000;
 
 export function useInactivityLogout() {
