@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.tsx\" \"test/**/*.ts\"",
-    "test": "npm run cypress:open"
+    "test": "cypress open",
+    "test:run": "cypress run"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
