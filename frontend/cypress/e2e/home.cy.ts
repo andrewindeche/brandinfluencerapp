@@ -17,7 +17,7 @@ describe('HomePage', () => {
 
   it('navigates to login page when "Log In" is clicked', () => {
     cy.contains('Get Started').click();
-    cy.contains('Log In').click();
+    cy.contains('Log In').should('be.visible').click();
     cy.url().should('include', '/login');
   });
 
