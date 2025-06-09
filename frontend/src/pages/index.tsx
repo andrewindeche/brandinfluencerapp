@@ -45,6 +45,7 @@ const HomePage: React.FC = () => {
             <div className="flex flex-col space-y-4">
               <button
                 onClick={handleLoginRedirect}
+                data-testid="login-button"
                 className="text-white px-4 py-2 rounded-lg hover:shadow-lg transition-transform transform hover:scale-105"
               >
                 Log In
