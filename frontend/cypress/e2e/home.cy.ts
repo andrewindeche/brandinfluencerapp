@@ -23,7 +23,7 @@ describe('HomePage', () => {
 
   it('navigates to signup page when "Sign Up" is clicked', () => {
     cy.contains('Get Started').click();
-    cy.contains('Sign Up').click();
+    cy.contains('Sign Up').should('be.visible').click();
     cy.url().should('include', '/signup');
   });
 
