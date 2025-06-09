@@ -1,0 +1,19 @@
+{
+  "validInfluencer": {
+    "email": "influencer@example.com",
+    "password": "password123"
+  },
+  "invalidUser": {
+    "email": "wrong@example.com",
+    "password": "wrongpass"
+  },
+  "brandUser": {
+    "email": "brand@example.com",
+    "password": "brandpass"
+  },
+  "unrelatedUser": {
+    "email": "unrelated@example.com"
+  },
+  "genericEmail": "user@example.com",
+  "genericPassword": "mypassword"
+}
