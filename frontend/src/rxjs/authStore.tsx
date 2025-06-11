@@ -72,13 +72,20 @@ const loginSchemaBase = z.object({
     }),
 });
 
-const loginSchema = loginSchemaBase.refine(
-  (data: z.infer<typeof loginSchemaBase>) => data.email !== data.password,
-  {
-    message: 'Username and password must not match!',
-    path: ['credentials'],
-  },
-);
+const loginSchema = loginSchemaBase.superRefine((data, ctx) => {
+  const emailValid = loginSchemaBase.shape.email.safeParse(data.email).success;
+  const passwordValid = loginSchemaBase.shape.password.safeParse(
+    data.password,
+  ).success;
+
+  if (emailValid && passwordValid && data.email === data.password) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['email'],
+      message: 'Email and password must not match!',
+    });
+  }
+});
 
 const registerSchema = loginSchemaBase
   .extend({

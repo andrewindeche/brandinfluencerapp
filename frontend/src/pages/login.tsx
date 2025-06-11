@@ -28,7 +28,7 @@ const LoginForm: React.FC = () => {
   >('unknown');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setLocalErrors] = useState<Record<string, string>>({});
+  const [authState, setAuthState] = useState(authStore.getCurrentUser());
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
@@ -40,7 +40,6 @@ const LoginForm: React.FC = () => {
     const subscription = authState$.subscribe((state) => {
       setEmailState(state.email);
       setUserType(state.role || 'unknown');
-      setLocalErrors(state.errors);
     });
 
     if (router.query.signup === 'success') {
@@ -53,6 +52,13 @@ const LoginForm: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, [router]);
+
+  useEffect(() => {
+    const sub = authState$.subscribe(setAuthState);
+    return () => sub.unsubscribe();
+  }, []);
+
+  const { errors } = authState;
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -93,18 +99,14 @@ const LoginForm: React.FC = () => {
     );
 
     if (Object.keys(validationErrors).length > 0) {
-      setLocalErrors(validationErrors);
       authStore.setErrors(validationErrors);
 
       setTimeout(() => {
-        setLocalErrors({});
         authStore.setErrors({});
       }, 4000);
 
       return;
     }
-
-    setLocalErrors({});
     authStore.setErrors({});
     setSubmitting(true);
 
