@@ -8,7 +8,8 @@ import {
 import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
 import { setUser } from './userStore';
-import { z } from 'zod';
+import { loginSchema } from './validation/loginSchema';
+import { registerSchema } from './validation/registerSchema';
 
 export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
@@ -52,64 +53,6 @@ export type AuthFormState = {
 export type LoginResult =
   | { success: true; role: Exclude<UserRole, 'unknown'> }
   | { success: false; message: string; throttle?: true };
-
-const loginSchemaBase = z.object({
-  email: z
-    .string()
-    .trim()
-    .nonempty('Email is required')
-    .email('Invalid email format')
-    .regex(/^[a-zA-Z0-9@._-]+$/, 'Invalid characters in email'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .regex(/^(?=.*[A-Z])(?=.*\d).+$/, {
-      message:
-        'Password must contain at least one uppercase letter and one number',
-    })
-    .refine((val) => !['password', '123456', 'qwerty'].includes(val), {
-      message: 'Password is too common',
-    }),
-});
-
-const loginSchema = loginSchemaBase.superRefine((data, ctx) => {
-  const emailValid = loginSchemaBase.shape.email.safeParse(data.email).success;
-  const passwordValid = loginSchemaBase.shape.password.safeParse(
-    data.password,
-  ).success;
-
-  if (emailValid && passwordValid && data.email === data.password) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['email'],
-      message: 'Email and password must not match!',
-    });
-  }
-});
-
-const registerSchema = loginSchemaBase
-  .extend({
-    username: z
-      .string()
-      .min(3, 'Username must be at least 3 characters long')
-      .max(20, 'Username must be at most 20 characters long')
-      .regex(/^[a-zA-Z0-9._-]+$/, {
-        message:
-          'Username can only contain letters, numbers, dots, underscores, and hyphens',
-      }),
-    confirmPassword: z.string().nonempty('Confirmation password is required'),
-    role: z.enum(['brand', 'influencer', 'admin', 'superuser'], {
-      errorMap: () => ({ message: 'Please select a valid user type.' }),
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Confirmation password must match the password',
-    path: ['confirmPassword'],
-  })
-  .refine((data) => data.username !== data.password, {
-    message: 'Username and password must not match!',
-    path: ['credentials'],
-  });
 
 export const initialAuthState: AuthFormState = {
   email: '',
@@ -208,7 +151,11 @@ export const authStore = {
   },
 
   setErrors(errors: Record<string, string>) {
-    updateAuthState({ errors });
+    const current = _authState$.value;
+    _authState$.next({
+      ...current,
+      errors: errors || {},
+    });
   },
 
   reset() {
@@ -222,7 +169,11 @@ export const authStore = {
   },
 
   getCurrentUser() {
-    return _authState$.value;
+    const current = _authState$.value;
+    return {
+      ...current,
+      errors: current.errors || {},
+    };
   },
 
   async login(email: string, password: string): Promise<LoginResult> {
