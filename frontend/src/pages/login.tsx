@@ -95,7 +95,6 @@ const LoginForm: React.FC = () => {
     if (Object.keys(validationErrors).length > 0) {
       setLocalErrors(validationErrors);
       authStore.setErrors(validationErrors);
-      showToast('Please fix the errors in the form.', 'error');
 
       setTimeout(() => {
         setLocalErrors({});
@@ -177,13 +176,13 @@ const LoginForm: React.FC = () => {
               id="email"
               value={email}
               onChange={handleEmailChange}
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
+              className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 shadow-lg bg-white ${
+                errors.email ? 'ring-2 ring-red-400' : 'focus:ring-yellow-400'
+              }`}
               placeholder="Enter your email"
             />
-            {(errors.email || authStore.getCurrentUser().errors.email) && (
-              <p className="text-red-400 text-sm mt-1">
-                {errors.email || authStore.getCurrentUser().errors.email}
-              </p>
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
