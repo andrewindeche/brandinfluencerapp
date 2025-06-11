@@ -5,7 +5,7 @@
 | 1.GitHub| Version Control| [Version-Control]; [Repository];|
 | 2.Next Js| Front End Framework| [Typescript];|
 | 3.Nest Js |  Javascript Based Backend Framework| [Javascript];|
-| 4.ESLint| Linting Framework| [Lint]; [syntax];|
+| 4.ESLint and Prettier| Linting Framework & Formatter| [Lint]; [syntax];|
 | 5.MongoDB | Not Only Relational Database| [Not Only relational Integrity]; [Database];|
 | 6.TailWind | Open Css Framework| [Css]; [Style Sheet];|
 | 7.Passport | Authentication Middleware| [Authentication]; [Middleware];|
