@@ -180,8 +180,10 @@ const LoginForm: React.FC = () => {
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your email"
             />
-            {errors.email && (
-              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+            {(errors.email || authStore.getCurrentUser().errors.email) && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.email || authStore.getCurrentUser().errors.email}
+              </p>
             )}
           </div>
 
