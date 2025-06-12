@@ -1,62 +1,34 @@
+import { ZodSchema } from 'zod';
 import { useToast } from './useToast';
 
-type FieldValues = Record<string, string>;
-type ErrorMessages = Record<string, string>;
+export type ErrorMessages = Record<string, string>;
 
-interface ValidationOptions {
-  fields: string[];
-  values: FieldValues;
-  labels?: Record<string, string>;
-}
-
-export const useFormValidation = () => {
+export function useFormValidation() {
   const { showToast } = useToast();
 
-  const validate = ({
-    fields,
-    values,
-    labels = {},
-  }: ValidationOptions): {
-    errors: ErrorMessages;
+  function validateWithSchema<T>(
+    schema: ZodSchema<T>,
+    values: unknown,
+  ): {
+    errors: Record<string, string>;
     isValid: boolean;
-  } => {
-    const errors: ErrorMessages = {};
+  } {
+    const result = schema.safeParse(values);
 
-    fields.forEach((field) => {
-      if (!values[field]?.trim()) {
-        errors[field] = `${labels[field] || field} is required`;
-      }
-    });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0]?.toString() || 'form';
+        errors[field] = err.message;
+      });
 
-    if (Object.keys(errors).length > 0) {
-      showToast('Please fill in all required fields', 'error');
+      showToast('Please correct the highlighted errors.', 'error');
+
+      return { errors, isValid: false };
     }
 
-    return {
-      errors,
-      isValid: Object.keys(errors).length === 0,
-    };
-  };
+    return { errors: {}, isValid: true };
+  }
 
-  const setErrors = (
-    fields: string[],
-    values: FieldValues,
-    labels?: Record<string, string>,
-  ) => {
-    return validate({ fields, values, labels }).errors;
-  };
-
-  const validateFields = (
-    fields: string[],
-    values: FieldValues,
-    labels?: Record<string, string>,
-  ) => {
-    return validate({ fields, values, labels }).isValid;
-  };
-
-  return {
-    validate,
-    setErrors,
-    validateFields,
-  };
-};
+  return { validateWithSchema };
+}

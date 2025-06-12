@@ -7,6 +7,7 @@ import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '../hooks/useFormValidation';
 import PageSpinner from '../app/components/PageSpinner';
 import { useRouteLoading } from '../hooks/useRouteLoading';
+import { registerSchema } from '@/rxjs/validation/registerSchema';
 
 const SignUpForm: React.FC = () => {
   useEffect(() => {
@@ -15,7 +16,7 @@ const SignUpForm: React.FC = () => {
   const router = useRouter();
   const [formState, setFormState] = useState(initialAuthState);
   const { toast, showToast, closeToast } = useToast();
-  const { validate } = useFormValidation();
+  const { validateWithSchema } = useFormValidation();
   const isRouteLoading = useRouteLoading(300);
 
   useEffect(() => {
@@ -65,31 +66,21 @@ const SignUpForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { email, username, password, confirmPassword, role } = formState;
+    const formValues = {
+      email,
+      username,
+      password,
+      confirmPassword,
+      role,
+    };
 
-    const { isValid, errors } = validate({
-      fields: ['email', 'username', 'password', 'confirmPassword', 'role'],
-      values: { email, username, password, confirmPassword, role },
-      labels: {
-        email: 'Email',
-        username: 'Username',
-        password: 'Password',
-        confirmPassword: 'Confirm Password',
-        role: 'User Type',
-      },
-    });
-
+    const { isValid, errors } = validateWithSchema(registerSchema, formValues);
     authStore.setField('errors', errors);
 
     if (!isValid) {
       setTimeout(() => {
         authStore.setField('errors', {});
       }, 5000);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      showToast('Passwords do not match', 'error');
       return;
     }
 

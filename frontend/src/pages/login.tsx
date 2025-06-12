@@ -7,6 +7,7 @@ import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { useRouteLoading } from '../hooks/useRouteLoading';
 import PageSpinner from '../app/components/PageSpinner';
+import { loginSchema } from '@/rxjs/validation/loginSchema';
 
 const Loader: React.FC = () => (
   <div className="flex items-center justify-center space-x-2 h-6 animate-fade-in">
@@ -32,7 +33,7 @@ const LoginForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
-  const { setErrors } = useFormValidation();
+  const { validateWithSchema } = useFormValidation();
   const isRouteLoading = useRouteLoading(300);
   const router = useRouter();
 
@@ -92,21 +93,17 @@ const LoginForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validationErrors = setErrors(
-      ['email', 'password'],
-      { email, password },
-      { email: 'Email', password: 'Password' },
-    );
+    const { errors, isValid } = validateWithSchema(loginSchema, {
+      email,
+      password,
+    });
 
-    if (Object.keys(validationErrors).length > 0) {
-      authStore.setErrors(validationErrors);
-
-      setTimeout(() => {
-        authStore.setErrors({});
-      }, 4000);
-
+    if (!isValid) {
+      authStore.setErrors(errors);
+      setTimeout(() => authStore.setErrors({}), 4000);
       return;
     }
+
     authStore.setErrors({});
     setSubmitting(true);
 
@@ -126,7 +123,6 @@ const LoginForm: React.FC = () => {
     if (isValidRole(role)) {
       setEmailState('');
       setPassword('');
-
       sessionStorage.setItem('toastMessage', 'Login successful!');
       router.push(`/${role}`);
     } else {
