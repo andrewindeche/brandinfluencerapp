@@ -72,6 +72,16 @@ export const initialAuthState: AuthFormState = {
 };
 
 const _authState$ = new BehaviorSubject<AuthFormState>(initialAuthState);
+const savedBio = localStorage.getItem('bio') || '';
+const savedProfileImage = localStorage.getItem('profileImage') || '';
+
+if (savedBio || savedProfileImage) {
+  updateAuthState({
+    bio: savedBio,
+    profileImage: savedProfileImage,
+  });
+}
+
 export const authState$ = _authState$
   .asObservable()
   .pipe(distinctUntilChanged());
