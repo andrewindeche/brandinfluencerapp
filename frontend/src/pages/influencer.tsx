@@ -166,7 +166,7 @@ const InfluencerPage: React.FC = () => {
                 alt={username || 'User'}
                 width={200}
                 height={150}
-                className="w-full h-auto rounded-lg"
+                className="w-full h-[400px] object-cover rounded-lg"
               />
 
               <label
