@@ -229,6 +229,10 @@ export const authStore = {
       });
       console.log('User returned from backend login:', data.user);
       setUser(data.user);
+      localStorage.setItem('username', data.user.username || '');
+      localStorage.setItem('profileImage', data.user.profileImage || '');
+      localStorage.setItem('bio', data.user.bio || '');
+
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
