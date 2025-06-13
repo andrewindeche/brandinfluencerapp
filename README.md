@@ -9,7 +9,7 @@
 | 5.MongoDB | Not Only Relational Database| [Not Only relational Integrity]; [Database];|
 | 6.TailWind | Open Css Framework| [Css]; [Style Sheet];|
 | 7.Passport | Authentication Middleware| [Authentication]; [Middleware];|
-| 8.RxJs | State Management Library| [state];|
+| 8.RxJS | Reactive Data Handling & State Management Support | [Observables]; [Reactivity]; [Async];
 | 9.Ethereal | Fake Email Server| [smtp]; [Email];|
 | 10.Redis | Cache manager & session manager| [cache]; [session];|
 | 11.Jest | Javascript Unit testing framework| [unittest]; [mocks];|
