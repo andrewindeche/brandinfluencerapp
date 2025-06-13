@@ -135,7 +135,7 @@ export class AuthController {
           statusCode: 409,
           error: 'Conflict',
           message: 'Username or email already exists.',
-          code: 'DUPLICATE_USER', // custom code
+          code: 'DUPLICATE_USER',
         });
       }
 
