@@ -74,13 +74,18 @@ export const profileUpdateStore = {
         await axiosInstance.patch('/users/bio', { bio }, authHeaders);
       }
 
+      const updatedImage =
+        typeof profileImage === 'string'
+          ? profileImage
+          : `/uploads/${profileImage.name}`;
+
       authStore.updateAuthState({
         bio,
-        profileImage:
-          typeof profileImage === 'string'
-            ? profileImage
-            : `/uploads/${profileImage.name}`,
+        profileImage: updatedImage,
       });
+
+      localStorage.setItem('bio', bio);
+      localStorage.setItem('profileImage', updatedImage);
 
       setProfileUpdateState({ status: 'success', error: null });
       showToast('Profile updated successfully!', 'success');
