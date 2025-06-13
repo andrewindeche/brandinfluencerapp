@@ -106,7 +106,10 @@ email$
           if (!res.data || typeof res.data.type !== 'string') {
             throw new Error('Invalid response format from user-type endpoint');
           }
-          return { type: res.data.type as UserRole };
+          return {
+            type: res.data.type as UserRole,
+            username: res.data.username,
+          };
         })
         .catch((err: unknown) => {
           const message =
@@ -129,6 +132,7 @@ email$
     } else if (['brand', 'influencer', 'admin'].includes(result.type)) {
       updateAuthState({
         role: result.type,
+        username: result.username || '',
         success: true,
         serverMessage: null,
         errors: {},
@@ -223,7 +227,7 @@ export const authStore = {
         password: '',
         confirmPassword: '',
       });
-
+      console.log('User returned from backend login:', data.user);
       setUser(data.user);
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
