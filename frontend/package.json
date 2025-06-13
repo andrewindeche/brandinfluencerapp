@@ -9,7 +9,6 @@
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.tsx\" \"test/**/*.ts\"",
     "test": "cypress open",
-    "jest": "jest --config jest.config.ts",
     "test:run": "cypress run"
   },
   "dependencies": {
