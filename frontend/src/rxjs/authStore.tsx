@@ -72,14 +72,19 @@ export const initialAuthState: AuthFormState = {
 };
 
 const _authState$ = new BehaviorSubject<AuthFormState>(initialAuthState);
-const savedBio = localStorage.getItem('bio') || '';
-const savedProfileImage = localStorage.getItem('profileImage') || '';
+if (typeof window !== 'undefined') {
+  const savedUsername = localStorage.getItem('username') || '';
+  const savedBio = localStorage.getItem('bio') || '';
+  const savedProfileImage = localStorage.getItem('profileImage') || '';
 
-if (savedBio || savedProfileImage) {
-  updateAuthState({
-    bio: savedBio,
-    profileImage: savedProfileImage,
-  });
+  if (savedUsername || savedBio || savedProfileImage) {
+    _authState$.next({
+      ..._authState$.value,
+      username: savedUsername,
+      bio: savedBio,
+      profileImage: savedProfileImage,
+    });
+  }
 }
 
 export const authState$ = _authState$
@@ -87,7 +92,16 @@ export const authState$ = _authState$
   .pipe(distinctUntilChanged());
 
 function updateAuthState(update: Partial<AuthFormState>) {
-  _authState$.next({ ..._authState$.value, ...update });
+  const newState = { ..._authState$.value, ...update };
+
+  if (typeof window !== 'undefined') {
+    if (update.username) localStorage.setItem('username', update.username);
+    if (update.bio) localStorage.setItem('bio', update.bio);
+    if (update.profileImage)
+      localStorage.setItem('profileImage', update.profileImage);
+  }
+
+  _authState$.next(newState);
 }
 
 function isAxiosError(error: unknown): error is AxiosError {
