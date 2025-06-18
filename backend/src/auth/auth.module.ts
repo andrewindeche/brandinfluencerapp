@@ -8,24 +8,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
 import { BrandModule } from '../user/brand/brand.module';
 import { UserModule } from '../user/user.module';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
 import { ForgotPasswordService } from '../forgot-password/forgot-password.service';
 import { SessionService } from '../session/session.service';
 import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
 import { RedisModule } from '../redis/redis.module';
 
-let secretKey: string;
-
-if (process.env.JWT_SECRET) {
-  secretKey = process.env.JWT_SECRET;
-} else if (fs.existsSync('.jwt_secret')) {
-  secretKey = fs.readFileSync('.jwt_secret', 'utf8');
-} else {
-  secretKey = crypto.randomBytes(64).toString('hex');
-  fs.writeFileSync('.jwt_secret', secretKey);
-}
 
 @Module({
   imports: [
@@ -35,7 +23,7 @@ if (process.env.JWT_SECRET) {
     forwardRef(() => UserModule),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || secretKey,
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60m' },
     }),
     BrandModule,
