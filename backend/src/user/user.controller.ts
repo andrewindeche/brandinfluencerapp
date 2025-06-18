@@ -13,6 +13,8 @@ import { UserService } from './user.service';
 import { User } from './user.schema';
 import { UpdateBioDto } from './dto/update-bio.dto';
 import { UpdateProfileImageDto } from './dto/update-profile-image.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UseInterceptors, UploadedFile } from '@nestjs/common';
 
 @Controller('users')
 export class UserController {
@@ -55,13 +57,25 @@ export class UserController {
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('auth-test')
+    getTest(@Req() req: any) {
+    console.log('✅ Reached test route. User:', req.user);
+    return req.user;
+  }
+
+
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('profileImage')) 
   @Patch('profile-image')
   async updateProfileImage(
-    @Req() req: Request,
+    @Req() req: any,
     @Body() updateProfileImageDto: UpdateProfileImageDto,
   ) {
     const userId = req.user._id;
+    console.log('User in request:', req.user);
+    console.log('Headers:', req.headers);
+    console.log('User from JwtGuard:', req.user);
     return this.userService.updateProfileImage(
       userId,
       updateProfileImageDto.profileImage,

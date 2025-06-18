@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthService } from './service/auth.service';
 import { AuthController } from './controller/auth.controller';
@@ -32,7 +32,7 @@ if (process.env.JWT_SECRET) {
     MongooseModule.forFeature([
       { name: 'Influencer', schema: InfluencerSchema },
     ]),
-    UserModule,
+    forwardRef(() => UserModule),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || secretKey,

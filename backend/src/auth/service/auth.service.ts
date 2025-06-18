@@ -82,6 +82,7 @@ export class AuthService {
 
   async validateUserByIdAndRole(userId: string, role: string) {
     const user = await this.userModel.findById(userId);
+    console.log('Found user in strategy:', user);
     if (!user) return null;
 
     return user.role?.toLowerCase() === role.toLowerCase() ? user : null;
