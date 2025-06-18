@@ -37,21 +37,6 @@ import mongoose from 'mongoose';
       inject: [ConfigService],
     }),
 
-    JwtModule.registerAsync({
-      useFactory: async () => {
-        const jwtSecret = process.env.JWT_SECRET;
-        if (!jwtSecret) {
-          console.error('JWT secret is missing in the environment.');
-          throw new Error('JWT secret missing');
-        }
-
-        return {
-          secret: jwtSecret,
-          signOptions: { expiresIn: '60s' },
-        };
-      },
-    }),
-
     CacheModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         store: redisStore,
