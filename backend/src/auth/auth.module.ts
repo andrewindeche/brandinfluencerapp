@@ -1,4 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthService } from './service/auth.service';
 import { AuthController } from './controller/auth.controller';
@@ -14,6 +16,12 @@ import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
 import { RedisModule } from '../redis/redis.module';
 
+const jwtSecret = process.env.JWT_SECRET
+  || (fs.existsSync('.jwt_secret') ? fs.readFileSync('.jwt_secret', 'utf8') : (() => {
+    const newSecret = crypto.randomBytes(64).toString('hex');
+    fs.writeFileSync('.jwt_secret', newSecret);
+    return newSecret;
+  })());
 
 @Module({
   imports: [
@@ -23,7 +31,7 @@ import { RedisModule } from '../redis/redis.module';
     forwardRef(() => UserModule),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET || jwtSecret,
       signOptions: { expiresIn: '60m' },
     }),
     BrandModule,

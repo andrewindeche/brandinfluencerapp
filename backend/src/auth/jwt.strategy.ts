@@ -1,14 +1,22 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth/service/auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      throw new Error('JWT_SECRET environment variable is not set.');
+     let jwtSecret: string;
+
+    if (process.env.JWT_SECRET) {
+      jwtSecret = process.env.JWT_SECRET;
+    } else if (fs.existsSync('.jwt_secret')) {
+      jwtSecret = fs.readFileSync('.jwt_secret', 'utf8');
+    } else {
+      jwtSecret = crypto.randomBytes(64).toString('hex');
+      fs.writeFileSync('.jwt_secret', jwtSecret);
     }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
