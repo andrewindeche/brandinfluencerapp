@@ -57,16 +57,16 @@ export class UserController {
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('auth-test')
-    getTest(@Req() req: any) {
+  @UseGuards(JwtAuthGuard)
+  @Get('auth-test')
+  getTest(@Req() req: any) {
     console.log('✅ Reached test route. User:', req.user);
+    console.log('➡️ Reached controller. User:', req.user);
     return req.user;
   }
 
-
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('profileImage')) 
+  @UseInterceptors(FileInterceptor('profileImage'))
   @Patch('profile-image')
   async updateProfileImage(
     @Req() req: any,

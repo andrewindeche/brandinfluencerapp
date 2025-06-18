@@ -8,7 +8,7 @@ import { AuthService } from '../auth/service/auth.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-     let jwtSecret: string;
+    let jwtSecret: string;
 
     if (process.env.JWT_SECRET) {
       jwtSecret = process.env.JWT_SECRET;

@@ -16,12 +16,15 @@ import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
 import { RedisModule } from '../redis/redis.module';
 
-const jwtSecret = process.env.JWT_SECRET
-  || (fs.existsSync('.jwt_secret') ? fs.readFileSync('.jwt_secret', 'utf8') : (() => {
-    const newSecret = crypto.randomBytes(64).toString('hex');
-    fs.writeFileSync('.jwt_secret', newSecret);
-    return newSecret;
-  })());
+const jwtSecret =
+  process.env.JWT_SECRET ||
+  (fs.existsSync('.jwt_secret')
+    ? fs.readFileSync('.jwt_secret', 'utf8')
+    : (() => {
+        const newSecret = crypto.randomBytes(64).toString('hex');
+        fs.writeFileSync('.jwt_secret', newSecret);
+        return newSecret;
+      })());
 
 @Module({
   imports: [

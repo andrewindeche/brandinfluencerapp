@@ -10,13 +10,13 @@ import { MongoExceptionFilter } from '../filters/mongo-exception.filter';
 import { AllExceptionsFilter } from '../filters/all-exceptions.filter';
 import { AdminService } from './admin/admin.service';
 import * as bodyParser from 'body-parser';
+import { AuthGuard } from '@nestjs/passport';
 
 dotenv.config();
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined. Set it in your .env file.');
 }
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -52,6 +52,15 @@ async function bootstrap() {
       max: 8,
       message: 'Too many login attempts. Please try again later.',
     }),
+  );
+
+  app.useGlobalGuards(
+    new (class extends AuthGuard('jwt') {
+      handleRequest(err, user, info) {
+        console.log('🌐 Global guard fired:', { user, err, info });
+        return user;
+      }
+    })(),
   );
 
   app.useGlobalPipes(
