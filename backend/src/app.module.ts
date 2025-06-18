@@ -1,7 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
