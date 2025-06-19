@@ -19,6 +19,7 @@ if (!process.env.JWT_SECRET) {
 }
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  console.log('✅ server is running',);
 
   app.enableCors({
     origin: [
@@ -52,15 +53,6 @@ async function bootstrap() {
       max: 8,
       message: 'Too many login attempts. Please try again later.',
     }),
-  );
-
-  app.useGlobalGuards(
-    new (class extends AuthGuard('jwt') {
-      handleRequest(err, user, info) {
-        console.log('🌐 Global guard fired:', { user, err, info });
-        return user;
-      }
-    })(),
   );
 
   app.useGlobalPipes(

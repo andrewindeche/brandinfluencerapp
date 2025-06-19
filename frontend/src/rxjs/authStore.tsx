@@ -251,7 +251,6 @@ export const authStore = {
         password: '',
         confirmPassword: '',
       });
-      console.log('User returned from backend login:', data.user);
       setUser(data.user);
       localStorage.setItem('username', data.user.username || '');
       localStorage.setItem('profileImage', data.user.profileImage || '');

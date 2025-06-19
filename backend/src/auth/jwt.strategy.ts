@@ -27,12 +27,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    console.log('🔥 JWT payload received in strategy:', payload);
     const user = await this.authService.validateUserByIdAndRole(
       payload.sub,
       payload.role,
     );
-    console.log('Fetched user:', user);
 
     if (!user) {
       throw new UnauthorizedException('Unauthorized access');

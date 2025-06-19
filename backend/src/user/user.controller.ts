@@ -60,8 +60,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('auth-test')
   getTest(@Req() req: any) {
-    console.log('✅ Reached test route. User:', req.user);
-    console.log('➡️ Reached controller. User:', req.user);
     return req.user;
   }
 
@@ -73,9 +71,6 @@ export class UserController {
     @Body() updateProfileImageDto: UpdateProfileImageDto,
   ) {
     const userId = req.user._id;
-    console.log('User in request:', req.user);
-    console.log('Headers:', req.headers);
-    console.log('User from JwtGuard:', req.user);
     return this.userService.updateProfileImage(
       userId,
       updateProfileImageDto.profileImage,
