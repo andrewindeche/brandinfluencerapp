@@ -2,9 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import {
-  Influencer,
-} from '../../user/influencer/influencer.schema';
+import { Influencer } from '../../user/influencer/influencer.schema';
 import * as bcryptjs from 'bcryptjs';
 import { User } from '../../user/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -24,12 +22,14 @@ export class AuthService {
     };
     const fullUser = await this.userModel.findById(influencer._id).lean();
     return {
-      access_token: this.jwtService.sign(payload, { 
+      access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '20m' }),
-      refresh_token: this.jwtService.sign(payload, { 
+        expiresIn: '20m',
+      }),
+      refresh_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '7d' }),
+        expiresIn: '7d',
+      }),
       user: {
         id: fullUser._id,
         username: fullUser.username,
@@ -49,12 +49,14 @@ export class AuthService {
   async loginBrand(brand: User) {
     const payload = { username: brand.username, sub: brand._id, role: 'brand' };
     return {
-      access_token: this.jwtService.sign(payload, { 
+      access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '20m' }),
-      refresh_token: this.jwtService.sign(payload, { 
+        expiresIn: '20m',
+      }),
+      refresh_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '7d' }),
+        expiresIn: '7d',
+      }),
     };
   }
 
@@ -159,12 +161,14 @@ export class AuthService {
     };
 
     return {
-      access_token: this.jwtService.sign(payload, { 
+      access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '20m' }),
-      refresh_token: this.jwtService.sign(payload, { 
+        expiresIn: '20m',
+      }),
+      refresh_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '7d' }),
+        expiresIn: '7d',
+      }),
     };
   }
 }
