@@ -19,7 +19,7 @@ if (!process.env.JWT_SECRET) {
 }
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  console.log('✅ server is running',);
+  console.log('✅ server is running');
 
   app.enableCors({
     origin: [
