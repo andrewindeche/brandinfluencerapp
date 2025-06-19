@@ -70,7 +70,7 @@ export class UserController {
     @Req() req: any,
     @Body() updateProfileImageDto: UpdateProfileImageDto,
   ) {
-    const userId = req.user._id;
+    const userId = req.user.sub;
     return this.userService.updateProfileImage(
       userId,
       updateProfileImageDto.profileImage,
