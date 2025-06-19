@@ -52,12 +52,12 @@ export const profileUpdateStore = {
     try {
       if (typeof profileImage === 'object') {
         const formData = new FormData();
-        formData.append('profileImage', profileImage as File);
+        formData.append('profileImage', profileImage);
 
         await axiosInstance.patch(
           '/users/profile-image',
           formData,
-          getAuthHeaders('multipart/form-data'),
+          getAuthHeaders(),
         );
       } else if (
         typeof profileImage === 'string' &&
