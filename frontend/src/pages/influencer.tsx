@@ -272,14 +272,18 @@ const InfluencerPage: React.FC = () => {
                       onClick={async () => {
                         setLoading(true);
                         try {
-                          const newImage = imagePreview || profileImage;
+                          const newImage = imageFile || profileImage;
                           await profileUpdateStore.updateProfile(
                             bioDraft,
                             newImage,
                             showToast,
                           );
                           setBio(bioDraft);
-                          setProfileImage(newImage);
+                          if (typeof newImage === 'string') {
+                            setProfileImage(newImage);
+                          } else if (newImage instanceof File) {
+                            setProfileImage(`/uploads/${newImage.name}`);
+                          }
                           setEditingBio(false);
                           setImageFile(null);
                           setImagePreview(null);
