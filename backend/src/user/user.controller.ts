@@ -29,7 +29,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() req: Request) {
-    console.log('Request received at /users/me');
     const userId = req.user?.sub;
     return this.userService.findById(userId);
   }
