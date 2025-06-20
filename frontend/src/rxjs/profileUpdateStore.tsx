@@ -33,7 +33,6 @@ export const profileUpdateStore = {
       authStore.getCurrentUser();
 
     const token = localStorage.getItem('token');
-    console.log('🛡 Token before upload:', token);
     const authHeaders = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : {};

@@ -242,10 +242,8 @@ export const authStore = {
         email,
         password,
       });
-      console.log('🪵 accessToken from backend:', data.access_token);
       localStorage.setItem('token', data.access_token);
       setAuthToken(data.access_token);
-
       updateAuthState({
         role: data.user.role,
         success: true,
@@ -263,7 +261,6 @@ export const authStore = {
 
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
-      console.log('🔥 Login failed. Raw error:', error);
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const message = isAxiosError(error)
         ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'

@@ -35,7 +35,6 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('🚀 Restored token on app load:', token);
     if (token) setAuthToken(token);
   }, []);
 
