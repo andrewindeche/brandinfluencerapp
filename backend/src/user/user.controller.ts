@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Patch,
   Query,
   Req,
@@ -53,7 +51,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Patch('bio')
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
-    const userId = req.user._id;
+    const userId = req.user.userId;
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
 
@@ -63,14 +61,14 @@ export class UserController {
     return req.user;
   }
 
-  @Patch('profile-image')
   @UseGuards(JwtAuthGuard)
+  @Patch('profile-image')
   @UseInterceptors(FileInterceptor('profileImage'))
   async updateProfileImage(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
   ) {
-    const userId = req.user.sub;
+    const userId = req.user.userId;
     return this.userService.updateProfileImage(userId, file);
   }
 }

@@ -86,6 +86,7 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
+  
   async updateBio(userId: string, bio: string): Promise<User> {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
