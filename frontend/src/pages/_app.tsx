@@ -5,6 +5,8 @@ import Toast from '../app/components/Toast';
 import { useState, useCallback } from 'react';
 import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { InactivityModal } from '@/app/components/InactivityModal';
+import { useEffect } from 'react';
+import { setAuthToken } from '../rxjs/axiosInstance';
 
 const irishGrover = Irish_Grover({
   weight: '400',
@@ -30,6 +32,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     message: string;
     type: 'success' | 'error';
   } | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log('🚀 Restored token on app load:', token);
+    if (token) setAuthToken(token);
+  }, []);
 
   const showToast = useCallback(
     (message: string, type: 'success' | 'error') => {
