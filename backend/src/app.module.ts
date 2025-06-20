@@ -67,9 +67,7 @@ import mongoose from 'mongoose';
 })
 export class AppModule implements OnModuleInit {
   onModuleInit() {
-    mongoose.connection.on('connected', () => {
-      console.log('[MongoDB] Connected');
-    });
+    mongoose.connection.on('connected', () => {});
 
     mongoose.connection.on('error', (err) => {
       console.error('[MongoDB] Error:', err);

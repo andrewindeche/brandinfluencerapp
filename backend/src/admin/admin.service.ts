@@ -31,8 +31,6 @@ export class AdminService {
       password: hashedPassword,
       role: 'superuser',
     });
-
-    console.log('✅ Superuser created from ENV');
   }
 
   async promoteUserToAdmin(superUserId: string, userId: string): Promise<User> {

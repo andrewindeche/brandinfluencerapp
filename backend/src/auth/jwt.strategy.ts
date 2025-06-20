@@ -23,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: jwtSecret,
     });
-    console.log('✅ JwtStrategy registered');
   }
 
   async validate(payload: any) {
@@ -37,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     return {
-      sub: user.id,
+      userId: user.id,
       username: user.username,
       role: user.role,
     };
