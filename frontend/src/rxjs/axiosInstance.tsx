@@ -7,9 +7,7 @@ interface ErrorResponse {
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:4000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: {},
 });
 
 export const setAuthToken = (token: string | null) => {
