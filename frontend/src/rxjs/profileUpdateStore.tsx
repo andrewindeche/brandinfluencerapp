@@ -26,7 +26,9 @@ function getAuthHeaders(contentType?: string) {
 
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  if (contentType) headers['Content-Type'] = contentType;
+  if (contentType && contentType !== 'multipart/form-data') {
+    headers['Content-Type'] = contentType;
+  }
 
   return { headers };
 }
