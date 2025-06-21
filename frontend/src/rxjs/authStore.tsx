@@ -247,6 +247,11 @@ export const authStore = {
       updateAuthState({
         role: data.user.role,
         success: true,
+        bio: data.user.bio || '',
+        profileImage: data.user.profileImage
+          ? `http://localhost:4000/${data.user.profileImage}`
+          : '/images/image4.png',
+
         submitting: false,
         serverMessage: 'Login successful!',
         errors: {},
@@ -256,7 +261,10 @@ export const authStore = {
       });
       setUser(data.user);
       localStorage.setItem('username', data.user.username || '');
-      localStorage.setItem('profileImage', data.user.profileImage || '');
+      localStorage.setItem(
+        'profileImage',
+        `http://localhost:4000/${data.user.profileImage}`,
+      );
       localStorage.setItem('bio', data.user.bio || '');
 
       return { success: true, role: data.user.role };

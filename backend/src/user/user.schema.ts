@@ -6,6 +6,8 @@ export interface User extends Document {
   email: string;
   role: 'brand' | 'influencer' | 'admin' | 'superuser';
   refreshToken?: string;
+  bio?: string;
+  profileImage?: string;
 }
 
 export const UserSchema = new Schema(
@@ -18,6 +20,8 @@ export const UserSchema = new Schema(
       enum: ['brand', 'admin', 'influencer', 'superuser'],
       default: 'user',
     },
+     bio: { type: String, default: '' },
+    profileImage: { type: String, default: '' },
   },
   { timestamps: true, discriminatorKey: '__t' },
 );
