@@ -39,17 +39,25 @@ export const profileUpdateStore = {
 
     setProfileUpdateState({ status: 'loading', error: null });
 
+    let uploadedFilename: string | undefined;
+
     try {
       if (typeof profileImage === 'object') {
         const formData = new FormData();
         formData.append('profileImage', profileImage);
 
-        const token = localStorage.getItem('token');
-        await axiosInstance.patch('/users/profile-image', formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await axiosInstance.patch(
+          '/users/profile-image',
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
+
+        uploadedFilename = response.data.imageUrl;
+        return response.data.imageUrl;
       } else if (
         typeof profileImage === 'string' &&
         profileImage !== currentImage
@@ -64,12 +72,10 @@ export const profileUpdateStore = {
       if (bio !== currentBio) {
         await axiosInstance.patch('/users/bio', { bio }, authHeaders);
       }
-
       const updatedImage =
         typeof profileImage === 'string'
           ? profileImage
-          : `/uploads/${profileImage.name}`;
-
+          : `/${uploadedFilename}`;
       authStore.updateAuthState({
         bio,
         profileImage: updatedImage,
