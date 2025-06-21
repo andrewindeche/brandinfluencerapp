@@ -8,6 +8,7 @@ import { RedisModule } from '../redis/redis.module';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
 import { BrandSchema } from '../user/brand/schema/brand.schema';
 import { AuthModule } from '../auth/auth.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -18,6 +19,9 @@ import { AuthModule } from '../auth/auth.module';
     ]),
     RedisModule,
     forwardRef(() => AuthModule),
+    MulterModule.register({
+      dest: './uploads',
+    }),
   ],
   controllers: [UserController],
   providers: [UserService, RedisService],
