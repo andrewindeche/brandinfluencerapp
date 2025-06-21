@@ -20,40 +20,27 @@ const SignUpForm: React.FC = () => {
   const isRouteLoading = useRouteLoading(300);
 
   useEffect(() => {
-    let handled = false;
-    let timeoutId: string | number | NodeJS.Timeout | undefined;
     const subscription = authState$.subscribe((state) => {
       setFormState(state);
-      if (!handled) {
-        handled = true;
 
-        if (state.success) {
-          showToast(
-            state.serverMessage?.toLowerCase().includes('exist')
-              ? 'User already exists'
-              : state.serverMessage || 'Registration successful',
-            state.serverMessage?.toLowerCase().includes('exist')
-              ? 'error'
-              : 'success',
-          );
+      if (state.success && state.serverMessage) {
+        const isDuplicate = state.serverMessage.toLowerCase().includes('exist');
 
-          if (!state.serverMessage?.toLowerCase().includes('exist')) {
-            authStore.reset();
-            timeoutId = setTimeout(
-              () => router.push('/login?signup=success'),
-              1000,
-            );
-          }
-        } else if (state.serverMessage) {
-          showToast(state.serverMessage, 'error');
+        showToast(
+          isDuplicate ? 'User already exists' : state.serverMessage,
+          isDuplicate ? 'error' : 'success',
+        );
+
+        if (!isDuplicate) {
+          authStore.reset();
+          setTimeout(() => router.push('/login?signup=success'), 1000);
         }
+      } else if (state.serverMessage) {
+        showToast(state.serverMessage, 'error');
       }
     });
 
-    return () => {
-      subscription.unsubscribe();
-      if (timeoutId) clearTimeout(timeoutId);
-    };
+    return () => subscription.unsubscribe();
   }, [router, showToast]);
 
   const handleChange = (
