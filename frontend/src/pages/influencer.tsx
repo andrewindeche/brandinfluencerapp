@@ -273,16 +273,17 @@ const InfluencerPage: React.FC = () => {
                         setLoading(true);
                         try {
                           const newImage = imageFile || profileImage;
-                          await profileUpdateStore.updateProfile(
-                            bioDraft,
-                            newImage,
-                            showToast,
-                          );
+                          const imagePath =
+                            await profileUpdateStore.updateProfile(
+                              bioDraft,
+                              newImage,
+                              showToast,
+                            );
                           setBio(bioDraft);
+                          setProfileImage(`http://localhost:4000/${imagePath}`);
+
                           if (typeof newImage === 'string') {
                             setProfileImage(newImage);
-                          } else if (newImage instanceof File) {
-                            setProfileImage(`/uploads/${newImage.name}`);
                           }
                           setEditingBio(false);
                           setImageFile(null);
