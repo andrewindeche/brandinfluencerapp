@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import RateLimitRedisStore, { RedisReply } from 'rate-limit-redis';
@@ -10,7 +11,7 @@ import { MongoExceptionFilter } from '../filters/mongo-exception.filter';
 import { AllExceptionsFilter } from '../filters/all-exceptions.filter';
 import { AdminService } from './admin/admin.service';
 import * as bodyParser from 'body-parser';
-import { AuthGuard } from '@nestjs/passport';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 dotenv.config();
 
@@ -18,8 +19,10 @@ if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined. Set it in your .env file.');
 }
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  console.log('✅ server is running');
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   app.enableCors({
     origin: [
