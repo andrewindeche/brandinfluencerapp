@@ -149,7 +149,7 @@ const InfluencerPage: React.FC = () => {
         </div>
       )}
 
-      <h1 className="text-2xl md:text-3xl font-semibold text-[#FFFF00] text-center mt-4">
+      <h1 className="text-2xl md:text-3xl font-semibold text-[#1E1E1E] text-center mt-4">
         My Profile
       </h1>
 
