@@ -266,7 +266,6 @@ export const authStore = {
         `http://localhost:4000/${data.user.profileImage}`,
       );
       localStorage.setItem('bio', data.user.bio || '');
-
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
