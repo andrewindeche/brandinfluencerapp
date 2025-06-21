@@ -75,7 +75,7 @@ export class UserService {
     userId: string,
     file: Express.Multer.File,
   ): Promise<User> {
-    const imageUrl = `uploads/${file.originalname}`;
+    const imageUrl = `uploads/${file.filename}`;
 
     const user = await this.userModel.findByIdAndUpdate(
       userId,
@@ -86,7 +86,7 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
-  
+
   async updateBio(userId: string, bio: string): Promise<User> {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
