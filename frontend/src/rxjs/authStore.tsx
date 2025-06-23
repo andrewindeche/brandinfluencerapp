@@ -242,10 +242,13 @@ export const authStore = {
         email,
         password,
       });
+      if (!data.user) {
+        throw new Error('User object missing in login response');
+      }
       localStorage.setItem('token', data.access_token);
       setAuthToken(data.access_token);
       updateAuthState({
-        role: data.user.role,
+        role: data.user?.role || 'unknown',
         success: true,
         bio: data.user.bio || '',
         profileImage: data.user.profileImage
@@ -268,10 +271,13 @@ export const authStore = {
       localStorage.setItem('bio', data.user.bio || '');
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
+      console.error('Login error:', error);
       const isThrottle = isAxiosError(error) && error.response?.status === 429;
       const message = isAxiosError(error)
         ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'
-        : 'Too many Login Attempts. Try Again Later';
+        : error instanceof Error
+          ? error.message
+          : 'Unexpected error occurred during login';
 
       updateAuthState({
         submitting: false,
