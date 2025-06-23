@@ -18,6 +18,16 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
+axiosInstance.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => {
+    console.error('Request was blocked:', error);
+    return Promise.reject(error);
+  },
+);
+
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
