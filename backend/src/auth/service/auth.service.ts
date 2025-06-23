@@ -59,6 +59,12 @@ export class AuthService {
         secret: process.env.JWT_SECRET,
         expiresIn: '7d',
       }),
+      user: {
+        username: brand.username,
+        role: 'brand',
+        bio: brand.bio || '',
+        profileImage: brand.profileImage || '',
+      },
     };
   }
 
