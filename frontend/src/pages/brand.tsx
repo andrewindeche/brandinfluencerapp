@@ -96,14 +96,14 @@ const BrandPage: React.FC = () => {
       )}
       <div className="flex justify-center space-x-4 mt-4">
         <button
-          onClick={() => setActiveTab('campaigns')}
-          className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-14 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
+          onClick={() => setActiveTab('influencers')}
+          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
         >
           Campaigns
         </button>
         <button
-          onClick={() => setActiveTab('influencers')}
-          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
+          onClick={() => setActiveTab('campaigns')}
+          className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-14 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
         >
           Influencers
         </button>
@@ -111,7 +111,7 @@ const BrandPage: React.FC = () => {
 
       <div className="mt-6">
         <h3 className="text-2xl text-[#FFFF00] underline">
-          {activeTab === 'influencers' ? 'Submissions' : 'Campaign Metrics'}
+          {activeTab === 'campaigns' ? 'Submissions' : 'Campaign Metrics'}
         </h3>
       </div>
 
