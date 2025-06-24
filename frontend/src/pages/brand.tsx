@@ -25,8 +25,13 @@ const BrandPage: React.FC = () => {
   useEffect(() => {
     const toastMessage = sessionStorage.getItem('toastMessage');
     if (toastMessage) {
-      setToast({ message: toastMessage, type: 'success' });
       sessionStorage.removeItem('toastMessage');
+      setToast({ message: toastMessage, type: 'success' });
+      const timeout = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+
+      return () => clearTimeout(timeout);
     }
   }, []);
 
