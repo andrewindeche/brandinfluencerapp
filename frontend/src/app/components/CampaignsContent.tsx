@@ -1,13 +1,28 @@
 import React from 'react';
-import ProfileCard from '../components/ProfileCard';
+import ProfileWithStats from '../components/ProfileCard';
 import Image from 'next/image';
+import { getRandom } from '../utils/random';
 
 const CampaignsContent: React.FC = () => {
   return (
-    <div className="relative w-full p-8">
+    <div className="relative w-full p-12">
       <div className="flex flex-row space-x-8">
         <div className="w-1/5">
-          <ProfileCard />
+          <ProfileWithStats
+            username="John Doe"
+            profileImage="/images/screenshots/HandM.jpg"
+            bio="Lifestyle content creator and influencer. Passionate about fashion and fitness."
+            likes={getRandom(50, 300)}
+            shares={getRandom(10, 100)}
+            campaigns={getRandom(1, 10)}
+            posts={getRandom(3, 25)}
+            submissions={getRandom(1, 15)}
+            onSave={async (newBio, newImage) => {
+              console.log('Saving...', newBio, newImage);
+              await new Promise((res) => setTimeout(res, 1000));
+            }}
+            showToast={(msg, type) => alert(`[${type.toUpperCase()}]: ${msg}`)}
+          />
         </div>
         <div className="flex-1 rounded-lg shadow-lg">
           <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white">

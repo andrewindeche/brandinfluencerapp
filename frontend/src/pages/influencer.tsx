@@ -8,6 +8,7 @@ import { authState$ } from '../rxjs/authStore';
 import NotificationsSection from '../app/components/NotificationsSection';
 import CampaignsSection from '../app/components/CampaignsSection';
 import ProfileWithStats from '../app/components/ProfileCard';
+import { getRandom } from '../app/utils/random';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -18,6 +19,10 @@ const InfluencerPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const { toast, showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [likes] = useState(getRandom(50, 200));
+  const [shares] = useState(getRandom(10, 100));
+  const [posts] = useState(getRandom(5, 15));
+  const [submissions] = useState(getRandom(2, 10));
 
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
@@ -60,15 +65,6 @@ const InfluencerPage: React.FC = () => {
     localStorage.clear();
     router.push('/login');
   };
-
-  const getRandomNumber = (min: number, max: number) =>
-    Math.floor(Math.random() * (max - min + 1)) + min;
-
-  const [likes] = useState(getRandomNumber(21, 200));
-  const [shares] = useState(getRandomNumber(21, 150));
-  const [showcampaigns] = useState(getRandomNumber(0, 30));
-  const [posts] = useState(getRandomNumber(0, 30));
-  const [submissions] = useState(getRandomNumber(0, 30));
 
   type Notification = {
     id: number;
@@ -156,7 +152,7 @@ const InfluencerPage: React.FC = () => {
             bio={bio || message}
             likes={likes}
             shares={shares}
-            campaigns={showcampaigns}
+            campaigns={campaigns.length}
             posts={posts}
             submissions={submissions}
             onSave={handleProfileSave}

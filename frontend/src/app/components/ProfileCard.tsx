@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent } from 'react';
 import Image from 'next/image';
+import { getRandom } from '../utils/random';
 
 type ProfileWithStatsProps = {
   username: string;
@@ -10,6 +11,7 @@ type ProfileWithStatsProps = {
   campaigns: number;
   posts: number;
   submissions: number;
+  defaultImage?: string;
   onSave: (newBio: string, newImage: File | string | null) => Promise<void>;
   loading?: boolean;
   showToast: (msg: string, type: 'success' | 'error') => void;
@@ -19,11 +21,6 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
   username,
   profileImage,
   bio,
-  likes,
-  shares,
-  campaigns,
-  posts,
-  submissions,
   onSave,
   loading = false,
   showToast,
@@ -33,6 +30,11 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [likes] = useState(() => getRandom(50, 300));
+  const [shares] = useState(() => getRandom(10, 100));
+  const [campaigns] = useState(() => getRandom(1, 10));
+  const [posts] = useState(() => getRandom(3, 25));
+  const [submissions] = useState(() => getRandom(1, 15));
 
   const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -138,7 +140,9 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
         </div>
 
         <div
-          className={`h-24 px-2 mt-2 ${isHovered ? 'overflow-y-auto' : 'overflow-hidden'}`}
+          className={`h-24 px-2 mt-2 ${
+            isHovered ? 'overflow-y-auto' : 'overflow-hidden'
+          }`}
         >
           {!editingBio ? (
             <>
