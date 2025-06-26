@@ -173,7 +173,7 @@ const CampaignsContent: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14">
             {filteredCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
               const displayedText = isExpanded
@@ -183,7 +183,7 @@ const CampaignsContent: React.FC = () => {
               return (
                 <div
                   key={campaign.title}
-                  className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-[270px] max-w-xs"
+                  className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-[240px] max-w-xs"
                 >
                   <Image
                     src={campaign.image}
