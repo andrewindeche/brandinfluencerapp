@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Dialog } from '@headlessui/react';
 import { v4 as uuidv4 } from 'uuid';
@@ -92,7 +90,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
             />
             <input
               type="date"
-              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+              className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
               required
