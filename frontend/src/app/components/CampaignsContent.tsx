@@ -86,15 +86,24 @@ const CampaignsContent: React.FC = () => {
         </div>
 
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-4">
-            <button
-              onClick={() => setCreateModalOpen(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 items-center text-white font-semibold px-4 py-2 rounded-xl shadow"
-            >
-              + Create Campaign
-            </button>
+          <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white mb-6">
+            {[
+              { title: 'Ambassadors', value: '12' },
+              { title: 'Total reach', value: '9.8K' },
+              { title: 'Submissions', value: '20' },
+              { title: 'Posts', value: '30K' },
+              { title: 'Likes', value: '5K' },
+              { title: 'Comments', value: '60.2K' },
+            ].map((stat) => (
+              <div
+                key={stat.title}
+                className="text-center rounded-lg bg-gradient-to-r from-zinc-800 to-black transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
+              >
+                <h4 className="text-lg">{stat.title}</h4>
+                <p className="text-lg font-bold">{stat.value}</p>
+              </div>
+            ))}
           </div>
-
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
             <input
               type="text"
@@ -119,28 +128,14 @@ const CampaignsContent: React.FC = () => {
               />
             </div>
           </div>
-          <h3 className="text-2xl font-bold underline underline-offset-4 mb-6 text-center">
-            📊 Campaigns Metrics
-          </h3>
-          <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white mb-6">
-            {[
-              { title: 'Ambassadors', value: '12' },
-              { title: 'Total reach', value: '9.8K' },
-              { title: 'Submissions', value: '20' },
-              { title: 'Posts', value: '30K' },
-              { title: 'Likes', value: '5K' },
-              { title: 'Comments', value: '60.2K' },
-            ].map((stat) => (
-              <div
-                key={stat.title}
-                className="text-center rounded-lg bg-gradient-to-r from-zinc-800 to-black transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
-              >
-                <h4 className="text-lg">{stat.title}</h4>
-                <p className="text-lg font-bold">{stat.value}</p>
-              </div>
-            ))}
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="bg-yellow-500 hover:bg-yellow-600 items-center text-white font-semibold px-4 py-2 rounded-xl shadow"
+            >
+              + Create Campaign
+            </button>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
