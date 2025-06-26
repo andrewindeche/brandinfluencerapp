@@ -5,14 +5,20 @@ import ProfileWithStats from '../components/ProfileCard';
 import SubmissionModal from '../components/SubmissionModal';
 import { getRandom } from '../utils/random';
 
+type StatusFilter = 'all' | 'active' | 'inactive';
+
 const CampaignsContent: React.FC = () => {
-  const campaigns = ['Campaign 1', 'Campaign 2', 'Campaign 3', 'Campaign 4'];
+  const campaigns = useMemo(
+    () => ['Campaign 1', 'Campaign 2', 'Campaign 3', 'Campaign 4'],
+    [],
+  );
+
   const message =
     'This is a detailed campaign description with instructions. It is expandable when the user clicks "Read More".';
 
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
 
@@ -26,7 +32,9 @@ const CampaignsContent: React.FC = () => {
         (statusFilter === 'active' && isActive) ||
         (statusFilter === 'inactive' && !isActive);
 
-      return title.toLowerCase().includes(searchQuery.toLowerCase()) && matchesStatus;
+      return (
+        title.toLowerCase().includes(searchQuery.toLowerCase()) && matchesStatus
+      );
     });
   }, [campaigns, searchQuery, statusFilter]);
 
@@ -36,7 +44,6 @@ const CampaignsContent: React.FC = () => {
   return (
     <div className="relative w-full p-12">
       <div className="flex flex-row space-x-8">
-        {/* Left Sidebar */}
         <div className="w-1/5">
           <ProfileWithStats
             username="John Doe"
@@ -55,11 +62,11 @@ const CampaignsContent: React.FC = () => {
           />
         </div>
 
-        {/* Main Content */}
         <div className="flex-1">
-          <h3 className="text-white text-xl font-bold mb-4 text-center">Your Campaigns</h3>
+          <h3 className="text-white text-xl font-bold mb-4 text-center">
+            Your Campaigns
+          </h3>
 
-          {/* Filters */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
             <input
               type="text"
@@ -71,18 +78,22 @@ const CampaignsContent: React.FC = () => {
             <div className="relative w-full sm:w-[200px]">
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as StatusFilter)
+                }
                 className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <option value="all">All Statuses</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none"
+                size={16}
+              />
             </div>
           </div>
 
-          {/* Metrics Grid */}
           <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white mb-6">
             {[
               { title: 'Ambassadors', value: '12' },
@@ -102,7 +113,6 @@ const CampaignsContent: React.FC = () => {
             ))}
           </div>
 
-          {/* Campaign Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCampaigns.map((title, index) => {
               const isExpanded = expanded[title];
@@ -149,7 +159,9 @@ const CampaignsContent: React.FC = () => {
 
                     <div className="flex justify-between items-center mt-2">
                       <p className="text-xs font-semibold">Deadline: 2 weeks</p>
-                      <p className={`text-xs font-bold ${isActive ? 'text-green-400' : 'text-red-400'}`}>
+                      <p
+                        className={`text-xs font-bold ${isActive ? 'text-green-400' : 'text-red-400'}`}
+                      >
                         {isActive ? 'Active' : 'Inactive'}
                       </p>
                     </div>
@@ -183,7 +195,6 @@ const CampaignsContent: React.FC = () => {
           />
         </div>
 
-        {/* Right Sidebar (Notifications) */}
         <div className="w-1/5 space-y-8">
           <div className="bg-[#E8BB5B] text-white p-6 rounded-2xl text-center hover:shadow-lg transition duration-300 transform hover:scale-105">
             <h4 className="text-xl font-bold">Notifications</h4>
