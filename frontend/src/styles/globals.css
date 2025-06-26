@@ -43,6 +43,10 @@ button:hover {
   background-position: 100% 0%;
 }
 
+.custom-date-icon::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 .custom-signup-button {
   background-color:  #4299e1;
   color: white;
