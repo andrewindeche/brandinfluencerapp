@@ -36,7 +36,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
         <div className="w-16 h-16 rounded-full border-1 border-black flex items-center justify-center">
           <div className="w-12 rounded-md border-1 border-black h-14">
             <Image
-              src={imageSrc || '/images/screenshots/HandM.jpg'}
+              src={imageSrc}
               alt={userName || 'User'}
               width={60}
               height={60}

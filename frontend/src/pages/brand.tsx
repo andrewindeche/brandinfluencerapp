@@ -5,6 +5,7 @@ import { Influencer } from '../types';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useRouter } from 'next/router';
+import { authState$ } from '@/rxjs/authStore';
 
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
@@ -13,7 +14,11 @@ const BrandPage: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: string } | null>(
     null,
   );
-
+  const [username, setUsername] = useState('');
+  const [profileImage, setProfileImage] = useState<string>(
+    '/images/screenshots/HandM.jpg',
+  );
+  const [bio, setBio] = useState<string>('');
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
 
@@ -21,6 +26,19 @@ const BrandPage: React.FC = () => {
     localStorage.clear();
     router.push('/login');
   };
+
+  useEffect(() => {
+    const sub = authState$.subscribe((state) => {
+      setUsername(state.username || localStorage.getItem('username') || 'User');
+      setProfileImage(
+        state.profileImage ||
+          localStorage.getItem('profileImage') ||
+          '/images/screenshots/HandM.jpg',
+      );
+      setBio(state.bio || localStorage.getItem('bio') || '');
+    });
+    return () => sub.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const toastMessage = sessionStorage.getItem('toastMessage');
@@ -85,7 +103,11 @@ const BrandPage: React.FC = () => {
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center">
       <div className="absolute top-2 right-36 z-50">
-        <UserMenu userName="John Doe" imageSrc={''} onLogout={handleLogout} />
+        <UserMenu
+          userName={username}
+          imageSrc={profileImage || '/images/screenshots/HandM.jpg'}
+          onLogout={handleLogout}
+        />
       </div>
       {toast && (
         <div
