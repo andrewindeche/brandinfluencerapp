@@ -6,7 +6,6 @@ import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useRouter } from 'next/router';
 import { authState$ } from '@/rxjs/authStore';
-import NotificationWidget from '../app/components/NotificationWidget';
 
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
