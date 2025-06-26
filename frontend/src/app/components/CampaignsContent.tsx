@@ -96,7 +96,7 @@ const CampaignsContent: React.FC = () => {
         }
       />
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-16">
         <div className="w-full lg:w-1/4 lg:w-1/4">
           <ProfileWithStats
             username="John Doe"
