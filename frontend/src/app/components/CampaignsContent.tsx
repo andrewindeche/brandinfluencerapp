@@ -104,7 +104,7 @@ const CampaignsContent: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-6 mb-16">
             <input
               type="text"
               placeholder="Search campaigns..."
@@ -136,7 +136,7 @@ const CampaignsContent: React.FC = () => {
               + Create Campaign
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
             {filteredCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
               const displayedText = isExpanded
