@@ -25,7 +25,7 @@ const NotificationWidget: React.FC<Props> = ({ notifications }) => {
       >
         🔔
         {notifications.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-bounce cursor-pointer">
             {notifications.length}
           </span>
         )}
