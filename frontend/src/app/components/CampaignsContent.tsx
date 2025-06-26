@@ -30,15 +30,21 @@ const CampaignsContent: React.FC = () => {
 
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'inactive'
+  >('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
+    null,
+  );
   const maxCharCount = 70;
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(({ title, status }) => {
-      const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
       const matchesStatus =
         statusFilter === 'all' ||
         (statusFilter === 'active' && status === 'active') ||
@@ -56,7 +62,9 @@ const CampaignsContent: React.FC = () => {
       <CreateCampaignModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
-        onCreate={(newCampaign) => setCampaigns((prev) => [...prev, newCampaign])}
+        onCreate={(newCampaign) =>
+          setCampaigns((prev) => [...prev, newCampaign])
+        }
       />
 
       <div className="flex flex-row space-x-8">
@@ -108,7 +116,10 @@ const CampaignsContent: React.FC = () => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" size={16} />
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none"
+                size={16}
+              />
             </div>
           </div>
 
@@ -181,7 +192,8 @@ const CampaignsContent: React.FC = () => {
                       <p
                         className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
                       >
-                        {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+                        {campaign.status.charAt(0).toUpperCase() +
+                          campaign.status.slice(1)}
                       </p>
                     </div>
 
