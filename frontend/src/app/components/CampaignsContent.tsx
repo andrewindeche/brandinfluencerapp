@@ -183,7 +183,7 @@ const CampaignsContent: React.FC = () => {
               return (
                 <div
                   key={campaign.title}
-                  className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-full max-w-xs"
+                  className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-[270px] max-w-xs"
                 >
                   <Image
                     src={campaign.image}
