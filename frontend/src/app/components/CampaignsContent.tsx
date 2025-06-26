@@ -3,38 +3,48 @@ import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import ProfileWithStats from '../components/ProfileCard';
 import SubmissionModal from '../components/SubmissionModal';
+import CreateCampaignModal from '../components/CreateCampaignModal';
 import { getRandom } from '../utils/random';
 
-type StatusFilter = 'all' | 'active' | 'inactive';
+interface CampaignType {
+  title: string;
+  description: string;
+  image: string;
+  status: 'active' | 'inactive';
+  date: string;
+}
 
 const CampaignsContent: React.FC = () => {
-  const campaigns = useMemo(
-    () => ['Campaign 1', 'Campaign 2', 'Campaign 3', 'Campaign 4'],
-    [],
-  );
-
   const message =
     'This is a detailed campaign description with instructions. It is expandable when the user clicks "Read More".';
 
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([
+    {
+      title: 'Campaign 1',
+      description: message,
+      image: '/images/fit.jpg',
+      status: 'active',
+      date: '16/01/2025',
+    },
+  ]);
+
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
-
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(null);
   const maxCharCount = 70;
 
   const filteredCampaigns = useMemo(() => {
-    return campaigns.filter((title, index) => {
-      const isActive = index % 2 === 0;
+    return campaigns.filter(({ title, status }) => {
+      const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus =
         statusFilter === 'all' ||
-        (statusFilter === 'active' && isActive) ||
-        (statusFilter === 'inactive' && !isActive);
+        (statusFilter === 'active' && status === 'active') ||
+        (statusFilter === 'inactive' && status === 'inactive');
 
-      return (
-        title.toLowerCase().includes(searchQuery.toLowerCase()) && matchesStatus
-      );
+      return matchesSearch && matchesStatus;
     });
   }, [campaigns, searchQuery, statusFilter]);
 
@@ -43,6 +53,12 @@ const CampaignsContent: React.FC = () => {
 
   return (
     <div className="relative w-full p-12">
+      <CreateCampaignModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreate={(newCampaign) => setCampaigns((prev) => [...prev, newCampaign])}
+      />
+
       <div className="flex flex-row space-x-8">
         <div className="w-1/5">
           <ProfileWithStats
@@ -51,7 +67,7 @@ const CampaignsContent: React.FC = () => {
             bio="Welcome to your campaign dashboard!"
             likes={getRandom(50, 300)}
             shares={getRandom(10, 100)}
-            campaigns={getRandom(1, 10)}
+            campaigns={campaigns.length}
             posts={getRandom(3, 25)}
             submissions={getRandom(1, 15)}
             onSave={async (newBio, newImage) => {
@@ -63,10 +79,17 @@ const CampaignsContent: React.FC = () => {
         </div>
 
         <div className="flex-1">
-          <h3 className="text-white text-xl font-bold mb-4 text-center">
-            Your Campaigns
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-white text-xl font-bold">Your Campaigns</h3>
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-xl shadow"
+            >
+              + Create Campaign
+            </button>
+          </div>
 
+          {/* Filters */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
             <input
               type="text"
@@ -78,22 +101,18 @@ const CampaignsContent: React.FC = () => {
             <div className="relative w-full sm:w-[200px]">
               <select
                 value={statusFilter}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value as StatusFilter)
-                }
+                onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <option value="all">All Statuses</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-              <ChevronDown
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none"
-                size={16}
-              />
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" size={16} />
             </div>
           </div>
 
+          {/* Metrics Grid */}
           <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white mb-6">
             {[
               { title: 'Ambassadors', value: '12' },
@@ -113,26 +132,26 @@ const CampaignsContent: React.FC = () => {
             ))}
           </div>
 
+          {/* Campaign Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCampaigns.map((title, index) => {
-              const isExpanded = expanded[title];
-              const isActive = index % 2 === 0;
+            {filteredCampaigns.map((campaign) => {
+              const isExpanded = expanded[campaign.title];
               const displayedText = isExpanded
-                ? message
-                : `${message.slice(0, maxCharCount)}${message.length > maxCharCount ? '...' : ''}`;
+                ? campaign.description
+                : `${campaign.description.slice(0, maxCharCount)}${campaign.description.length > maxCharCount ? '...' : ''}`;
 
               return (
                 <div
-                  key={title}
+                  key={campaign.title}
                   className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300"
                   onClick={() => {
-                    setSelectedCampaign(title);
+                    setSelectedCampaign(campaign);
                     setModalOpen(true);
                   }}
                 >
                   <Image
-                    src="/images/fit.jpg"
-                    alt={title}
+                    src={campaign.image}
+                    alt={campaign.title}
                     width={500}
                     height={300}
                     className="rounded-2xl w-full h-[150px] object-cover"
@@ -140,16 +159,16 @@ const CampaignsContent: React.FC = () => {
 
                   <div className="bg-black text-white p-3 rounded-b-xl">
                     <div className="flex justify-between items-center">
-                      <p className="font-semibold">{title}</p>
-                      <p className="text-xs">16/01/2025</p>
+                      <p className="font-semibold">{campaign.title}</p>
+                      <p className="text-xs">{campaign.date}</p>
                     </div>
                     <p className="text-xs mt-2">{displayedText}</p>
 
-                    {message.length > maxCharCount && (
+                    {campaign.description.length > maxCharCount && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleExpand(title);
+                          toggleExpand(campaign.title);
                         }}
                         className="text-red-400 hover:underline text-xs mt-1"
                       >
@@ -160,16 +179,16 @@ const CampaignsContent: React.FC = () => {
                     <div className="flex justify-between items-center mt-2">
                       <p className="text-xs font-semibold">Deadline: 2 weeks</p>
                       <p
-                        className={`text-xs font-bold ${isActive ? 'text-green-400' : 'text-red-400'}`}
+                        className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
                       >
-                        {isActive ? 'Active' : 'Inactive'}
+                        {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
                       </p>
                     </div>
 
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedCampaign(title);
+                        setSelectedCampaign(campaign);
                         setModalOpen(true);
                       }}
                       className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
@@ -182,17 +201,19 @@ const CampaignsContent: React.FC = () => {
             })}
           </div>
 
-          <SubmissionModal
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            campaignTitle={selectedCampaign ?? ''}
-            imageSrc="/images/fit.jpg"
-            message={message}
-            onSubmit={(text) => {
-              console.log(`Submitted for ${selectedCampaign}:`, text);
-              setModalOpen(false);
-            }}
-          />
+          {selectedCampaign && (
+            <SubmissionModal
+              isOpen={modalOpen}
+              onClose={() => setModalOpen(false)}
+              campaignTitle={selectedCampaign.title}
+              imageSrc={selectedCampaign.image}
+              message={selectedCampaign.description}
+              onSubmit={(text) => {
+                console.log(`Submitted for ${selectedCampaign.title}:`, text);
+                setModalOpen(false);
+              }}
+            />
+          )}
         </div>
 
         <div className="w-1/5 space-y-8">
