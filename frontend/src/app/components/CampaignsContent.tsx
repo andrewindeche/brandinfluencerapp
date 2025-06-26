@@ -97,7 +97,7 @@ const CampaignsContent: React.FC = () => {
       />
 
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-1/5">
+        <div className="w-full lg:w-1/4 lg:w-1/4">
           <ProfileWithStats
             username="John Doe"
             profileImage="/images/screenshots/HandM.jpg"
@@ -183,7 +183,7 @@ const CampaignsContent: React.FC = () => {
               return (
                 <div
                   key={campaign.title}
-                  className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300"
+                  className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-full max-w-xs"
                 >
                   <Image
                     src={campaign.image}
