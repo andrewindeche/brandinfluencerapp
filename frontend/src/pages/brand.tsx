@@ -101,8 +101,8 @@ const BrandPage: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center">
-      <div className="absolute top-2 right-36 z-50">
+    <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center px-4 sm:px-6 lg:px-20">
+      <div className="absolute top-2 right-6 sm:right-16 z-50">
         <UserMenu
           userName={username}
           imageSrc={profileImage || '/images/screenshots/HandM.jpg'}
@@ -111,39 +111,41 @@ const BrandPage: React.FC = () => {
       </div>
       {toast && (
         <div
-          className={`fixed top-22 right-26 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
+          className={`fixed top-20 right-4 sm:right-10 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
         >
           {toast.message}
         </div>
       )}
-      <div className="flex justify-center space-x-4 mt-4">
+      <div className="flex flex-wrap justify-center gap-4 mt-6 w-full">
         <button
           onClick={() => setActiveTab('influencers')}
-          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-14 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
+          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-10 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
         >
           Campaigns
         </button>
         <button
           onClick={() => setActiveTab('campaigns')}
-          className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-14 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
+          className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-10 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
         >
           Influencers
         </button>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 text-center">
         <h3 className="text-2xl font-bold underline underline-offset-4 mb-6">
           {activeTab === 'campaigns' ? '📢 Submissions' : '📈 Campaigns'}
         </h3>
       </div>
 
       <div
-        className={`mt-4 flex flex-col sm:flex-row justify-center items-center space-y-12 sm:space-y-2 sm:space-x-20 w-full px-4 fade-in ${activeTab === 'influencers' ? 'show' : 'show'}`}
+        className={`mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-8 ${activeTab === 'influencers' ? '' : ''}`}
       >
         {activeTab === 'campaigns' ? (
-          influencers.map((influencer, index) => (
-            <InfluencerCard key={index} influencer={influencer} />
-          ))
+          <div className="flex flex-wrap justify-center gap-6">
+            {influencers.map((influencer, index) => (
+              <InfluencerCard key={index} influencer={influencer} />
+            ))}
+          </div>
         ) : (
           <CampaignsContent />
         )}

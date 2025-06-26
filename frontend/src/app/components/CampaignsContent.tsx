@@ -57,7 +57,7 @@ const CampaignsContent: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full p-12">
+    <div className="relative w-full p-6 sm:p-8 md:p-12">
       <CreateCampaignModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
@@ -66,8 +66,8 @@ const CampaignsContent: React.FC = () => {
         }
       />
 
-      <div className="flex flex-row space-x-8">
-        <div className="w-1/5">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="w-full lg:w-1/5">
           <ProfileWithStats
             username="John Doe"
             profileImage="/images/screenshots/HandM.jpg"
@@ -86,7 +86,7 @@ const CampaignsContent: React.FC = () => {
         </div>
 
         <div className="flex-1">
-          <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white mb-6">
+          <div className="p-1 grid grid-cols-2 sm:grid-cols-3 gap-2 text-white rounded-lg border border-white mb-6">
             {[
               { title: 'Ambassadors', value: '12' },
               { title: 'Total reach', value: '9.8K' },
@@ -104,7 +104,8 @@ const CampaignsContent: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-6 mb-16">
+
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
             <input
               type="text"
               placeholder="Search campaigns..."
@@ -128,6 +129,7 @@ const CampaignsContent: React.FC = () => {
               />
             </div>
           </div>
+
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => setCreateModalOpen(true)}
@@ -136,6 +138,7 @@ const CampaignsContent: React.FC = () => {
               + Create Campaign
             </button>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
             {filteredCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
@@ -195,7 +198,7 @@ const CampaignsContent: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-1/5 space-y-8">
+        <div className="w-full lg:w-1/5 space-y-8 mt-8 lg:mt-0">
           <div className="bg-[#E8BB5B] text-white p-6 rounded-2xl text-center hover:shadow-lg transition duration-300 transform hover:scale-105">
             <h4 className="text-xl font-bold">Notifications</h4>
             <h4 className="text-4xl text-red-600 font-bold">2</h4>
