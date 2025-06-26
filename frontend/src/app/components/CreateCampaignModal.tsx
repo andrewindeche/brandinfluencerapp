@@ -3,6 +3,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Dialog } from '@headlessui/react';
 import { v4 as uuidv4 } from 'uuid';
+import Image from 'next/image';
 
 interface CampaignType {
   id: string;
@@ -67,26 +68,23 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black bg-opacity-40"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-blue bg-opacity-50" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className="w-full max-w-xl rounded-xl bg-white p-6 shadow-xl">
+        <div className="w-full max-w-xl rounded-xl bg-zinc-900 text-gray-100 p-6 shadow-2xl border border-zinc-700">
           <h2 className="text-lg font-bold mb-4">Create New Campaign</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
               placeholder="Campaign Title"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100 placeholder-gray-300"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
             <textarea
               placeholder="Campaign Description"
-              className="w-full p-2 border rounded resize-none"
+              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded resize-none text-gray-100 placeholder-gray-300"
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -94,13 +92,13 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
             />
             <input
               type="date"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
               required
             />
             <select
-              className="w-full p-2 border rounded"
+              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
               value={status}
               onChange={(e) =>
                 setStatus(e.target.value as 'active' | 'inactive')
@@ -109,11 +107,18 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-            <input type="file" accept="image/*" onChange={handleImageChange} />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="text-sm text-gray-100"
+            />
             {imagePreview && (
               <Image
                 src={imagePreview}
                 alt="Preview"
+                width={500}
+                height={300}
                 className="w-full h-48 object-cover rounded"
               />
             )}
@@ -121,13 +126,13 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+                className="px-4 py-2 rounded bg-zinc-700 text-gray-200 hover:bg-zinc-600"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500 font-semibold"
               >
                 Create
               </button>

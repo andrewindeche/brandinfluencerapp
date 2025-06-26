@@ -132,8 +132,8 @@ const BrandPage: React.FC = () => {
       </div>
 
       <div className="mt-6">
-        <h3 className="text-2xl text-[#FFFF00] underline">
-          {activeTab === 'campaigns' ? 'Submissions' : 'Campaign Metrics'}
+        <h3 className="text-2xl font-bold underline underline-offset-4 mb-6">
+          {activeTab === 'campaigns' ? '📢 Submissions' : '📈 Campaigns'}
         </h3>
       </div>
 

@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import ProfileWithStats from '../components/ProfileCard';
-import SubmissionModal from '../components/SubmissionModal';
 import CreateCampaignModal from '../components/CreateCampaignModal';
 import { getRandom } from '../utils/random';
 
@@ -33,11 +32,7 @@ const CampaignsContent: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
-  const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
-    null,
-  );
   const maxCharCount = 70;
 
   const filteredCampaigns = useMemo(() => {
@@ -56,6 +51,10 @@ const CampaignsContent: React.FC = () => {
 
   const toggleExpand = (title: string) =>
     setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
+
+  const deleteCampaign = (title: string) => {
+    setCampaigns((prev) => prev.filter((c) => c.title !== title));
+  };
 
   return (
     <div className="relative w-full p-12">
@@ -88,16 +87,14 @@ const CampaignsContent: React.FC = () => {
 
         <div className="flex-1">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-white text-xl font-bold">Your Campaigns</h3>
             <button
               onClick={() => setCreateModalOpen(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-xl shadow"
+              className="bg-yellow-500 hover:bg-yellow-600 items-center text-white font-semibold px-4 py-2 rounded-xl shadow"
             >
               + Create Campaign
             </button>
           </div>
 
-          {/* Filters */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
             <input
               type="text"
@@ -122,8 +119,9 @@ const CampaignsContent: React.FC = () => {
               />
             </div>
           </div>
-
-          {/* Metrics Grid */}
+          <h3 className="text-2xl font-bold underline underline-offset-4 mb-6 text-center">
+            📊 Campaigns Metrics
+          </h3>
           <div className="p-1 grid grid-cols-3 gap-1 text-white rounded-lg border border-white mb-6">
             {[
               { title: 'Ambassadors', value: '12' },
@@ -143,7 +141,6 @@ const CampaignsContent: React.FC = () => {
             ))}
           </div>
 
-          {/* Campaign Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
@@ -155,10 +152,6 @@ const CampaignsContent: React.FC = () => {
                 <div
                   key={campaign.title}
                   className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300"
-                  onClick={() => {
-                    setSelectedCampaign(campaign);
-                    setModalOpen(true);
-                  }}
                 >
                   <Image
                     src={campaign.image}
@@ -177,10 +170,7 @@ const CampaignsContent: React.FC = () => {
 
                     {campaign.description.length > maxCharCount && (
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleExpand(campaign.title);
-                        }}
+                        onClick={() => toggleExpand(campaign.title)}
                         className="text-red-400 hover:underline text-xs mt-1"
                       >
                         {isExpanded ? 'Read Less' : 'Read More'}
@@ -198,34 +188,16 @@ const CampaignsContent: React.FC = () => {
                     </div>
 
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCampaign(campaign);
-                        setModalOpen(true);
-                      }}
-                      className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
+                      onClick={() => deleteCampaign(campaign.title)}
+                      className="mt-2 px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition"
                     >
-                      Submit
+                      Delete
                     </button>
                   </div>
                 </div>
               );
             })}
           </div>
-
-          {selectedCampaign && (
-            <SubmissionModal
-              isOpen={modalOpen}
-              onClose={() => setModalOpen(false)}
-              campaignTitle={selectedCampaign.title}
-              imageSrc={selectedCampaign.image}
-              message={selectedCampaign.description}
-              onSubmit={(text) => {
-                console.log(`Submitted for ${selectedCampaign.title}:`, text);
-                setModalOpen(false);
-              }}
-            />
-          )}
         </div>
 
         <div className="w-1/5 space-y-8">
@@ -235,24 +207,6 @@ const CampaignsContent: React.FC = () => {
             <p className="text-xs ml-2 inline-block align-top">New</p>
             <p className="text-sm mt-2">Sport Campaign</p>
             <p className="text-xs">16/01/2025</p>
-          </div>
-
-          <div className="bg-black text-white p-4 rounded-2xl text-center transition-transform transform hover:scale-105 hover:shadow-lg">
-            <div className="relative w-full h-60 group">
-              <Image
-                src="/images/image1.png"
-                alt="New Submission"
-                layout="fill"
-                objectFit="cover"
-                className="w-full h-auto rounded-2xl transition-transform transform group-hover:scale-110"
-              />
-              <p className="absolute bottom-0 left-0 w-full text-xs text-white bg-black bg-opacity-75 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                New Submission
-              </p>
-            </div>
-            <p className="mt-2">Social Media</p>
-            <p className="text-xs mt-2">16/01/2025</p>
-            <p className="text-xs mt-2">Join our TikTok account</p>
           </div>
         </div>
       </div>
