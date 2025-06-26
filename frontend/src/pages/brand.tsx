@@ -101,7 +101,7 @@ const BrandPage: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center px-4 sm:px-6 lg:px-20">
+    <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center px-2 sm:px-4 lg:px-4">
       <div className="absolute top-2 right-6 sm:right-16 z-50">
         <UserMenu
           userName={username}
