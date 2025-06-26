@@ -132,13 +132,13 @@ const BrandPage: React.FC = () => {
       </div>
 
       <div className="mt-6 text-center">
-        <h3 className="text-2xl font-bold underline underline-offset-4 mb-6">
+        <h3 className="text-2xl font-bold underline underline-offset-4 mb-1">
           {activeTab === 'campaigns' ? '📢 Submissions' : '📈 Campaigns'}
         </h3>
       </div>
 
       <div
-        className={`mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-8 ${activeTab === 'influencers' ? '' : ''}`}
+        className={`mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-4 ${activeTab === 'influencers' ? '' : ''}`}
       >
         {activeTab === 'campaigns' ? (
           <div className="flex flex-wrap justify-center gap-6">
