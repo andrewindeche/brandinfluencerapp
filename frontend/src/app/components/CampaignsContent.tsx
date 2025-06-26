@@ -86,7 +86,13 @@ const CampaignsContent: React.FC = () => {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onCreate={(newCampaign) =>
-          setCampaigns((prev) => [...prev, newCampaign])
+          setCampaigns((prev) => [
+            ...prev,
+            {
+              ...newCampaign,
+              date: new Date().toLocaleDateString(),
+            },
+          ])
         }
       />
 
