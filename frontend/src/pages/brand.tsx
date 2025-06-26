@@ -118,7 +118,7 @@ const BrandPage: React.FC = () => {
       )}
       <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
         <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
-          <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
+          <div className="flex flex-wrap justify-center gap-6 w-full">
             <button
               onClick={() => setActiveTab('influencers')}
               className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
