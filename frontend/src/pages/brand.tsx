@@ -116,19 +116,31 @@ const BrandPage: React.FC = () => {
           {toast.message}
         </div>
       )}
-      <div className="flex flex-wrap justify-center gap-4 mt-6 w-full">
-        <button
-          onClick={() => setActiveTab('influencers')}
-          className={`bg-[#FFFF00] hover:scale-105 transition-transform duration-300 text-black py-2 px-10 rounded-full border-2 border-black ${activeTab === 'influencers' ? 'bg-yellow-300' : ''}`}
-        >
-          Campaigns
-        </button>
-        <button
-          onClick={() => setActiveTab('campaigns')}
-          className={`bg-red-500 hover:scale-105 transition-transform duration-300 text-white py-2 px-10 rounded-full border-2 border-white ${activeTab === 'campaigns' ? 'bg-red-700' : ''}`}
-        >
-          Influencers
-        </button>
+      <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
+        <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
+          <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
+            <button
+              onClick={() => setActiveTab('influencers')}
+              className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
+                activeTab === 'influencers'
+                  ? '!bg-red-600 !text-white !border-white'
+                  : '!bg-yellow-300 !text-black !border-black'
+              }`}
+            >
+              Campaigns
+            </button>
+            <button
+              onClick={() => setActiveTab('campaigns')}
+              className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
+                activeTab === 'campaigns'
+                  ? '!bg-red-600 !text-white !border-white'
+                  : '!bg-yellow-300 !text-black !border-black'
+              }`}
+            >
+              Influencers
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="mt-6 text-center">
