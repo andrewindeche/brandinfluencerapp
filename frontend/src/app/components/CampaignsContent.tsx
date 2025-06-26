@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import ProfileWithStats from '../components/ProfileCard';
 import CreateCampaignModal from '../components/CreateCampaignModal';
 import { getRandom } from '../utils/random';
+import NotificationWidget from '../components/NotificationWidget';
 
 interface CampaignType {
   title: string;
@@ -12,6 +13,29 @@ interface CampaignType {
   status: 'active' | 'inactive';
   date: string;
 }
+
+const notifications: {
+  id: number;
+  campaign: string;
+  status: 'accepted' | 'rejected';
+  date: string;
+  message: string;
+}[] = [
+  {
+    id: 1,
+    campaign: 'Sport Campaign',
+    status: 'accepted',
+    date: '16/01/2025',
+    message: 'Your submission for Sport Campaign has been approved.',
+  },
+  {
+    id: 2,
+    campaign: 'Music Fest',
+    status: 'rejected',
+    date: '15/01/2025',
+    message: 'Unfortunately, your submission for Music Fest was not approved.',
+  },
+];
 
 const CampaignsContent: React.FC = () => {
   const message =
@@ -198,15 +222,7 @@ const CampaignsContent: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-full lg:w-1/5 space-y-8 mt-8 lg:mt-0">
-          <div className="bg-[#E8BB5B] text-white p-6 rounded-2xl text-center hover:shadow-lg transition duration-300 transform hover:scale-105">
-            <h4 className="text-xl font-bold">Notifications</h4>
-            <h4 className="text-4xl text-red-600 font-bold">2</h4>
-            <p className="text-xs ml-2 inline-block align-top">New</p>
-            <p className="text-sm mt-2">Sport Campaign</p>
-            <p className="text-xs">16/01/2025</p>
-          </div>
-        </div>
+        <NotificationWidget notifications={notifications} />
       </div>
     </div>
   );
