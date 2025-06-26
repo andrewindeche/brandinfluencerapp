@@ -146,7 +146,11 @@ const CampaignsContent: React.FC = () => {
             <div className="relative w-full sm:w-[200px]">
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e) =>
+                  setStatusFilter(
+                    e.target.value as 'all' | 'active' | 'inactive',
+                  )
+                }
                 className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <option value="all">All Statuses</option>
