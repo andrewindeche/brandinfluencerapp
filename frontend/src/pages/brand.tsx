@@ -141,7 +141,7 @@ const BrandPage: React.FC = () => {
         className={`mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-4 ${activeTab === 'influencers' ? '' : ''}`}
       >
         {activeTab === 'campaigns' ? (
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-20">
             {influencers.map((influencer, index) => (
               <InfluencerCard key={index} influencer={influencer} />
             ))}
