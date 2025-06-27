@@ -50,6 +50,7 @@ export class AuthService {
 
   async loginBrand(brand: User) {
     const payload = { username: brand.username, sub: brand._id, role: 'brand' };
+    const fullUser = await this.userModel.findById(brand._id).lean();
     return {
       access_token: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
@@ -60,10 +61,10 @@ export class AuthService {
         expiresIn: '7d',
       }),
       user: {
-        username: brand.username,
-        role: 'brand',
-        bio: brand.bio || '',
-        profileImage: brand.profileImage || '',
+        username: fullUser.username,
+        role: fullUser.role,
+        bio: fullUser.bio,
+        profileImage: fullUser.profileImage,
       },
     };
   }
