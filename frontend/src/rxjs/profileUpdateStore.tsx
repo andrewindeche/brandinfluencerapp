@@ -75,14 +75,19 @@ export const profileUpdateStore = {
       const updatedImage =
         typeof profileImage === 'string'
           ? profileImage
-          : `/${uploadedFilename}`;
+          : uploadedFilename
+            ? `/${uploadedFilename}`
+            : currentImage;
       authStore.updateAuthState({
         bio,
         profileImage: updatedImage,
       });
 
       localStorage.setItem('bio', bio);
-      localStorage.setItem('profileImage', updatedImage);
+      localStorage.setItem(
+        'profileImage',
+        updatedImage || '/images/default.png',
+      );
 
       setProfileUpdateState({ status: 'success', error: null });
       showToast('Profile updated successfully!', 'success');
