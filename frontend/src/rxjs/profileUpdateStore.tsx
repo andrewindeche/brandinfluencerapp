@@ -23,7 +23,6 @@ function setProfileUpdateState(update: Partial<ProfileUpdateState>) {
 
 export const profileUpdateStore = {
   state$: profileUpdateState$,
-
   async updateProfile(
     bio: string,
     profileImage: File | string,
@@ -31,11 +30,6 @@ export const profileUpdateStore = {
   ) {
     const { bio: currentBio, profileImage: currentImage } =
       authStore.getCurrentUser();
-
-    const token = localStorage.getItem('token');
-    const authHeaders = token
-      ? { headers: { Authorization: `Bearer ${token}` } }
-      : {};
 
     setProfileUpdateState({ status: 'loading', error: null });
 
@@ -49,35 +43,27 @@ export const profileUpdateStore = {
         const response = await axiosInstance.patch(
           '/users/profile-image',
           formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
 
         uploadedFilename = response.data.imageUrl;
-        return response.data.imageUrl;
       } else if (
         typeof profileImage === 'string' &&
         profileImage !== currentImage
       ) {
-        await axiosInstance.patch(
-          '/users/profile-image',
-          { profileImage },
-          authHeaders,
-        );
+        await axiosInstance.patch('/users/profile-image', { profileImage });
       }
 
       if (bio !== currentBio) {
-        await axiosInstance.patch('/users/bio', { bio }, authHeaders);
+        await axiosInstance.patch('/users/bio', { bio });
       }
+
       const updatedImage =
         typeof profileImage === 'string'
           ? profileImage
           : uploadedFilename
             ? `/${uploadedFilename}`
             : currentImage;
+
       authStore.updateAuthState({
         bio,
         profileImage: updatedImage,
@@ -100,9 +86,5 @@ export const profileUpdateStore = {
       setProfileUpdateState({ status: 'error', error: message });
       showToast(message, 'error');
     }
-  },
-
-  resetState() {
-    setProfileUpdateState({ status: 'idle', error: null });
   },
 };
