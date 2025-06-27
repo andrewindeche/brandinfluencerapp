@@ -73,8 +73,8 @@ const HomePage: React.FC = () => {
       </div>
 
       <div className="mt-6">
-        <h3 className="text-2xl text-[#FFFF00] underline flicker-text">
-          Our Influencers
+        <h3 className="text-2xl text-[#FFFF00] flicker-text">
+          Connect with top-tier influencers in minutes.
         </h3>
       </div>
 
