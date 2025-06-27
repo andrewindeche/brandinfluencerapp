@@ -7,7 +7,6 @@ export const BrandSchema = new Schema({
 });
 
 export interface Brand extends User {
-  website?: string;
   bio: string;
   profileImage?: string;
   role: 'brand';
