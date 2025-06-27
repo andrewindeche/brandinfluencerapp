@@ -65,7 +65,7 @@ export const profileUpdateStore = {
           ? profileImage
           : uploadedFilename
             ? `/${uploadedFilename}`
-            : currentImage;
+            : currentImage || '/images/image4.png';
 
       authStore.updateAuthState({
         bio,
@@ -75,7 +75,7 @@ export const profileUpdateStore = {
       localStorage.setItem('bio', bio);
       localStorage.setItem(
         'profileImage',
-        updatedImage || '/images/default.png',
+        updatedImage || '/images/image4.png',
       );
 
       setProfileUpdateState({ status: 'success', error: null });
