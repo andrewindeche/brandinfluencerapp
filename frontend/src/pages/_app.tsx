@@ -7,6 +7,8 @@ import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { InactivityModal } from '@/app/components/InactivityModal';
 import { useEffect } from 'react';
 import { setAuthToken } from '../rxjs/axiosInstance';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 const irishGrover = Irish_Grover({
   weight: '400',
