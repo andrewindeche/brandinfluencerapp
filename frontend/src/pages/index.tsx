@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useRouteLoading } from '@/hooks/useRouteLoading';
 import PageSpinner from '@/app/components/PageSpinner';
+import TestimonialCarousel from '../app/components/TestimonialCarousel';
 
 const HomePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -124,6 +125,7 @@ const HomePage: React.FC = () => {
           <p className="influencer-name">LIZZIE - INSTAGRAM</p>
         </div>
       </div>
+      <TestimonialCarousel />
     </div>
   );
 };
