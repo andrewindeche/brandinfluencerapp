@@ -155,11 +155,9 @@ const CampaignsContent: React.FC = () => {
             campaigns={campaigns.length}
             posts={posts}
             submissions={submissions}
-            onSave={async (newBio, newImage) => {
-              console.log('Saving...', newBio, newImage);
-              await new Promise((res) => setTimeout(res, 1000));
-            }}
-            showToast={(msg, type) => alert(`[${type.toUpperCase()}]: ${msg}`)}
+            onSave={handleProfileSave}
+            loading={loading}
+            showToast={showToast}
           />
         </div>
 
@@ -287,6 +285,3 @@ const CampaignsContent: React.FC = () => {
 };
 
 export default CampaignsContent;
-function setProfileImage(arg0: any) {
-  throw new Error('Function not implemented.');
-}
