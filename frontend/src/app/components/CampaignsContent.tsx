@@ -1,10 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
+import { useToast } from '../../hooks/useToast';
 import ProfileWithStats from '../components/ProfileCard';
 import CreateCampaignModal from '../components/CreateCampaignModal';
 import { getRandom } from '../utils/random';
 import NotificationWidget from '../components/NotificationWidget';
+import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
+import { authState$ } from '@/rxjs/authStore';
 
 interface CampaignType {
   title: string;
@@ -58,7 +61,17 @@ const CampaignsContent: React.FC = () => {
   >('all');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const maxCharCount = 70;
-
+  const [bio, setBio] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState('');
+  const { toast, showToast } = useToast();
+  const [likes] = useState(getRandom(50, 200));
+  const [shares] = useState(getRandom(10, 100));
+  const [posts] = useState(getRandom(5, 15));
+  const [submissions] = useState(getRandom(2, 10));
+  const [profileImage, setProfileImage] = useState<string>(
+    '/images/screenshots/HandM.jpg',
+  );
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(({ title, status }) => {
       const matchesSearch = title
@@ -80,6 +93,41 @@ const CampaignsContent: React.FC = () => {
     setCampaigns((prev) => prev.filter((c) => c.title !== title));
   };
 
+  useEffect(() => {
+    const sub = authState$.subscribe((state) => {
+      setUsername(state.username || localStorage.getItem('username') || 'User');
+      setProfileImage(
+        state.profileImage ||
+          localStorage.getItem('profileImage') ||
+          '/images/image4.png',
+      );
+      setBio(state.bio || localStorage.getItem('bio') || '');
+    });
+    return () => sub.unsubscribe();
+  }, []);
+
+  const handleProfileSave = async (
+    newBio: string,
+    newImage: File | string | null,
+  ) => {
+    setLoading(true);
+    try {
+      const imagePath = await profileUpdateStore.updateProfile(
+        newBio,
+        newImage!,
+        showToast,
+      );
+      setBio(newBio);
+      if (typeof newImage === 'string') {
+        setProfileImage(newImage);
+      } else {
+        setProfileImage(`http://localhost:4000/${imagePath}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="relative w-full p-6 sm:p-8 md:p-12">
       <CreateCampaignModal
@@ -99,14 +147,14 @@ const CampaignsContent: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-16">
         <div className="w-full lg:w-1/4 lg:w-1/4">
           <ProfileWithStats
-            username="John Doe"
-            profileImage="/images/screenshots/HandM.jpg"
-            bio="Welcome to your campaign dashboard!"
-            likes={getRandom(50, 300)}
-            shares={getRandom(10, 100)}
+            username={username}
+            profileImage={profileImage}
+            bio={bio || message}
+            likes={likes}
+            shares={shares}
             campaigns={campaigns.length}
-            posts={getRandom(3, 25)}
-            submissions={getRandom(1, 15)}
+            posts={posts}
+            submissions={submissions}
             onSave={async (newBio, newImage) => {
               console.log('Saving...', newBio, newImage);
               await new Promise((res) => setTimeout(res, 1000));
@@ -239,3 +287,6 @@ const CampaignsContent: React.FC = () => {
 };
 
 export default CampaignsContent;
+function setProfileImage(arg0: any) {
+  throw new Error('Function not implemented.');
+}
