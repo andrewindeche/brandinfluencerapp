@@ -145,7 +145,7 @@ const BrandPage: React.FC = () => {
 
       <div className="mt-6 text-center">
         <h3 className="text-2xl font-bold underline underline-offset-4 mb-1">
-          {activeTab === 'campaigns' ? '📢 Submissions' : '📈 Campaigns'}
+          {activeTab === 'campaigns' ? '📢 Influencer Matches' : '📈 Campaigns'}
         </h3>
       </div>
 
