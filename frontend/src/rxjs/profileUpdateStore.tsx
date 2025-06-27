@@ -45,6 +45,9 @@ export const profileUpdateStore = {
           formData,
         );
 
+        if (!response.data.imageUrl) {
+          throw new Error('No image URL returned from server');
+        }
         uploadedFilename = response.data.imageUrl;
       } else if (
         typeof profileImage === 'string' &&
