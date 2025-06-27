@@ -202,6 +202,9 @@ export const authStore = {
     const current = _authState$.value;
     return {
       ...current,
+      profileImage: current.profileImage?.includes('undefined')
+        ? '/images/default.png'
+        : current.profileImage,
       errors: current.errors || {},
     };
   },
