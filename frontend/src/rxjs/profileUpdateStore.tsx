@@ -59,13 +59,15 @@ export const profileUpdateStore = {
       if (bio !== currentBio) {
         await axiosInstance.patch('/users/bio', { bio });
       }
+      function normalizeImagePath(path?: string): string {
+        if (!path) return '/images/image4.png';
+        return path.startsWith('/') ? path : `/${path}`;
+      }
 
       const updatedImage =
         typeof profileImage === 'string'
           ? profileImage
-          : uploadedFilename
-            ? `/${uploadedFilename}`
-            : currentImage || '/images/image4.png';
+          : normalizeImagePath(uploadedFilename) || currentImage;
 
       authStore.updateAuthState({
         bio,
