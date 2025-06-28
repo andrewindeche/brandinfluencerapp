@@ -77,7 +77,7 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
       >
         <div className="relative group rounded-lg overflow-hidden shadow-lg">
           <Image
-            src={imagePreview || profileImage}
+            src={imagePreview || `${profileImage}?t=${Date.now()}`}
             alt={username}
             width={200}
             height={150}
