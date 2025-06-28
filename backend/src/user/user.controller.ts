@@ -70,6 +70,6 @@ export class UserController {
   ) {
     const userId = req.user.userId;
     await this.userService.updateProfileImage(userId, file);
-    return { imageUrl: `uploads/${file.filename}` };
+    return { imageUrl: `/uploads/${file.filename}` };
   }
 }
