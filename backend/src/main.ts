@@ -45,18 +45,20 @@ async function bootstrap() {
     password: process.env.REDIS_PASSWORD,
   });
 
-  app.use(
-    rateLimit({
-      store: new RateLimitRedisStore({
-        sendCommand: async (command: string, ...args: string[]) => {
-          return (await redisClient.call(command, ...args)) as RedisReply;
-        },
-      }),
-      windowMs: 30 * 60 * 1000,
-      max: 8,
-      message: 'Too many login attempts. Please try again later.',
+  const authRateLimiter = rateLimit({
+    store: new RateLimitRedisStore({
+      sendCommand: async (command: string, ...args: string[]) => {
+        return (await redisClient.call(command, ...args)) as RedisReply;
+      },
     }),
-  );
+    windowMs: 30 * 60 * 1000,
+    max: 8,
+    message: 'Too many login attempts. Please try again later.',
+  });
+
+  app.use('/auth/login', authRateLimiter);
+  app.use('/auth/register', authRateLimiter);
+  app.use('/auth/forgot-password', authRateLimiter);
 
   app.useGlobalPipes(
     new ValidationPipe({
