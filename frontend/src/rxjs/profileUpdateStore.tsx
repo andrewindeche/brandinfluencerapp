@@ -44,7 +44,6 @@ export const profileUpdateStore = {
           '/users/profile-image',
           formData,
         );
-
         if (!response.data.imageUrl) {
           throw new Error('No image URL returned from server');
         }
@@ -59,15 +58,19 @@ export const profileUpdateStore = {
       if (bio !== currentBio) {
         await axiosInstance.patch('/users/bio', { bio });
       }
-      function normalizeImagePath(path?: string): string {
-        if (!path) return '/images/image4.png';
-        return path.startsWith('/') ? path : `/${path}`;
+      const BASE_URL = 'http://localhost:4000';
+
+      let updatedImage = currentImage;
+
+      if (typeof profileImage === 'string') {
+        updatedImage = profileImage;
+      } else if (uploadedFilename) {
+        updatedImage = `${BASE_URL}${uploadedFilename}`;
       }
 
-      const updatedImage =
-        typeof profileImage === 'string'
-          ? profileImage
-          : normalizeImagePath(uploadedFilename) || currentImage;
+      if (!updatedImage) {
+        updatedImage = '/images/image4.png';
+      }
 
       authStore.updateAuthState({
         bio,
