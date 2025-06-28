@@ -35,7 +35,7 @@ const UserMenu: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         <div className="w-16 h-16 rounded-full border border-black bg-black/40 flex items-center justify-center">
           <div className="w-12 rounded-md border-1 border-black h-14">
             <Image
-              src={user.profileImage || '/images/default.png'}
+              src={user.profileImage || '/images/image4.png'}
               alt={user.username || 'User'}
               width={60}
               height={60}
