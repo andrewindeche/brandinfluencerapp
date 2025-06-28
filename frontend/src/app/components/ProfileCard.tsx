@@ -54,6 +54,10 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
     }
   };
 
+  const finalImageSrc =
+    imagePreview ??
+    (profileImage ? `${profileImage}?t=${Date.now()}` : '/images/image4.png');
+
   const handleSave = async () => {
     try {
       await onSave(bioDraft, imageFile);
@@ -77,7 +81,7 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
       >
         <div className="relative group rounded-lg overflow-hidden shadow-lg">
           <Image
-            src={imagePreview || `${profileImage}?t=${Date.now()}`}
+            src={finalImageSrc}
             alt={username}
             width={200}
             height={150}
