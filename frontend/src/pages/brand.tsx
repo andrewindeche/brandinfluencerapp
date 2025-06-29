@@ -18,7 +18,6 @@ const BrandPage: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string>(
     '/images/screenshots/HandM.jpg',
   );
-  const [bio, setBio] = useState<string>('');
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
 
@@ -35,7 +34,6 @@ const BrandPage: React.FC = () => {
           localStorage.getItem('profileImage') ||
           '/images/screenshots/HandM.jpg',
       );
-      setBio(state.bio || localStorage.getItem('bio') || '');
     });
     return () => sub.unsubscribe();
   }, []);
