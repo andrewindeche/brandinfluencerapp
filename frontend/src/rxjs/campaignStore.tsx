@@ -1,0 +1,49 @@
+import { BehaviorSubject } from 'rxjs';
+import axiosInstance, { setAuthToken } from './axiosInstance';
+
+type CampaignType = {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  deadline: string;
+  status: 'active' | 'inactive';
+};
+
+const campaigns$ = new BehaviorSubject<CampaignType[]>([]);
+
+export const campaignStore = {
+  campaigns$,
+
+  setCampaigns: (list: CampaignType[]) => campaigns$.next(list),
+
+  addCampaign: (campaign: CampaignType) => {
+    const current = campaigns$.value;
+    campaigns$.next([...current, campaign]);
+  },
+
+  setAuth: (token: string | null) => {
+    setAuthToken(token);
+  },
+
+  fetchCampaigns: async () => {
+    try {
+      const { data } = await axiosInstance.get<CampaignType[]>('/campaign');
+      campaignStore.setCampaigns(data);
+    } catch (err) {
+      console.error('Failed to fetch campaigns:', err);
+    }
+  },
+
+  createCampaign: async (newCampaign: Omit<CampaignType, 'id'>) => {
+    try {
+      const { data } = await axiosInstance.post<CampaignType>(
+        '/campaign',
+        newCampaign,
+      );
+      campaignStore.addCampaign(data);
+    } catch (err) {
+      console.error('Failed to create campaign:', err);
+    }
+  },
+};
