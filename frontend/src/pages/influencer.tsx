@@ -101,9 +101,9 @@ const InfluencerPage: React.FC = () => {
       );
       setBio(newBio);
       if (typeof newImage === 'string') {
-        setProfileImage(newImage);
+        setProfileImage(`${newImage}?t=${Date.now()}`);
       } else {
-        setProfileImage(`http://localhost:4000/${imagePath}`);
+        setProfileImage(`${imagePath}?t=${Date.now()}`);
       }
     } finally {
       setLoading(false);
@@ -146,19 +146,21 @@ const InfluencerPage: React.FC = () => {
 
       <div className="flex flex-col lg:flex-row gap-6 mt-8">
         <div className="w-full lg:w-[25%] min-w-[250px] max-w-full space-y-12">
-          <ProfileWithStats
-            username={username}
-            profileImage={profileImage}
-            bio={bio || message}
-            likes={likes}
-            shares={shares}
-            campaigns={campaigns.length}
-            posts={posts}
-            submissions={submissions}
-            onSave={handleProfileSave}
-            loading={loading}
-            showToast={showToast}
-          />
+          {profileImage && (
+            <ProfileWithStats
+              username={username}
+              profileImage={profileImage}
+              bio={bio || message}
+              likes={likes}
+              shares={shares}
+              campaigns={campaigns.length}
+              posts={posts}
+              submissions={submissions}
+              onSave={handleProfileSave}
+              loading={loading}
+              showToast={showToast}
+            />
+          )}
         </div>
 
         <div className="w-full lg:w-4/5 space-y-6">

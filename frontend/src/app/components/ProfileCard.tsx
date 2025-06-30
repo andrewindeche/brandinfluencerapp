@@ -56,7 +56,9 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
 
   const finalImageSrc =
     imagePreview ??
-    (profileImage ? `${profileImage}?t=${Date.now()}` : '/images/image4.png');
+    (profileImage && profileImage !== 'undefined'
+      ? `${profileImage}?t=${Date.now()}`
+      : '/images/image4.png');
 
   const handleSave = async () => {
     try {
