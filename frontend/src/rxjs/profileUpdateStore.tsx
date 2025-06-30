@@ -22,17 +22,17 @@ function setProfileUpdateState(update: Partial<ProfileUpdateState>) {
 }
 
 export const profileUpdateStore = {
-  state$: profileUpdateState$,
   async updateProfile(
     bio: string,
     profileImage: File | string,
     showToast: (msg: string, type: 'success' | 'error') => void,
-  ) {
+  ): Promise<string> {
     const { bio: currentBio, profileImage: currentImage } =
       authStore.getCurrentUser();
 
     setProfileUpdateState({ status: 'loading', error: null });
 
+    let updatedImage = currentImage;
     let uploadedFilename: string | undefined;
 
     try {
@@ -47,34 +47,24 @@ export const profileUpdateStore = {
         if (!response.data.imageUrl) {
           throw new Error('No image URL returned from server');
         }
+
         uploadedFilename = response.data.imageUrl;
+        updatedImage = uploadedFilename;
       } else if (
         typeof profileImage === 'string' &&
         profileImage !== currentImage
       ) {
+        updatedImage = profileImage;
         await axiosInstance.patch('/users/profile-image', { profileImage });
       }
 
       if (bio !== currentBio) {
         await axiosInstance.patch('/users/bio', { bio });
       }
-      const BASE_URL = 'http://localhost:4000';
-
-      let updatedImage = currentImage;
-
-      if (typeof profileImage === 'string') {
-        updatedImage = profileImage;
-      } else if (uploadedFilename) {
-        updatedImage = `${BASE_URL}${uploadedFilename}`;
-      }
-
-      if (!updatedImage) {
-        updatedImage = '/images/image4.png';
-      }
 
       authStore.updateAuthState({
         bio,
-        profileImage: updatedImage,
+        profileImage: updatedImage || '/images/image4.png',
       });
 
       localStorage.setItem('bio', bio);
@@ -85,6 +75,8 @@ export const profileUpdateStore = {
 
       setProfileUpdateState({ status: 'success', error: null });
       showToast('Profile updated successfully!', 'success');
+
+      return `${updatedImage}?t=${Date.now()}`;
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
       const message =
@@ -93,6 +85,7 @@ export const profileUpdateStore = {
         'Failed to update profile.';
       setProfileUpdateState({ status: 'error', error: message });
       showToast(message, 'error');
+      return currentImage || '/images/image4.png';
     }
   },
 };
