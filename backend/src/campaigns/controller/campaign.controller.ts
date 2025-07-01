@@ -9,6 +9,7 @@ import {
   Req,
   InternalServerErrorException,
   HttpException,
+  Patch,
 } from '@nestjs/common';
 import { isValidObjectId } from 'mongoose';
 import { CampaignsService } from '../service/campaigns.service';
@@ -33,6 +34,19 @@ export class CampaignController {
       throw new UnauthorizedException('Only brands can create campaigns');
     }
     return this.campaignService.createCampaign(createCampaignDto);
+  }
+
+  @Patch(':id')
+  async updateCampaign(
+    @Param('id') id: string,
+    @Body() updateDto: Partial<CreateCampaignDto>,
+    @Req() req: any,
+  ) {
+    const user = req.user;
+    if (user.role !== 'brand') {
+      throw new UnauthorizedException('Only brands can update campaigns');
+    }
+    return this.campaignService.updateCampaign(id, updateDto);
   }
 
   @Post(':campaignId/join')

@@ -48,6 +48,17 @@ export class CampaignsService {
     return createdCampaign.save();
   }
 
+  async updateCampaign(
+    campaignId: string,
+    updateDto: Partial<CreateCampaignDto>,
+  ): Promise<Campaign> {
+    const existing = await this.campaignModel.findById(campaignId);
+    if (!existing) throw new BadRequestException('Campaign not found');
+
+    Object.assign(existing, updateDto);
+    return existing.save();
+  }
+
   async addSubmission(
     campaignId: string,
     content: string,

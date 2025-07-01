@@ -71,6 +71,5 @@ export class UserController {
     const userId = req.user.userId;
     await this.userService.updateProfileImage(userId, file);
     return { imageUrl: `http://localhost:4000/uploads/${file.filename}` };
-
   }
 }
