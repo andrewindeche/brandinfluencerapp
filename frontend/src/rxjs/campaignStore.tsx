@@ -46,4 +46,27 @@ export const campaignStore = {
       console.error('Failed to create campaign:', err);
     }
   },
+
+  updateCampaign: async (id: string, updates: Partial<CampaignType>) => {
+    try {
+      const { data } = await axiosInstance.patch<CampaignType>(
+        `/campaign/${id}`,
+        updates,
+      );
+      const updated = campaigns$.value.map((c) => (c.id === id ? data : c));
+      campaigns$.next(updated);
+    } catch (err) {
+      console.error(`❌ Failed to update campaign [${id}]:`, err);
+    }
+  },
+
+  deleteCampaign: async (id: string) => {
+    try {
+      await axiosInstance.delete(`/campaign/${id}`);
+      const filtered = campaigns$.value.filter((c) => c.id !== id);
+      campaigns$.next(filtered);
+    } catch (err) {
+      console.error(`❌ Failed to delete campaign [${id}]:`, err);
+    }
+  },
 };
