@@ -59,6 +59,18 @@ export class CampaignsService {
     return existing.save();
   }
 
+  async deleteCampaign(campaignId: string): Promise<{ success: boolean }> {
+    const result = await this.campaignModel.deleteOne({ _id: campaignId });
+    if (result.deletedCount === 0) {
+      throw new BadRequestException('Campaign not found or already deleted');
+    }
+
+    await this.cacheManager.del(`campaign_${campaignId}`);
+    await this.cacheManager.del('campaigns_list');
+
+    return { success: true };
+  }
+
   async addSubmission(
     campaignId: string,
     content: string,

@@ -10,6 +10,7 @@ import {
   InternalServerErrorException,
   HttpException,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { isValidObjectId } from 'mongoose';
 import { CampaignsService } from '../service/campaigns.service';
@@ -47,6 +48,15 @@ export class CampaignController {
       throw new UnauthorizedException('Only brands can update campaigns');
     }
     return this.campaignService.updateCampaign(id, updateDto);
+  }
+
+  @Delete(':id')
+  async deleteCampaign(@Param('id') id: string, @Req() req: any) {
+    const user = req.user;
+    if (user.role !== 'brand') {
+      throw new UnauthorizedException('Only brands can delete campaigns');
+    }
+    return this.campaignService.deleteCampaign(id);
   }
 
   @Post(':campaignId/join')
