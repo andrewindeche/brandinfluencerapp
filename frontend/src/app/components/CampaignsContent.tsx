@@ -8,22 +8,9 @@ import { getRandom } from '../utils/random';
 import NotificationWidget from '../components/NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
+import { CampaignType } from '@/rxjs/campaignStore';
 
-interface CampaignType {
-  title: string;
-  description: string;
-  image: string;
-  status: 'active' | 'inactive';
-  date: string;
-}
-
-const notifications: {
-  id: number;
-  campaign: string;
-  status: 'accepted' | 'rejected';
-  date: string;
-  message: string;
-}[] = [
+const notifications = [
   {
     id: 1,
     campaign: 'Sport Campaign',
@@ -41,19 +28,7 @@ const notifications: {
 ];
 
 const CampaignsContent: React.FC = () => {
-  const message =
-    'This is a detailed campaign description with instructions. It is expandable when the user clicks "Read More".';
-
-  const [campaigns, setCampaigns] = useState<CampaignType[]>([
-    {
-      title: 'Campaign 1',
-      description: message,
-      image: '/images/fit.jpg',
-      status: 'active',
-      date: '16/01/2025',
-    },
-  ]);
-
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<
@@ -72,6 +47,7 @@ const CampaignsContent: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string>(
     '/images/screenshots/HandM.jpg',
   );
+
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(({ title, status }) => {
       const matchesSearch = title
@@ -130,23 +106,17 @@ const CampaignsContent: React.FC = () => {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onCreate={(newCampaign) =>
-          setCampaigns((prev) => [
-            ...prev,
-            {
-              ...newCampaign,
-              date: new Date().toLocaleDateString(),
-            },
-          ])
+          setCampaigns((prev) => [...prev, newCampaign])
         }
       />
 
       <div className="flex flex-col lg:flex-row gap-16">
-        <div className="w-full lg:w-1/4 lg:w-1/4">
+        <div className="w-full lg:w-1/4">
           {profileImage && (
             <ProfileWithStats
               username={username}
               profileImage={profileImage}
-              bio={bio || message}
+              bio={bio}
               likes={likes}
               shares={shares}
               campaigns={campaigns.length}
@@ -220,9 +190,10 @@ const CampaignsContent: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14">
             {filteredCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
+              const description = campaign.instructions;
               const displayedText = isExpanded
-                ? campaign.description
-                : `${campaign.description.slice(0, maxCharCount)}${campaign.description.length > maxCharCount ? '...' : ''}`;
+                ? description
+                : `${description.slice(0, maxCharCount)}${description.length > maxCharCount ? '...' : ''}`;
 
               return (
                 <div
@@ -230,7 +201,7 @@ const CampaignsContent: React.FC = () => {
                   className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-[240px] max-w-xs"
                 >
                   <Image
-                    src={campaign.image}
+                    src={campaign.images[0] || '/images/placeholder.jpg'}
                     alt={campaign.title}
                     width={500}
                     height={300}
@@ -240,11 +211,11 @@ const CampaignsContent: React.FC = () => {
                   <div className="bg-black text-white p-3 rounded-b-xl">
                     <div className="flex justify-between items-center">
                       <p className="font-semibold">{campaign.title}</p>
-                      <p className="text-xs">{campaign.date}</p>
+                      <p className="text-xs">{campaign.startDate}</p>
                     </div>
                     <p className="text-xs mt-2">{displayedText}</p>
 
-                    {campaign.description.length > maxCharCount && (
+                    {description.length > maxCharCount && (
                       <button
                         onClick={() => toggleExpand(campaign.title)}
                         className="text-red-400 hover:underline text-xs mt-1"
@@ -254,7 +225,9 @@ const CampaignsContent: React.FC = () => {
                     )}
 
                     <div className="flex justify-between items-center mt-2">
-                      <p className="text-xs font-semibold">Deadline: 2 weeks</p>
+                      <p className="text-xs font-semibold">
+                        Deadline: {campaign.endDate}
+                      </p>
                       <p
                         className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
                       >
