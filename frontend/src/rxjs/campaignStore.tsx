@@ -1,12 +1,13 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance, { setAuthToken } from './axiosInstance';
 
-type CampaignType = {
+export type CampaignType = {
   id: string;
   title: string;
-  description: string;
-  image: string;
-  deadline: string;
+  instructions: string;
+  images: string[];
+  startDate: string;
+  endDate: string;
   status: 'active' | 'inactive';
 };
 
@@ -35,15 +36,19 @@ export const campaignStore = {
     }
   },
 
-  createCampaign: async (newCampaign: Omit<CampaignType, 'id'>) => {
+  createCampaign: async (
+    newCampaign: Omit<CampaignType, 'id'>,
+  ): Promise<CampaignType> => {
     try {
       const { data } = await axiosInstance.post<CampaignType>(
         '/campaign',
         newCampaign,
       );
       campaignStore.addCampaign(data);
+      return data;
     } catch (err) {
       console.error('Failed to create campaign:', err);
+      throw err;
     }
   },
 
