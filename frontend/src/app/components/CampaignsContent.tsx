@@ -8,7 +8,7 @@ import { getRandom } from '../utils/random';
 import NotificationWidget from '../components/NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
-import { CampaignType } from '@/rxjs/campaignStore';
+import { campaignStore, CampaignType } from '@/rxjs/campaignStore';
 
 const notifications = [
   {
@@ -79,6 +79,14 @@ const CampaignsContent: React.FC = () => {
       );
       setBio(state.bio || localStorage.getItem('bio') || '');
     });
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const sub = campaignStore.campaigns$.subscribe((data) => {
+      setCampaigns(data);
+    });
+    campaignStore.fetchCampaigns();
     return () => sub.unsubscribe();
   }, []);
 
