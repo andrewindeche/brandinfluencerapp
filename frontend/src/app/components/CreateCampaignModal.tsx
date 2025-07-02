@@ -1,67 +1,90 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Dialog } from '@headlessui/react';
-import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
-
-interface CampaignType {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  deadline: string;
-  status: 'active' | 'inactive';
-}
+import { campaignStore, CampaignType } from '../../rxjs/campaignStore';
 
 interface CreateCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (campaign: CampaignType) => void;
+  campaignToEdit?: CampaignType | null;
+  onCreate?: (newCampaign: CampaignType) => void;
 }
 
 const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   isOpen,
   onClose,
+  campaignToEdit,
   onCreate,
 }) => {
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [deadline, setDeadline] = useState('');
+  const [instructions, setInstructions] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [status, setStatus] = useState<'active' | 'inactive'>('active');
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [images, setImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (campaignToEdit) {
+      setTitle(campaignToEdit.title);
+      setInstructions(campaignToEdit.instructions);
+      setStartDate(campaignToEdit.startDate);
+      setEndDate(campaignToEdit.endDate);
+      setStatus(campaignToEdit.status);
+      setImages(campaignToEdit.images || []);
+      setImagePreview(campaignToEdit.images?.[0] || '');
+    } else {
+      resetForm();
+    }
+  }, [campaignToEdit]);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setImageFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setImagePreview(result);
+        setImages([result]);
+      };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const newCampaign: CampaignType = {
-      id: uuidv4(),
+    const payload = {
       title,
-      description,
-      image: imagePreview || '/images/fit.jpg',
-      deadline,
+      instructions,
+      images: images.length ? images : ['/images/placeholder.jpg'],
+      startDate,
+      endDate,
       status,
     };
-    onCreate(newCampaign);
-    resetForm();
-    onClose();
+
+    try {
+      let createdCampaign;
+      if (campaignToEdit) {
+        await campaignStore.updateCampaign(campaignToEdit.id, payload);
+      } else {
+        createdCampaign = await campaignStore.createCampaign(payload);
+        if (onCreate) onCreate(createdCampaign);
+      }
+      resetForm();
+      onClose();
+    } catch (error) {
+      console.error('Error submitting campaign:', error);
+    }
   };
 
   const resetForm = () => {
     setTitle('');
-    setDescription('');
-    setDeadline('');
+    setInstructions('');
+    setStartDate('');
+    setEndDate('');
     setStatus('active');
-    setImageFile(null);
     setImagePreview('');
+    setImages([]);
   };
 
   return (
@@ -69,7 +92,9 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
       <div className="fixed inset-0 bg-blue bg-opacity-50" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <div className="w-full max-w-xl rounded-xl bg-zinc-900 text-gray-100 p-6 shadow-2xl border border-zinc-700">
-          <h2 className="text-lg font-bold mb-4">Create New Campaign</h2>
+          <h2 className="text-lg font-bold mb-4">
+            {campaignToEdit ? 'Edit Campaign' : 'Create New Campaign'}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
@@ -84,15 +109,22 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
               placeholder="Campaign Description"
               className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded resize-none text-gray-100 placeholder-gray-300"
               rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
               required
             />
             <input
               type="date"
-              className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+            />
+            <input
+              type="date"
+              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
               required
             />
             <select
@@ -132,7 +164,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                 type="submit"
                 className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500 font-semibold"
               >
-                Create
+                {campaignToEdit ? 'Update' : 'Create'}
               </button>
             </div>
           </form>
