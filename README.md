@@ -82,10 +82,8 @@ npm install
 
 4. Brand login: POST: http://localhost:4000/auth/brand/login
     {
-    "username": "example corp",
     "email": "examplecorp@example.com",
     "password": "securepassword123",
-    "confirmPassword": "securepassword123",
     }
 
 2. Create Campaign: POST: http://localhost:4000/campaign
