@@ -3,9 +3,6 @@ import { Schema as MongooseSchema, Types } from 'mongoose';
 
 @Schema()
 export class Campaign {
-  @Prop()
-  _id?: Types.ObjectId;
-
   @Prop({ required: true })
   title: string;
 
