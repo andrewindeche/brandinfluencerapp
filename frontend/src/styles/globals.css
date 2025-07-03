@@ -45,6 +45,8 @@ button:hover {
 
 .custom-date-icon::-webkit-calendar-picker-indicator {
   filter: invert(1);
+  background-color: white;
+
 }
 
 .custom-signup-button {

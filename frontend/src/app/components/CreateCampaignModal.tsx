@@ -115,14 +115,14 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
             />
             <input
               type="date"
-              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+              className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               required
             />
             <input
               type="date"
-              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+              className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               required
