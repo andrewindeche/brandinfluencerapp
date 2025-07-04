@@ -44,6 +44,10 @@ export const campaignStore = {
         '/campaign',
         newCampaign,
       );
+      if (data?.id) {
+        campaignStore.addCampaign(data);
+        return data;
+      }
       campaignStore.addCampaign(data);
       return data;
     } catch (err) {
