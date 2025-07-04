@@ -209,7 +209,7 @@ const CampaignsContent: React.FC = () => {
                   className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-[240px] max-w-xs"
                 >
                   <Image
-                    src={campaign.images[0] || '/images/placeholder.jpg'}
+                    src={campaign.images[0] || '/images/campaign.jpg'}
                     alt={campaign.title}
                     width={500}
                     height={300}
