@@ -56,22 +56,23 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     const payload = {
       title,
       instructions,
-      images: images.length ? images : ['/images/placeholder.jpg'],
+      images: images.length ? images : ['/images/campaign.jpg'],
       startDate,
       endDate,
       status,
     };
 
     try {
-      let createdCampaign;
       if (campaignToEdit) {
         await campaignStore.updateCampaign(campaignToEdit.id, payload);
       } else {
-        createdCampaign = await campaignStore.createCampaign(payload);
-        if (onCreate) onCreate(createdCampaign);
+        const createdCampaign = await campaignStore.createCampaign(payload);
+        if (createdCampaign?.id) {
+          if (onCreate) onCreate(createdCampaign);
+          onClose();
+        }
       }
       resetForm();
-      onClose();
     } catch (error) {
       console.error('Error submitting campaign:', error);
     }
@@ -143,9 +144,9 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
               onChange={handleImageChange}
               className="text-sm text-gray-100"
             />
-            {imagePreview && (
+            {(imagePreview || true) && (
               <Image
-                src={imagePreview}
+                src={imagePreview || '/images/campaign.jpg'}
                 alt="Preview"
                 width={500}
                 height={300}
