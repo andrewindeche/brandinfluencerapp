@@ -9,7 +9,7 @@ import { authState$ } from '@/rxjs/authStore';
 
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
-    'influencers',
+    'campaigns',
   );
   const [toast, setToast] = useState<{ message: string; type: string } | null>(
     null,
@@ -40,15 +40,13 @@ const BrandPage: React.FC = () => {
 
   useEffect(() => {
     const toastMessage = sessionStorage.getItem('toastMessage');
+    let timeout: NodeJS.Timeout;
     if (toastMessage) {
       sessionStorage.removeItem('toastMessage');
       setToast({ message: toastMessage, type: 'success' });
-      const timeout = setTimeout(() => {
-        setToast(null);
-      }, 3000);
-
-      return () => clearTimeout(timeout);
+      timeout = setTimeout(() => setToast(null), 3000);
     }
+    return () => clearTimeout(timeout);
   }, []);
 
   if (!checked) {
@@ -59,9 +57,7 @@ const BrandPage: React.FC = () => {
     );
   }
 
-  if (!authorized) {
-    return null;
-  }
+  if (!authorized) return null;
 
   const influencers: Influencer[] = [
     {
@@ -99,65 +95,69 @@ const BrandPage: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#005B96] min-h-screen flex flex-col justify-start items-center px-2 sm:px-4 lg:px-4">
+    <div className="bg-[#005B96] min-h-screen flex flex-col items-center px-2 sm:px-4 lg:px-4">
       <div className="absolute top-2 right-6 sm:right-16 z-50">
         <UserMenu
           userName={username}
-          imageSrc={profileImage || '/images/screenshots/HandM.jpg'}
+          imageSrc={profileImage}
           onLogout={handleLogout}
         />
       </div>
+
       {toast && (
         <div
-          className={`fixed top-20 right-4 sm:right-10 z-50 text-white px-4 py-3 rounded shadow-lg ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}
+          className={`fixed top-20 right-4 sm:right-10 z-50 text-white px-4 py-3 rounded shadow-lg ${
+            toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'
+          }`}
         >
           {toast.message}
         </div>
       )}
-      <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
-        <div className="flex flex-wrap justify-center gap-6 mt-6 w-full">
-          <div className="flex flex-wrap justify-center gap-6 w-full">
-            <button
-              onClick={() => setActiveTab('influencers')}
-              className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
-                activeTab === 'influencers'
-                  ? '!bg-red-600 !text-white !border-white'
-                  : '!bg-yellow-300 !text-black !border-black'
-              }`}
-            >
-              Campaigns
-            </button>
-            <button
-              onClick={() => setActiveTab('campaigns')}
-              className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
-                activeTab === 'campaigns'
-                  ? '!bg-red-600 !text-white !border-white'
-                  : '!bg-yellow-300 !text-black !border-black'
-              }`}
-            >
-              Influencers
-            </button>
-          </div>
-        </div>
+
+      <div className="flex justify-center gap-6 mt-6 w-full">
+        <button
+          onClick={() => setActiveTab('campaigns')}
+          className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
+            activeTab === 'campaigns'
+              ? '!bg-red-600 !text-white !border-white'
+              : '!bg-yellow-300 !text-black !border-black'
+          }`}
+        >
+          Campaigns
+        </button>
+        <button
+          onClick={() => setActiveTab('influencers')}
+          className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
+            activeTab === 'influencers'
+              ? '!bg-red-600 !text-white !border-white'
+              : '!bg-yellow-300 !text-black !border-black'
+          }`}
+        >
+          Influencers
+        </button>
       </div>
 
       <div className="mt-6 text-center">
         <h3 className="text-2xl font-bold underline underline-offset-4 mb-1">
-          {activeTab === 'campaigns' ? '📢 Influencer Matches' : '📈 Campaigns'}
+          {activeTab === 'campaigns' ? '📈 Campaigns' : '📢 Influencer Matches'}
         </h3>
       </div>
 
-      <div
-        className={`mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-4 ${activeTab === 'influencers' ? '' : ''}`}
-      >
+      <div className="mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-4">
         {activeTab === 'campaigns' ? (
+          <CampaignsContent />
+        ) : (
           <div className="flex flex-wrap justify-center gap-20">
-            {influencers.map((influencer, index) => (
-              <InfluencerCard key={index} influencer={influencer} />
+            {influencers.map((influencer) => (
+              <InfluencerCard
+                key={influencer.name}
+                influencer={{
+                  ...influencer,
+                  message: influencer.message,
+                }}
+              />
             ))}
           </div>
-        ) : (
-          <CampaignsContent />
         )}
       </div>
     </div>
