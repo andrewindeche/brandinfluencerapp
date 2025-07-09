@@ -233,17 +233,17 @@ const CampaignsContent: React.FC = () => {
                     )}
                     <div className="flex justify-end mt-2">
                       <button
-                        onClick={() => deleteCampaign(campaign.title)}
+                        onClick={() => deleteCampaign(campaign.id)}
                         className="px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
                       >
                         <TrashIcon className="h-4 w-4" />
                       </button>
                     </div>
                     <div className="flex justify-between items-center mt-1">
-                      <p className="text-xs">
+                      <div className="text-xs">
                         <p>StartDate: {campaign.startDate}</p>
                         <p>Deadline: {campaign.endDate}</p>
-                      </p>
+                      </div>
                       <p
                         className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
                       >
