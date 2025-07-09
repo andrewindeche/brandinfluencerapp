@@ -231,13 +231,18 @@ const CampaignsContent: React.FC = () => {
                         {isExpanded ? 'Read Less' : 'Read More'}
                       </button>
                     )}
-
-                    <div className="flex justify-between items-center mt-2">
-                      <p className="text-xs font-semibold">
-                        <p className="text-xs">
-                          Start Date: {campaign.startDate}
-                        </p>
-                        <p className="text-xs">Deadline: {campaign.endDate}</p>
+                    <div className="flex justify-end mt-2">
+                      <button
+                        onClick={() => deleteCampaign(campaign.title)}
+                        className="px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className="text-xs">
+                        <p>StartDate: {campaign.startDate}</p>
+                        <p>Deadline: {campaign.endDate}</p>
                       </p>
                       <p
                         className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
@@ -246,12 +251,6 @@ const CampaignsContent: React.FC = () => {
                           campaign.status.slice(1)}
                       </p>
                     </div>
-                    <button
-                      onClick={() => deleteCampaign(campaign.title)}
-                      className="mt-2 px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
                   </div>
                 </div>
               );
