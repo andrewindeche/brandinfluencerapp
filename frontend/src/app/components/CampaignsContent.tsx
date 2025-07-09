@@ -9,6 +9,7 @@ import NotificationWidget from '../components/NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
 import { campaignStore, CampaignType } from '@/rxjs/campaignStore';
+import { TrashIcon } from '@heroicons/react/24/solid';
 
 const notifications = [
   {
@@ -243,12 +244,11 @@ const CampaignsContent: React.FC = () => {
                           campaign.status.slice(1)}
                       </p>
                     </div>
-
                     <button
                       onClick={() => deleteCampaign(campaign.title)}
-                      className="mt-2 px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition"
+                      className="mt-2 px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
                     >
-                      Delete
+                      <TrashIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
