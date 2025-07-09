@@ -220,7 +220,6 @@ const CampaignsContent: React.FC = () => {
                   <div className="bg-black text-white p-3 rounded-b-xl">
                     <div className="flex justify-between items-center">
                       <p className="font-semibold">{campaign.title}</p>
-                      <p className="text-xs">{campaign.startDate}</p>
                     </div>
                     <p className="text-xs mt-2">{displayedText}</p>
 
@@ -235,7 +234,10 @@ const CampaignsContent: React.FC = () => {
 
                     <div className="flex justify-between items-center mt-2">
                       <p className="text-xs font-semibold">
-                        Deadline: {campaign.endDate}
+                        <p className="text-xs">
+                          Start Date: {campaign.startDate}
+                        </p>
+                        <p className="text-xs">Deadline: {campaign.endDate}</p>
                       </p>
                       <p
                         className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
