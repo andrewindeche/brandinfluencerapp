@@ -15,7 +15,7 @@ const BrandPage: React.FC = () => {
     null,
   );
   const [username, setUsername] = useState('');
-  const [profileImage, setProfileImage] = useState<string>(
+  const [profileImage, setProfileImage] = useState(
     '/images/screenshots/HandM.jpg',
   );
   const router = useRouter();
@@ -63,40 +63,37 @@ const BrandPage: React.FC = () => {
     {
       name: 'APRIL',
       likes: 100,
-      message:
-        "Influencer Network\nJoin our Influencer Network Today!\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: 'Influencer Network\nJoin our Influencer Network Today! ...',
       image: '/images/image3.png',
       alt: 'April - TikTok',
     },
     {
       name: 'JESY',
       likes: 50,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: 'Social Media\nJoin our TikTok account ...',
       image: '/images/image2.png',
       alt: 'Jesy - YouTuber',
     },
     {
       name: 'KATE',
       likes: 20,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: 'Social Media\nJoin our TikTok account ...',
       image: '/images/image2.png',
-      alt: 'kate - Instagram',
+      alt: 'Kate - Instagram',
     },
     {
       name: 'BRAD',
       likes: 20,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
+      message: 'Social Media\nJoin our TikTok account ...',
       image: '/images/image4.png',
-      alt: 'kate - Instagram',
+      alt: 'Brad - Instagram',
     },
   ];
 
   return (
-    <div className="bg-[#005B96] min-h-screen flex flex-col items-center px-2 sm:px-4 lg:px-4">
-      <div className="absolute top-2 right-6 sm:right-16 z-50">
+    <div className="bg-[#005B96] min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-8 py-4">
+      {/* User menu */}
+      <div className="absolute top-2 right-4 sm:right-16 z-50">
         <UserMenu
           userName={username}
           imageSrc={profileImage}
@@ -104,6 +101,7 @@ const BrandPage: React.FC = () => {
         />
       </div>
 
+      {/* Toast */}
       {toast && (
         <div
           className={`fixed top-20 right-4 sm:right-10 z-50 text-white px-4 py-3 rounded shadow-lg ${
@@ -114,10 +112,11 @@ const BrandPage: React.FC = () => {
         </div>
       )}
 
-      <div className="flex justify-center gap-6 mt-6 w-full">
+      {/* Tab buttons */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mt-6 w-full max-w-md">
         <button
           onClick={() => setActiveTab('campaigns')}
-          className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
+          className={`transition-all duration-300 py-2 px-6 sm:px-12 lg:px-20 w-full sm:w-auto text-center rounded-full border-2 hover:scale-105 ${
             activeTab === 'campaigns'
               ? '!bg-red-600 !text-white !border-white'
               : '!bg-yellow-300 !text-black !border-black'
@@ -127,7 +126,7 @@ const BrandPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('influencers')}
-          className={`transition-transform duration-300 py-2 px-24 rounded-full border-2 hover:scale-105 ${
+          className={`transition-all duration-300 py-2 px-6 sm:px-12 lg:px-20 w-full sm:w-auto text-center rounded-full border-2 hover:scale-105 ${
             activeTab === 'influencers'
               ? '!bg-red-600 !text-white !border-white'
               : '!bg-yellow-300 !text-black !border-black'
@@ -137,17 +136,19 @@ const BrandPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Section header */}
       <div className="mt-6 text-center">
         <h3 className="text-2xl font-bold underline underline-offset-4 mb-1">
           {activeTab === 'campaigns' ? '📈 Campaigns' : '📢 Influencer Matches'}
         </h3>
       </div>
 
+      {/* Content */}
       <div className="mt-4 w-full max-w-screen-xl mx-auto flex flex-col gap-4">
         {activeTab === 'campaigns' ? (
           <CampaignsContent />
         ) : (
-          <div className="flex flex-wrap justify-center gap-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
             {influencers.map((influencer) => (
               <InfluencerCard
                 key={influencer.name}
