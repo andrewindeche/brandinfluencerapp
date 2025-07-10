@@ -128,6 +128,8 @@ npm install
 
 7. Refresh Token: http://localhost:4000/auth/refresh
 
+8. Delete Campaign: DELETE /campaign/ID
+
 ## <h1> Figma Designs </h1>
 https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bwG3VeJPii4DMXfm-1
 
