@@ -66,8 +66,9 @@ const CampaignsContent: React.FC = () => {
   const toggleExpand = (title: string) =>
     setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
 
-  const deleteCampaign = (title: string) => {
+  const deleteCampaign = (id: string, title: string) => {
     setCampaigns((prev) => prev.filter((c) => c.title !== title));
+    campaignStore.deleteCampaign(id);
   };
 
   useEffect(() => {
@@ -203,8 +204,6 @@ const CampaignsContent: React.FC = () => {
               const displayedText = isExpanded
                 ? description
                 : `${description.slice(0, maxCharCount)}${description.length > maxCharCount ? '...' : ''}`;
-              console.log('Rendered campaign:', campaign);
-
               return (
                 <div
                   key={campaign.title}
@@ -235,10 +234,7 @@ const CampaignsContent: React.FC = () => {
                     <div className="flex justify-end mt-2">
                       <button
                         onClick={() => {
-                          console.log(
-                            `Attempting to delete campaign with id: ${campaign.id}`,
-                          );
-                          deleteCampaign(campaign.id);
+                          deleteCampaign(campaign.id, campaign.title);
                         }}
                         className="px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
                       >
