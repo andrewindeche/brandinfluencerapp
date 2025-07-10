@@ -23,6 +23,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   const [status, setStatus] = useState<'active' | 'inactive'>('active');
   const [imagePreview, setImagePreview] = useState<string>('');
   const [images, setImages] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (campaignToEdit) {
@@ -53,6 +54,8 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+
     const payload = {
       title,
       instructions,
@@ -65,6 +68,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     try {
       if (campaignToEdit) {
         await campaignStore.updateCampaign(campaignToEdit.id, payload);
+        onClose();
       } else {
         const createdCampaign = await campaignStore.createCampaign(payload);
         if (createdCampaign?.id) {
@@ -72,6 +76,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
           onClose();
         }
       }
+      onClose();
       resetForm();
     } catch (error) {
       console.error('Error submitting campaign:', error);
