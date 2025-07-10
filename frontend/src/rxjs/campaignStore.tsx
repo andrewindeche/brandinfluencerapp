@@ -1,6 +1,16 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance, { setAuthToken } from './axiosInstance';
 
+type CampaignAPIResponse = {
+  _id: string;
+  title: string;
+  instructions: string;
+  images: string[];
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'inactive';
+};
+
 export type CampaignType = {
   id: string;
   title: string;
@@ -29,8 +39,18 @@ export const campaignStore = {
 
   fetchCampaigns: async () => {
     try {
-      const { data } = await axiosInstance.get<CampaignType[]>('/campaign');
-      campaignStore.setCampaigns(data);
+      const { data } =
+        await axiosInstance.get<CampaignAPIResponse[]>('/campaign');
+      const normalized: CampaignType[] = data.map((c) => ({
+        id: c._id,
+        title: c.title,
+        instructions: c.instructions,
+        images: c.images,
+        startDate: c.startDate,
+        endDate: c.endDate,
+        status: c.status,
+      }));
+      campaignStore.setCampaigns(normalized);
     } catch (err) {
       console.error('Failed to fetch campaigns:', err);
     }

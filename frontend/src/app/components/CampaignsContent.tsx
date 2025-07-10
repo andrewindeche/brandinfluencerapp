@@ -203,6 +203,7 @@ const CampaignsContent: React.FC = () => {
               const displayedText = isExpanded
                 ? description
                 : `${description.slice(0, maxCharCount)}${description.length > maxCharCount ? '...' : ''}`;
+              console.log('Rendered campaign:', campaign);
 
               return (
                 <div
@@ -233,7 +234,12 @@ const CampaignsContent: React.FC = () => {
                     )}
                     <div className="flex justify-end mt-2">
                       <button
-                        onClick={() => deleteCampaign(campaign.id)}
+                        onClick={() => {
+                          console.log(
+                            `Attempting to delete campaign with id: ${campaign.id}`,
+                          );
+                          deleteCampaign(campaign.id);
+                        }}
                         className="px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
                       >
                         <TrashIcon className="h-4 w-4" />
