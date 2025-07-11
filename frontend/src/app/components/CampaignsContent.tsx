@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil, Eye, Trash2 } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 import ProfileWithStats from '../components/ProfileCard';
 import CreateCampaignModal from '../components/CreateCampaignModal';
@@ -9,7 +9,6 @@ import NotificationWidget from '../components/NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
 import { campaignStore, CampaignType } from '@/rxjs/campaignStore';
-import { TrashIcon } from '@heroicons/react/24/solid';
 import { useSpring, animated } from '@react-spring/web';
 
 const notifications = [
@@ -37,22 +36,26 @@ const CampaignsContent: React.FC = () => {
     'all' | 'active' | 'inactive'
   >('all');
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const maxCharCount = 70;
-  const [bio, setBio] = useState<string>('');
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
+    null,
+  );
+  const [showSubmissions, setShowSubmissions] = useState(false);
+
+  const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
+  const [profileImage, setProfileImage] = useState(
+    '/images/screenshots/HandM.jpg',
+  );
+
   const { toast, showToast } = useToast();
+
   const [likes] = useState(getRandom(50, 200));
   const [shares] = useState(getRandom(10, 100));
   const [posts] = useState(getRandom(5, 15));
   const [submissions] = useState(getRandom(2, 10));
-  const [profileImage, setProfileImage] = useState<string>(
-    '/images/screenshots/HandM.jpg',
-  );
-  const [showSubmissions, setShowSubmissions] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
-    null,
-  );
+
+  const maxCharCount = 70;
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(({ title, status }) => {
@@ -131,10 +134,21 @@ const CampaignsContent: React.FC = () => {
     <div className="relative w-full p-6 sm:p-8 md:p-12">
       <CreateCampaignModal
         isOpen={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onCreate={(newCampaign) =>
-          setCampaigns((prev) => [...prev, newCampaign])
-        }
+        onClose={() => {
+          setCreateModalOpen(false);
+          setSelectedCampaign(null);
+        }}
+        onCreate={(newCampaign) => {
+          if (selectedCampaign) {
+            setCampaigns((prev) =>
+              prev.map((c) => (c.id === newCampaign.id ? newCampaign : c)),
+            );
+          } else {
+            setCampaigns((prev) => [...prev, newCampaign]);
+          }
+          setSelectedCampaign(null);
+        }}
+        campaignToEdit={selectedCampaign}
       />
 
       <div className="flex flex-col lg:flex-row gap-16">
@@ -157,25 +171,6 @@ const CampaignsContent: React.FC = () => {
         </div>
 
         <div className="flex-1">
-          <div className="p-1 grid grid-cols-2 sm:grid-cols-3 gap-2 text-white rounded-lg border border-white mb-6">
-            {[
-              { title: 'Ambassadors', value: '12' },
-              { title: 'Total reach', value: '9.8K' },
-              { title: 'Submissions', value: '20' },
-              { title: 'Posts', value: '30K' },
-              { title: 'Likes', value: '5K' },
-              { title: 'Comments', value: '60.2K' },
-            ].map((stat) => (
-              <div
-                key={stat.title}
-                className="text-center rounded-lg bg-gradient-to-r from-zinc-800 to-black transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
-              >
-                <h4 className="text-lg">{stat.title}</h4>
-                <p className="text-lg font-bold">{stat.value}</p>
-              </div>
-            ))}
-          </div>
-
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
             <input
               type="text"
@@ -207,7 +202,10 @@ const CampaignsContent: React.FC = () => {
 
           <div className="flex justify-between items-center mb-4">
             <button
-              onClick={() => setCreateModalOpen(true)}
+              onClick={() => {
+                setSelectedCampaign(null);
+                setCreateModalOpen(true);
+              }}
               className="bg-yellow-500 hover:bg-yellow-600 items-center text-white font-semibold px-4 py-2 rounded-xl shadow"
             >
               + Create Campaign
@@ -221,6 +219,7 @@ const CampaignsContent: React.FC = () => {
               const displayedText = isExpanded
                 ? description
                 : `${description.slice(0, maxCharCount)}${description.length > maxCharCount ? '...' : ''}`;
+
               return (
                 <div
                   key={campaign.title}
@@ -234,10 +233,9 @@ const CampaignsContent: React.FC = () => {
                     className="rounded-2xl w-full h-[150px] object-cover"
                   />
                   <div className="bg-black text-white p-3 rounded-b-xl">
-                    <div className="flex justify-between items-center">
-                      <p className="font-semibold">{campaign.title}</p>
-                    </div>
+                    <p className="font-semibold">{campaign.title}</p>
                     <p className="text-xs mt-2">{displayedText}</p>
+
                     {description.length > maxCharCount && (
                       <button
                         onClick={() => toggleExpand(campaign.title)}
@@ -246,20 +244,11 @@ const CampaignsContent: React.FC = () => {
                         {isExpanded ? 'Read Less' : 'Read More'}
                       </button>
                     )}
-                    <div className="flex justify-end mt-2">
-                      <button
-                        onClick={() =>
-                          deleteCampaign(campaign.id, campaign.title)
-                        }
-                        className="px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
+
                     <div className="flex justify-between items-center mt-1">
                       <div className="text-xs">
-                        <p>StartDate: {campaign.startDate}</p>
-                        <p>Deadline: {campaign.endDate}</p>
+                        <p>Start: {campaign.startDate}</p>
+                        <p>End: {campaign.endDate}</p>
                       </div>
                       <p
                         className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
@@ -269,12 +258,31 @@ const CampaignsContent: React.FC = () => {
                       </p>
                     </div>
 
-                    <button
-                      onClick={() => handleViewSubmissions(campaign)}
-                      className="text-blue-500 text-xs mt-2"
-                    >
-                      View Influencer Submissions
-                    </button>
+                    <div className="flex justify-between items-center gap-1 mt-3">
+                      <button
+                        onClick={() => {
+                          setSelectedCampaign(campaign);
+                          setCreateModalOpen(true);
+                        }}
+                        className="flex items-center gap-1 bg-yellow-500 text-white px-2 py-1 text-xs rounded hover:bg-yellow-600"
+                      >
+                        <Pencil size={14} /> Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          deleteCampaign(campaign.id, campaign.title)
+                        }
+                        className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                      <button
+                        onClick={() => handleViewSubmissions(campaign)}
+                        className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
+                      >
+                        <Eye size={14} /> View
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -287,15 +295,15 @@ const CampaignsContent: React.FC = () => {
 
       <animated.div
         style={slideIn}
-        className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50 rounded-lg"
+        className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50"
       >
-        <div className="bg-white p-6 w-1/3 h-full overflow-y-auto rounded-lg shadow-lg">
+        <div className="bg-white p-6 w-1/3 h-full overflow-y-auto rounded-l-xl shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Influencer Submissions
           </h2>
           <button
             onClick={handleCloseSubmissions}
-            className="bg-red-500 text-white rounded-full px-4 py-2 mb-4 transition-all transform hover:bg-red-600"
+            className="bg-red-500 text-white rounded-full px-4 py-2 mb-4 hover:bg-red-600"
           >
             Close
           </button>
