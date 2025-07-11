@@ -20,5 +20,5 @@ export class CreateCampaignDto {
   status?: 'active' | 'inactive';
 
   @IsString()
-  brandId: string; 
+  brandId: string;
 }
