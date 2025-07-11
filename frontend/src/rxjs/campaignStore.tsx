@@ -118,4 +118,34 @@ export const campaignStore = {
       console.error(`❌ Failed to delete campaign [${id}]:`, err);
     }
   },
+
+  fetchFilteredCampaigns: async (
+    status?: 'active' | 'inactive',
+    search?: string,
+  ) => {
+    try {
+      const params: Record<string, string> = {};
+      if (status) params.status = status;
+      if (search) params.search = search;
+
+      const { data } = await axiosInstance.get<CampaignAPIResponse[]>(
+        '/campaign',
+        { params },
+      );
+
+      const normalized: CampaignType[] = data.map((c) => ({
+        id: c._id,
+        title: c.title,
+        instructions: c.instructions,
+        images: c.images,
+        startDate: c.startDate,
+        endDate: c.endDate,
+        status: c.status,
+      }));
+
+      campaignStore.setCampaigns(normalized);
+    } catch (err) {
+      console.error('❌ Failed to fetch filtered campaigns:', err);
+    }
+  },
 };
