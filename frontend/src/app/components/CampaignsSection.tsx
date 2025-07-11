@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import TipBox from './TipBox';
 import SubmissionModal from './SubmissionModal';
+import { CampaignType } from '@/rxjs/campaignStore';
 
 interface Props {
-  campaigns: string[];
-  message: string;
+  campaigns: CampaignType[];
   expanded: { [key: string]: boolean };
   onExpandToggle: (title: string) => void;
   onCampaignAction: (title: string) => void;
@@ -17,7 +17,6 @@ interface Props {
 
 const CampaignsSection: React.FC<Props> = ({
   campaigns,
-  message,
   expanded,
   onExpandToggle,
   onCampaignAction,
@@ -29,28 +28,31 @@ const CampaignsSection: React.FC<Props> = ({
     'all' | 'active' | 'inactive'
   >('all');
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
+    null,
+  );
 
-  const handleCardClick = (title: string) => {
-    setSelectedCampaign(title);
+  const handleCardClick = (campaign: CampaignType) => {
+    setSelectedCampaign(campaign);
     setModalOpen(true);
   };
 
   const handleSubmit = (text: string) => {
-    console.log(`Submission for ${selectedCampaign}:`, text);
-    onCampaignAction(selectedCampaign || '');
+    console.log(`Submission for ${selectedCampaign?.title}:`, text);
+    if (selectedCampaign) {
+      onCampaignAction(selectedCampaign.title);
+    }
   };
 
   const filteredCampaigns = useMemo(() => {
-    return campaigns.filter((title, index) => {
-      const matchesSearch = title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const isActive = index % 2 === 0;
+    return campaigns.filter((campaign) => {
+      const matchesSearch =
+        campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        campaign.instructions.toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesStatus =
-        statusFilter === 'all' ||
-        (statusFilter === 'active' && isActive) ||
-        (statusFilter === 'inactive' && !isActive);
+        statusFilter === 'all' || campaign.status === statusFilter;
+
       return matchesSearch && matchesStatus;
     });
   }, [campaigns, searchQuery, statusFilter]);
@@ -66,7 +68,7 @@ const CampaignsSection: React.FC<Props> = ({
         duration={10000}
       />
 
-      {campaigns.length > 0 && (
+      {filteredCampaigns.length > 0 && (
         <div className="mb-4 font-medium text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded">
           You have open campaigns awaiting submission!
         </div>
@@ -107,14 +109,13 @@ const CampaignsSection: React.FC<Props> = ({
         }`}
       >
         <AnimatePresence>
-          {filteredCampaigns.map((title, index) => {
-            const isExpanded = expanded[title];
+          {filteredCampaigns.map((campaign) => {
+            const isExpanded = expanded[campaign.title];
             const displayedText = isExpanded
-              ? message
-              : `${message.slice(0, maxCharCount)}${
-                  message.length > maxCharCount ? '...' : ''
+              ? campaign.instructions
+              : `${campaign.instructions.slice(0, maxCharCount)}${
+                  campaign.instructions.length > maxCharCount ? '...' : ''
                 }`;
-            const isActive = index % 2 === 0;
 
             return (
               <motion.div
@@ -123,15 +124,15 @@ const CampaignsSection: React.FC<Props> = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                key={title}
+                key={campaign.id}
                 className={`relative ${
                   notificationOpen ? 'min-w-[32%] max-w-[32%] snap-start' : ''
                 } flex-shrink-0 bg-black text-white p-1 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 active:scale-100 hover:ring-2 hover:ring-blue-300 cursor-pointer`}
-                onClick={() => handleCardClick(title)}
+                onClick={() => handleCardClick(campaign)}
               >
                 <Image
-                  src="/images/fit.jpg"
-                  alt={title}
+                  src={campaign.images?.[0] || '/images/fit.jpg'}
+                  alt={campaign.title}
                   width={500}
                   height={300}
                   className="rounded-2xl w-full h-[150px] object-cover"
@@ -139,22 +140,24 @@ const CampaignsSection: React.FC<Props> = ({
                 <SubmissionModal
                   isOpen={modalOpen}
                   onClose={() => setModalOpen(false)}
-                  campaignTitle={selectedCampaign ?? ''}
-                  imageSrc="/images/fit.jpg"
-                  message={message}
+                  campaignTitle={selectedCampaign?.title ?? ''}
+                  imageSrc={selectedCampaign?.images?.[0] || '/images/fit.jpg'}
+                  message={selectedCampaign?.instructions || ''}
                   onSubmit={handleSubmit}
                 />
                 <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
                   <div className="flex justify-between items-center">
-                    <p className="font-semibold">{title}</p>
-                    <p className="text-xs">16/01/2025</p>
+                    <p className="font-semibold">{campaign.title}</p>
+                    <p className="text-xs">
+                      {new Date(campaign.startDate).toLocaleDateString()}
+                    </p>
                   </div>
                   <p className="text-xs mt-2">{displayedText}</p>
-                  {message.length > maxCharCount && (
+                  {campaign.instructions.length > maxCharCount && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onExpandToggle(title);
+                        onExpandToggle(campaign.title);
                       }}
                       className="text-red-400 hover:underline text-xs mt-1"
                     >
@@ -162,19 +165,23 @@ const CampaignsSection: React.FC<Props> = ({
                     </button>
                   )}
                   <div className="flex justify-between items-center mt-2">
-                    <p className="text-xs font-semibold">Deadline: 2 weeks</p>
+                    <p className="text-xs font-semibold">
+                      Ends: {new Date(campaign.endDate).toLocaleDateString()}
+                    </p>
                     <p
                       className={`text-xs font-bold ${
-                        isActive ? 'text-green-400' : 'text-red-400'
+                        campaign.status === 'active'
+                          ? 'text-green-400'
+                          : 'text-red-400'
                       }`}
                     >
-                      {isActive ? 'Active' : 'Inactive'}
+                      {campaign.status === 'active' ? 'Active' : 'Inactive'}
                     </p>
                   </div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleCardClick(title);
+                      handleCardClick(campaign);
                     }}
                     className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
                   >
