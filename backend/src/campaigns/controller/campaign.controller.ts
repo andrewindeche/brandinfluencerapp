@@ -37,7 +37,7 @@ export class CampaignController {
     }
     return this.campaignService.createCampaign({
       ...createCampaignDto,
-      brandId: user.userId,
+      brand: user.userId,
     });
   }
 
@@ -157,7 +157,11 @@ export class CampaignController {
     }
 
     if (user.role === 'brand') {
-      return this.campaignService.getCampaignsByBrandId(user.userId);
+      return this.campaignService.getFilteredCampaigns(
+        status,
+        search,
+        user.userId,
+      );
     }
 
     throw new UnauthorizedException('Invalid user role');
