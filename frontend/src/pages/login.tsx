@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { authState$, authStore } from '../rxjs/authStore';
+import { authState$, authStore, AuthFormState } from '../rxjs/authStore';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
@@ -22,7 +22,10 @@ const LoginForm: React.FC = () => {
   >('unknown');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
-  const [authState, setAuthState] = useState(authStore.getCurrentUser());
+  const [authState, setAuthState] = useState<Partial<AuthFormState>>({
+    profileImage: undefined,
+  });
+
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast, closeToast } = useToast();
@@ -48,7 +51,9 @@ const LoginForm: React.FC = () => {
   }, [router]);
 
   useEffect(() => {
-    const sub = authState$.subscribe(setAuthState);
+    const sub = authState$.subscribe((state: AuthFormState) => {
+      setAuthState(state);
+    });
     return () => sub.unsubscribe();
   }, []);
 
@@ -168,11 +173,11 @@ const LoginForm: React.FC = () => {
               value={email}
               onChange={handleEmailChange}
               className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 shadow-lg bg-white ${
-                errors.email ? 'ring-2 ring-red-400' : 'focus:ring-yellow-400'
+                errors?.email ? 'ring-2 ring-red-400' : 'focus:ring-yellow-400'
               }`}
               placeholder="Enter your email"
             />
-            {errors.email && (
+            {errors?.email && (
               <p className="text-red-400 text-sm mt-1">{errors.email}</p>
             )}
           </div>
@@ -192,7 +197,7 @@ const LoginForm: React.FC = () => {
               className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
               placeholder="Enter your password"
             />
-            {errors.password && (
+            {errors?.password && (
               <p className="text-red-400 text-sm mt-1">{errors.password}</p>
             )}
           </div>
@@ -209,9 +214,9 @@ const LoginForm: React.FC = () => {
             {submitting ? <Loader /> : 'Log In'}
           </button>
 
-          {errors.server && (
+          {errors?.server && (
             <p className="text-red-400 text-sm mt-2 text-center">
-              {errors.server}
+              {errors?.server}
             </p>
           )}
         </form>
