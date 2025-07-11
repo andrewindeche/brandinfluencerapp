@@ -124,6 +124,7 @@ const CampaignsContent: React.FC = () => {
   const slideIn = useSpring({
     transform: showSubmissions ? 'translateX(0)' : 'translateX(100%)',
     opacity: showSubmissions ? 1 : 0,
+    config: { tension: 300, friction: 30 },
   });
 
   return (
@@ -284,27 +285,26 @@ const CampaignsContent: React.FC = () => {
         <NotificationWidget notifications={notifications} />
       </div>
 
-      {/* Slide-in submissions panel */}
       <animated.div
         style={slideIn}
-        className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-end z-50"
+        className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50 rounded-lg"
       >
-        <div className="bg-white p-6 w-1/3 h-full overflow-y-auto">
-          <h2 className="text-xl font-semibold mb-4">Influencer Submissions</h2>
+        <div className="bg-white p-6 w-1/3 h-full overflow-y-auto rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Influencer Submissions
+          </h2>
           <button
             onClick={handleCloseSubmissions}
-            className="bg-red-500 text-white rounded-full px-4 py-2 mb-4"
+            className="bg-red-500 text-white rounded-full px-4 py-2 mb-4 transition-all transform hover:bg-red-600"
           >
             Close
           </button>
           {selectedCampaign && (
             <>
-              <h3 className="text-lg font-bold mb-4">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
                 {selectedCampaign.title}
               </h3>
-              {/* Map over submissions data */}
-              <div>
-                {/* Replace with actual submission data */}
+              <div className="text-gray-600">
                 <p>No submissions available yet.</p>
               </div>
             </>
