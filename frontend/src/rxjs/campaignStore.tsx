@@ -60,16 +60,23 @@ export const campaignStore = {
     newCampaign: Omit<CampaignType, 'id'>,
   ): Promise<CampaignType> => {
     try {
-      const { data } = await axiosInstance.post<CampaignType>(
+      const { data } = await axiosInstance.post<CampaignAPIResponse>(
         '/campaign',
         newCampaign,
       );
-      if (data?.id) {
-        campaignStore.addCampaign(data);
-        return data;
-      }
-      campaignStore.addCampaign(data);
-      return data;
+
+      const normalized: CampaignType = {
+        id: data._id,
+        title: data.title,
+        instructions: data.instructions,
+        images: data.images,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status: data.status,
+      };
+
+      campaignStore.addCampaign(normalized);
+      return normalized;
     } catch (err) {
       console.error('Failed to create campaign:', err);
       throw err;
@@ -78,12 +85,25 @@ export const campaignStore = {
 
   updateCampaign: async (id: string, updates: Partial<CampaignType>) => {
     try {
-      const { data } = await axiosInstance.patch<CampaignType>(
+      const { data } = await axiosInstance.patch<CampaignAPIResponse>(
         `/campaign/${id}`,
         updates,
       );
-      const updated = campaigns$.value.map((c) => (c.id === id ? data : c));
-      campaigns$.next(updated);
+
+      const normalized: CampaignType = {
+        id: data._id,
+        title: data.title,
+        instructions: data.instructions,
+        images: data.images,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status: data.status,
+      };
+
+      const updatedList = campaigns$.value.map((c) =>
+        c.id === id ? normalized : c,
+      );
+      campaigns$.next(updatedList);
     } catch (err) {
       console.error(`❌ Failed to update campaign [${id}]:`, err);
     }
