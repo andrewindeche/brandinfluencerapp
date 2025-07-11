@@ -1,7 +1,7 @@
 import React from 'react';
 
 const PageSpinner: React.FC = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 to-purple-700">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-700 to-purple-700">
     <svg
       className="animate-spin h-12 w-12 text-white"
       xmlns="http://www.w3.org/2000/svg"
