@@ -68,18 +68,19 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     try {
       if (campaignToEdit) {
         await campaignStore.updateCampaign(campaignToEdit.id, payload);
-        onClose();
       } else {
         const createdCampaign = await campaignStore.createCampaign(payload);
-        if (createdCampaign?.id) {
-          if (onCreate) onCreate(createdCampaign);
-          onClose();
+        if (createdCampaign?.id && onCreate) {
+          onCreate(createdCampaign);
         }
       }
-      onClose();
+
       resetForm();
+      onClose();
     } catch (error) {
       console.error('Error submitting campaign:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -97,7 +98,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-blue bg-opacity-50" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className="w-full max-w-xl rounded-xl bg-zinc-900 text-gray-100 p-6 shadow-2xl border border-zinc-700">
+        <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-lg bg-zinc-900 p-4 text-gray-100 shadow-xl border border-zinc-700">
           <h2 className="text-lg font-bold mb-4">
             {campaignToEdit ? 'Edit Campaign' : 'Create New Campaign'}
           </h2>
