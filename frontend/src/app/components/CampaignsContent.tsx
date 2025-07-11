@@ -48,7 +48,7 @@ const CampaignsContent: React.FC = () => {
     '/images/screenshots/HandM.jpg',
   );
 
-  const { toast, showToast } = useToast();
+  const { showToast } = useToast();
 
   const [likes] = useState(getRandom(50, 200));
   const [shares] = useState(getRandom(10, 100));
@@ -75,6 +75,7 @@ const CampaignsContent: React.FC = () => {
 
   const deleteCampaign = (id: string, title: string) => {
     campaignStore.deleteCampaign(id);
+    campaignStore.deleteCampaign(title);
   };
 
   const handleViewSubmissions = (campaign: CampaignType) => {
