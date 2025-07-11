@@ -34,7 +34,10 @@ export class CampaignController {
     if (user.role !== 'brand') {
       throw new UnauthorizedException('Only brands can create campaigns');
     }
-    return this.campaignService.createCampaign(createCampaignDto);
+    return this.campaignService.createCampaign({
+    ...createCampaignDto,
+    brandId: user.userId,
+  });
   }
 
   @Patch(':id')
