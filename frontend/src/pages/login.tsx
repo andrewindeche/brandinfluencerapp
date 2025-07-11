@@ -8,14 +8,7 @@ import { useFormValidation } from '@/hooks/useFormValidation';
 import { useRouteLoading } from '../hooks/useRouteLoading';
 import PageSpinner from '../app/components/PageSpinner';
 import { loginSchema } from '@/rxjs/validation/loginSchema';
-
-const Loader: React.FC = () => (
-  <div className="flex items-center justify-center space-x-2 h-6 animate-fade-in">
-    <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce [animation-delay:0ms]" />
-    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce [animation-delay:100ms]" />
-    <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce [animation-delay:200ms]" />
-  </div>
-);
+import Loader from '../app/components/Loader';
 
 function isValidRole(role: unknown): role is 'brand' | 'influencer' | 'admin' {
   return (
