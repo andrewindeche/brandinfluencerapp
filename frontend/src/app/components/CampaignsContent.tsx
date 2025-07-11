@@ -10,6 +10,7 @@ import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
 import { campaignStore, CampaignType } from '@/rxjs/campaignStore';
 import { TrashIcon } from '@heroicons/react/24/solid';
+import { useSpring, animated } from '@react-spring/web';
 
 const notifications = [
   {
@@ -48,6 +49,10 @@ const CampaignsContent: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string>(
     '/images/screenshots/HandM.jpg',
   );
+  const [showSubmissions, setShowSubmissions] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
+    null,
+  );
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(({ title, status }) => {
@@ -58,7 +63,6 @@ const CampaignsContent: React.FC = () => {
         statusFilter === 'all' ||
         (statusFilter === 'active' && status === 'active') ||
         (statusFilter === 'inactive' && status === 'inactive');
-
       return matchesSearch && matchesStatus;
     });
   }, [campaigns, searchQuery, statusFilter]);
@@ -70,6 +74,13 @@ const CampaignsContent: React.FC = () => {
     setCampaigns((prev) => prev.filter((c) => c.title !== title));
     campaignStore.deleteCampaign(id);
   };
+
+  const handleViewSubmissions = (campaign: CampaignType) => {
+    setSelectedCampaign(campaign);
+    setShowSubmissions(true);
+  };
+
+  const handleCloseSubmissions = () => setShowSubmissions(false);
 
   useEffect(() => {
     const sub = authState$.subscribe((state) => {
@@ -109,6 +120,11 @@ const CampaignsContent: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const slideIn = useSpring({
+    transform: showSubmissions ? 'translateX(0)' : 'translateX(100%)',
+    opacity: showSubmissions ? 1 : 0,
+  });
 
   return (
     <div className="relative w-full p-6 sm:p-8 md:p-12">
@@ -216,13 +232,11 @@ const CampaignsContent: React.FC = () => {
                     height={300}
                     className="rounded-2xl w-full h-[150px] object-cover"
                   />
-
                   <div className="bg-black text-white p-3 rounded-b-xl">
                     <div className="flex justify-between items-center">
                       <p className="font-semibold">{campaign.title}</p>
                     </div>
                     <p className="text-xs mt-2">{displayedText}</p>
-
                     {description.length > maxCharCount && (
                       <button
                         onClick={() => toggleExpand(campaign.title)}
@@ -233,9 +247,9 @@ const CampaignsContent: React.FC = () => {
                     )}
                     <div className="flex justify-end mt-2">
                       <button
-                        onClick={() => {
-                          deleteCampaign(campaign.id, campaign.title);
-                        }}
+                        onClick={() =>
+                          deleteCampaign(campaign.id, campaign.title)
+                        }
                         className="px-3 py-1 text-sm bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition flex items-center gap-2"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -253,6 +267,13 @@ const CampaignsContent: React.FC = () => {
                           campaign.status.slice(1)}
                       </p>
                     </div>
+
+                    <button
+                      onClick={() => handleViewSubmissions(campaign)}
+                      className="text-blue-500 text-xs mt-2"
+                    >
+                      View Influencer Submissions
+                    </button>
                   </div>
                 </div>
               );
@@ -262,6 +283,34 @@ const CampaignsContent: React.FC = () => {
 
         <NotificationWidget notifications={notifications} />
       </div>
+
+      {/* Slide-in submissions panel */}
+      <animated.div
+        style={slideIn}
+        className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-end z-50"
+      >
+        <div className="bg-white p-6 w-1/3 h-full overflow-y-auto">
+          <h2 className="text-xl font-semibold mb-4">Influencer Submissions</h2>
+          <button
+            onClick={handleCloseSubmissions}
+            className="bg-red-500 text-white rounded-full px-4 py-2 mb-4"
+          >
+            Close
+          </button>
+          {selectedCampaign && (
+            <>
+              <h3 className="text-lg font-bold mb-4">
+                {selectedCampaign.title}
+              </h3>
+              {/* Map over submissions data */}
+              <div>
+                {/* Replace with actual submission data */}
+                <p>No submissions available yet.</p>
+              </div>
+            </>
+          )}
+        </div>
+      </animated.div>
     </div>
   );
 };
