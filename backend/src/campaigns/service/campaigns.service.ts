@@ -71,6 +71,27 @@ export class CampaignsService {
     return { success: true };
   }
 
+  async getCampaignsByBrandId(brandId: string) {
+    return this.campaignModel.find({ brand: brandId }).exec();
+  }
+
+  async getFilteredCampaigns(status?: string, search?: string) {
+    const filter: any = {};
+
+    if (status) {
+      filter.status = status;
+    }
+
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { instructions: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    return this.campaignModel.find(filter).populate('brand').exec();
+  }
+
   async addSubmission(
     campaignId: string,
     content: string,
