@@ -7,6 +7,7 @@ import { profileUpdateStore } from '../rxjs/profileUpdateStore';
 import { authState$ } from '../rxjs/authStore';
 import NotificationsSection from '../app/components/NotificationsSection';
 import CampaignsSection from '../app/components/CampaignsSection';
+import { campaignStore, CampaignType } from '../rxjs/campaignStore';
 import ProfileWithStats from '../app/components/ProfileCard';
 import { getRandom } from '../app/utils/random';
 
@@ -29,14 +30,14 @@ const InfluencerPage: React.FC = () => {
   }>({});
   const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
 
-  const campaigns = [
-    'Campaign 1',
-    'Campaign 2',
-    'Campaign 3',
-    'Campaign 4',
-    'Campaign 5',
-    'Campaign 6',
-  ];
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+
+  useEffect(() => {
+    campaignStore.fetchCampaigns().then(() => {
+      const sub = campaignStore.campaigns$.subscribe(setCampaigns);
+      return () => sub.unsubscribe();
+    });
+  }, []);
 
   useEffect(() => {
     const sub = authState$.subscribe((state) => {
@@ -173,7 +174,6 @@ const InfluencerPage: React.FC = () => {
 
           <CampaignsSection
             campaigns={campaigns}
-            message={message}
             expanded={expandedCards}
             onExpandToggle={handleToggleExpand}
             onCampaignAction={handleCampaignAction}
