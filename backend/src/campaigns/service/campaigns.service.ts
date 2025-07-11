@@ -75,7 +75,11 @@ export class CampaignsService {
     return this.campaignModel.find({ brand: brandId }).exec();
   }
 
-  async getFilteredCampaigns(status?: string, search?: string) {
+  async getFilteredCampaigns(
+    status?: string,
+    search?: string,
+    brandId?: string,
+  ) {
     const filter: any = {};
 
     if (status) {
@@ -87,6 +91,10 @@ export class CampaignsService {
         { title: { $regex: search, $options: 'i' } },
         { instructions: { $regex: search, $options: 'i' } },
       ];
+    }
+
+    if (brandId) {
+      filter.brand = brandId;
     }
 
     return this.campaignModel.find(filter).populate('brand').exec();
