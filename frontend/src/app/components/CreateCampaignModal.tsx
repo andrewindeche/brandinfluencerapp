@@ -2,6 +2,8 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Dialog } from '@headlessui/react';
 import Image from 'next/image';
 import { campaignStore, CampaignType } from '../../rxjs/campaignStore';
+import { useToast } from '../../hooks/useToast';
+import Toast from './Toast';
 
 interface CreateCampaignModalProps {
   isOpen: boolean;
@@ -24,6 +26,7 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string>('');
   const [images, setImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const { toast, showToast, closeToast } = useToast(3000);
 
   useEffect(() => {
     if (campaignToEdit) {
@@ -68,17 +71,20 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     try {
       if (campaignToEdit) {
         await campaignStore.updateCampaign(campaignToEdit.id, payload);
+        showToast('Campaign updated successfully!', 'success');
       } else {
         const createdCampaign = await campaignStore.createCampaign(payload);
         if (createdCampaign?.id && onCreate) {
           onCreate(createdCampaign);
         }
+        showToast('Campaign created successfully!', 'success');
       }
 
       resetForm();
       onClose();
     } catch (error) {
       console.error('Error submitting campaign:', error);
+      showToast('Failed to submit campaign. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -95,96 +101,116 @@ const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-blue bg-opacity-50" aria-hidden="true" />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-lg bg-zinc-900 p-4 text-gray-100 shadow-xl border border-zinc-700">
-          <h2 className="text-lg font-bold mb-4">
-            {campaignToEdit ? 'Edit Campaign' : 'Create New Campaign'}
-          </h2>
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type || 'success'}
+          onClose={closeToast}
+        />
+      )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Campaign Title"
-              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100 placeholder-gray-300"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-            <textarea
-              placeholder="Campaign Description"
-              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded resize-none text-gray-100 placeholder-gray-300"
-              rows={4}
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              required
-            />
-            <input
-              type="date"
-              className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-            />
-            <input
-              type="date"
-              className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              required
-            />
-            <select
-              className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
-              value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as 'active' | 'inactive')
-              }
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="text-sm text-gray-100"
-            />
-            {(imagePreview || true) && (
-              <Image
-                src={imagePreview || '/images/campaign.jpg'}
-                alt="Preview"
-                width={500}
-                height={300}
-                className="w-full h-48 object-cover rounded"
+      <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+        <div
+          className="fixed inset-0 bg-blue bg-opacity-50"
+          aria-hidden="true"
+        />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-lg bg-zinc-900 p-4 text-gray-100 shadow-xl border border-zinc-700">
+            <h2 className="text-lg font-bold mb-4">
+              {campaignToEdit ? 'Edit Campaign' : 'Create New Campaign'}
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Campaign Title"
+                className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100 placeholder-gray-300"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
               />
-            )}
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 rounded bg-zinc-700 text-gray-200 hover:bg-zinc-600"
+
+              <textarea
+                placeholder="Campaign Description"
+                className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded resize-none text-gray-100 placeholder-gray-300"
+                rows={4}
+                value={instructions}
+                onChange={(e) => setInstructions(e.target.value)}
+                required
+              />
+
+              <input
+                type="date"
+                className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+              />
+
+              <input
+                type="date"
+                className="custom-date-icon w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+              />
+
+              <select
+                className="w-full p-2 bg-zinc-800 border border-zinc-600 rounded text-gray-100"
+                value={status}
+                onChange={(e) =>
+                  setStatus(e.target.value as 'active' | 'inactive')
+                }
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500 font-semibold"
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <div className="loader"></div>
-                ) : campaignToEdit ? (
-                  'Update'
-                ) : (
-                  'Create'
-                )}
-              </button>
-            </div>
-          </form>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="text-sm text-gray-100"
+              />
+
+              {(imagePreview || true) && (
+                <Image
+                  src={imagePreview || '/images/campaign.jpg'}
+                  alt="Preview"
+                  width={500}
+                  height={300}
+                  className="w-full h-48 object-cover rounded"
+                />
+              )}
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 rounded bg-zinc-700 text-gray-200 hover:bg-zinc-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500 font-semibold"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <div className="loader"></div>
+                  ) : campaignToEdit ? (
+                    'Update'
+                  ) : (
+                    'Create'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-    </Dialog>
+      </Dialog>
+    </>
   );
 };
 
