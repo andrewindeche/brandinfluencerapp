@@ -87,8 +87,8 @@ const HomePage: React.FC = () => {
           <Image
             src="/images/woman2.png"
             alt="Amy - TikTok"
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: 'cover' }}
             className="object-cover"
           />
           <p className="influencer-name">AMY - TIK TOK</p>
@@ -101,8 +101,8 @@ const HomePage: React.FC = () => {
           <Image
             src="/images/man.png"
             alt="Brad - YouTuber"
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: 'cover' }}
             sizes="(max-width: 900px) 100vw, 50vw"
             priority
             className="object-cover"
@@ -117,8 +117,8 @@ const HomePage: React.FC = () => {
           <Image
             src="/images/woman3.png"
             alt="Lizzie - Instagram"
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: 'cover' }}
             sizes="(max-width: 100px) 100vw, 50vw"
             className="object-cover"
           />
