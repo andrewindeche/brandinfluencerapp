@@ -18,6 +18,7 @@ import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { SessionAuthGuard } from '../../session-auth/session-auth.guard';
+import { Query } from '@nestjs/common';
 
 @Controller('campaign')
 @UseGuards(JwtAuthGuard, SessionAuthGuard)
@@ -35,9 +36,9 @@ export class CampaignController {
       throw new UnauthorizedException('Only brands can create campaigns');
     }
     return this.campaignService.createCampaign({
-    ...createCampaignDto,
-    brandId: user.userId,
-  });
+      ...createCampaignDto,
+      brandId: user.userId,
+    });
   }
 
   @Patch(':id')
@@ -144,8 +145,22 @@ export class CampaignController {
   }
 
   @Get()
-  getAllCampaigns(@Req() req) {
-    return this.campaignService.getCampaigns();
+  async getAllCampaigns(
+    @Req() req,
+    @Query('status') status: 'active' | 'inactive',
+    @Query('search') search: string,
+  ) {
+    const user = req.user;
+
+    if (user.role === 'influencer') {
+      return this.campaignService.getFilteredCampaigns(status, search);
+    }
+
+    if (user.role === 'brand') {
+      return this.campaignService.getCampaignsByBrandId(user.userId);
+    }
+
+    throw new UnauthorizedException('Invalid user role');
   }
 
   @Get(':id')
