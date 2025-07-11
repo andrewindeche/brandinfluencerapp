@@ -74,7 +74,6 @@ const CampaignsContent: React.FC = () => {
     setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
 
   const deleteCampaign = (id: string, title: string) => {
-    setCampaigns((prev) => prev.filter((c) => c.title !== title));
     campaignStore.deleteCampaign(id);
   };
 
@@ -138,17 +137,10 @@ const CampaignsContent: React.FC = () => {
           setCreateModalOpen(false);
           setSelectedCampaign(null);
         }}
+        campaignToEdit={selectedCampaign}
         onCreate={(newCampaign) => {
-          if (selectedCampaign) {
-            setCampaigns((prev) =>
-              prev.map((c) => (c.id === newCampaign.id ? newCampaign : c)),
-            );
-          } else {
-            setCampaigns((prev) => [...prev, newCampaign]);
-          }
           setSelectedCampaign(null);
         }}
-        campaignToEdit={selectedCampaign}
       />
 
       <div className="flex flex-col lg:flex-row gap-16">
@@ -222,7 +214,7 @@ const CampaignsContent: React.FC = () => {
 
               return (
                 <div
-                  key={campaign.title}
+                  key={campaign.id}
                   className="bg-black text-white p-1 rounded-xl shadow-lg hover:scale-105 transform transition-transform duration-300 w-[240px] max-w-xs"
                 >
                   <Image
@@ -251,14 +243,18 @@ const CampaignsContent: React.FC = () => {
                         <p>End: {campaign.endDate}</p>
                       </div>
                       <p
-                        className={`text-xs font-bold ${campaign.status === 'active' ? 'text-green-400' : 'text-red-400'}`}
+                        className={`text-xs font-bold ${
+                          campaign.status === 'active'
+                            ? 'text-green-400'
+                            : 'text-red-400'
+                        }`}
                       >
                         {campaign.status.charAt(0).toUpperCase() +
                           campaign.status.slice(1)}
                       </p>
                     </div>
 
-                    <div className="flex justify-between items-center gap-1 mt-3">
+                    <div className="flex flex-wrap justify-between items-center gap-1 mt-3">
                       <button
                         onClick={() => {
                           setSelectedCampaign(campaign);
