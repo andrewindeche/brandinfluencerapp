@@ -21,6 +21,9 @@ export class Campaign {
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User' }])
   influencers: MongooseSchema.Types.ObjectId[];
 
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
+  brand: MongooseSchema.Types.ObjectId;
+
   @Prop({ enum: ['active', 'inactive'], default: 'active' })
   status: 'active' | 'inactive';
 
