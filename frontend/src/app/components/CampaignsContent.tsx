@@ -138,7 +138,7 @@ const CampaignsContent: React.FC = () => {
           setSelectedCampaign(null);
         }}
         campaignToEdit={selectedCampaign}
-        onCreate={(newCampaign) => {
+        onCreate={() => {
           setSelectedCampaign(null);
         }}
       />
