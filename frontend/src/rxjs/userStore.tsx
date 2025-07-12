@@ -1,12 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-
-export type User = {
-  username: string;
-  name: string;
-  email: string;
-  role: 'brand' | 'influencer' | 'admin';
-};
+import { User } from '../types';
 
 const userSubject = new BehaviorSubject<User | null>(null);
 

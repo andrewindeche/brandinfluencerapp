@@ -10,8 +10,7 @@ import { AxiosError } from 'axios';
 import { setUser } from './userStore';
 import { loginSchema } from './validation/loginSchema';
 import { registerSchema } from './validation/registerSchema';
-
-export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
+import { UserRole, AuthFormState, LoginResult } from '../types';
 
 interface ErrorResponseData {
   code?: string;
@@ -32,27 +31,6 @@ function isAxiosCustomError(err: unknown): err is AxiosCustomError {
     typeof (err as Record<string, unknown>).message === 'string'
   );
 }
-
-export type AuthFormState = {
-  email: string;
-  role: UserRole;
-  name: string;
-  username: string;
-  password: string;
-  confirmPassword: string;
-  profileImage?: string;
-  bio?: string;
-  category?: string;
-  errors: Record<string, string>;
-  submitting: boolean;
-  success: boolean;
-  serverMessage: string | null;
-  roleDetected: boolean;
-};
-
-export type LoginResult =
-  | { success: true; role: Exclude<UserRole, 'unknown'> }
-  | { success: false; message: string; throttle?: true };
 
 export const initialAuthState: AuthFormState = {
   email: '',

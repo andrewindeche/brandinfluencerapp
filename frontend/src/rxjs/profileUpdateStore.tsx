@@ -2,8 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
 import { authStore } from './authStore';
-
-type ProfileUpdateStatus = 'idle' | 'loading' | 'success' | 'error';
+import { ProfileUpdateStatus } from '../types';
 
 interface ProfileUpdateState {
   status: ProfileUpdateStatus;

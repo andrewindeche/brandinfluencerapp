@@ -1,15 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
-
-export type PasswordResetState = {
-  email: string;
-  token: string;
-  newPassword: string;
-  confirmPassword: string;
-  resetStatus: 'idle' | 'loading' | 'success' | 'error';
-  errorMessage?: string;
-};
+import { PasswordResetState } from '../types';
 
 const initialResetState: PasswordResetState = {
   email: '',

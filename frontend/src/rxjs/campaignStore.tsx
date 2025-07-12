@@ -1,25 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance, { setAuthToken } from './axiosInstance';
-
-type CampaignAPIResponse = {
-  _id: string;
-  title: string;
-  instructions: string;
-  images: string[];
-  startDate: string;
-  endDate: string;
-  status: 'active' | 'inactive';
-};
-
-export type CampaignType = {
-  id: string;
-  title: string;
-  instructions: string;
-  images: string[];
-  startDate: string;
-  endDate: string;
-  status: 'active' | 'inactive';
-};
+import { CampaignAPIResponse, CampaignType } from '../types';
 
 const campaigns$ = new BehaviorSubject<CampaignType[]>([]);
 
