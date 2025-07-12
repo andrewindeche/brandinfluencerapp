@@ -23,14 +23,17 @@ const CampaignsSection: React.FC<Props> = ({
   maxCharCount = 70,
   notificationOpen,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
     null,
   );
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 6;
 
   const handleCardClick = (campaign: CampaignType) => {
     setSelectedCampaign(campaign);
@@ -38,7 +41,6 @@ const CampaignsSection: React.FC<Props> = ({
   };
 
   const handleSubmit = (text: string) => {
-    console.log(`Submission for ${selectedCampaign?.title}:`, text);
     if (selectedCampaign) {
       onCampaignAction(selectedCampaign.title);
     }
@@ -56,6 +58,18 @@ const CampaignsSection: React.FC<Props> = ({
       return matchesSearch && matchesStatus;
     });
   }, [campaigns, searchQuery, statusFilter]);
+
+  const totalPages = Math.ceil(filteredCampaigns.length / pageSize);
+
+  const paginatedCampaigns = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredCampaigns.slice(start, start + pageSize);
+  }, [filteredCampaigns, currentPage]);
+
+  const goToPrevPage = () =>
+    setCurrentPage((prev: number) => Math.max(prev - 1, 1));
+  const goToNextPage = () =>
+    setCurrentPage((prev: number) => Math.min(prev + 1, totalPages));
 
   return (
     <div className="p-4 rounded-2xl shadow-lg bg-white">
@@ -80,14 +94,18 @@ const CampaignsSection: React.FC<Props> = ({
           placeholder="Search campaigns..."
           className="w-full sm:w-1/2 px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
         />
         <div className="relative w-full sm:w-[200px]">
           <select
             value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')
-            }
+            onChange={(e) => {
+              setStatusFilter(e.target.value as 'all' | 'active' | 'inactive');
+              setCurrentPage(1);
+            }}
             className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
           >
             <option value="all">All Statuses</option>
@@ -109,7 +127,7 @@ const CampaignsSection: React.FC<Props> = ({
         }`}
       >
         <AnimatePresence>
-          {filteredCampaigns.map((campaign) => {
+          {paginatedCampaigns.map((campaign) => {
             const isExpanded = expanded[campaign.title];
             const displayedText = isExpanded
               ? campaign.instructions
@@ -192,6 +210,26 @@ const CampaignsSection: React.FC<Props> = ({
             );
           })}
         </AnimatePresence>
+      </div>
+
+      <div className="flex justify-center mt-6 space-x-4 items-center">
+        <button
+          onClick={goToPrevPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="font-semibold text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={goToNextPage}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

@@ -35,6 +35,9 @@ const CampaignsContent: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
     null,
@@ -57,34 +60,6 @@ const CampaignsContent: React.FC = () => {
 
   const maxCharCount = 70;
 
-  const filteredCampaigns = useMemo(() => {
-    return campaigns.filter(({ title, status }) => {
-      const matchesSearch = title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesStatus =
-        statusFilter === 'all' ||
-        (statusFilter === 'active' && status === 'active') ||
-        (statusFilter === 'inactive' && status === 'inactive');
-      return matchesSearch && matchesStatus;
-    });
-  }, [campaigns, searchQuery, statusFilter]);
-
-  const toggleExpand = (title: string) =>
-    setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
-
-  const deleteCampaign = (id: string, title: string) => {
-    campaignStore.deleteCampaign(id);
-    campaignStore.deleteCampaign(title);
-  };
-
-  const handleViewSubmissions = (campaign: CampaignType) => {
-    setSelectedCampaign(campaign);
-    setShowSubmissions(true);
-  };
-
-  const handleCloseSubmissions = () => setShowSubmissions(false);
-
   useEffect(() => {
     const sub = authState$.subscribe((state) => {
       setUsername(state.username || localStorage.getItem('username') || 'User');
@@ -99,9 +74,7 @@ const CampaignsContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const sub = campaignStore.campaigns$.subscribe((data) => {
-      setCampaigns(data);
-    });
+    const sub = campaignStore.campaigns$.subscribe(setCampaigns);
     campaignStore.fetchCampaigns();
     return () => sub.unsubscribe();
   }, []);
@@ -123,6 +96,36 @@ const CampaignsContent: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const toggleExpand = (title: string) => {
+    setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
+  const handleViewSubmissions = (campaign: CampaignType) => {
+    setSelectedCampaign(campaign);
+    setShowSubmissions(true);
+  };
+
+  const handleCloseSubmissions = () => setShowSubmissions(false);
+
+  const filteredCampaigns = useMemo(() => {
+    return campaigns.filter(({ title, status }) => {
+      const matchesSearch = title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && status === 'active') ||
+        (statusFilter === 'inactive' && status === 'inactive');
+      return matchesSearch && matchesStatus;
+    });
+  }, [campaigns, searchQuery, statusFilter]);
+
+  const totalPages = Math.ceil(filteredCampaigns.length / pageSize);
+  const paginatedCampaigns = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredCampaigns.slice(start, start + pageSize);
+  }, [filteredCampaigns, currentPage]);
 
   const slideIn = useSpring({
     transform: showSubmissions ? 'translateX(0)' : 'translateX(100%)',
@@ -169,17 +172,21 @@ const CampaignsContent: React.FC = () => {
               type="text"
               placeholder="Search campaigns..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full sm:w-1/2 px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             />
             <div className="relative w-full sm:w-[200px]">
               <select
                 value={statusFilter}
-                onChange={(e) =>
+                onChange={(e) => {
                   setStatusFilter(
                     e.target.value as 'all' | 'active' | 'inactive',
-                  )
-                }
+                  );
+                  setCurrentPage(1);
+                }}
                 className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <option value="all">All Statuses</option>
@@ -206,12 +213,14 @@ const CampaignsContent: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14">
-            {filteredCampaigns.map((campaign) => {
+            {paginatedCampaigns.map((campaign) => {
               const isExpanded = expanded[campaign.title];
               const description = campaign.instructions;
               const displayedText = isExpanded
                 ? description
-                : `${description.slice(0, maxCharCount)}${description.length > maxCharCount ? '...' : ''}`;
+                : `${description.slice(0, maxCharCount)}${
+                    description.length > maxCharCount ? '...' : ''
+                  }`;
 
               return (
                 <div
@@ -267,7 +276,7 @@ const CampaignsContent: React.FC = () => {
                       </button>
                       <button
                         onClick={() =>
-                          deleteCampaign(campaign.id, campaign.title)
+                          campaignStore.deleteCampaign(campaign.id)
                         }
                         className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600"
                       >
@@ -285,11 +294,34 @@ const CampaignsContent: React.FC = () => {
               );
             })}
           </div>
+
+          <div className="flex justify-center mt-8 space-x-4 items-center">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="font-semibold text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
 
         <NotificationWidget notifications={notifications} />
       </div>
 
+      {/* Submission Slide-In Panel */}
       <animated.div
         style={slideIn}
         className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50"
