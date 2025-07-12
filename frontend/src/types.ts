@@ -1,18 +1,3 @@
-export interface Influencer {
-  alt: string;
-  likes: number;
-  image: string;
-  name: string;
-  message: string;
-}
-
-export interface SubmissionType {
-  id: string;
-  content: string;
-  submittedAt?: string;
-  influencerId?: string;
-}
-
 export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
 export type AuthFormState = {
