@@ -58,3 +58,20 @@ export type User = {
   email: string;
   role: 'brand' | 'influencer' | 'admin';
 };
+
+export type AuthState = {
+  token: string | null;
+  username: string | null;
+  bio: string | null;
+  profileImage: string | null;
+};
+
+export type NotificationStatus = 'accepted' | 'rejected' | 'new_submission';
+
+export interface Notification {
+  id: number;
+  campaign: string;
+  status: NotificationStatus;
+  date: string;
+  message: string;
+}
