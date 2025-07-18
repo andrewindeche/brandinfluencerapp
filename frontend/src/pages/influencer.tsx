@@ -7,7 +7,8 @@ import { profileUpdateStore } from '../rxjs/profileUpdateStore';
 import { authState$ } from '../rxjs/authStore';
 import NotificationsSection from '../app/components/NotificationsSection';
 import CampaignsSection from '../app/components/CampaignsSection';
-import { campaignStore, CampaignType } from '../rxjs/campaignStore';
+import { campaignStore } from '../rxjs/campaignStore';
+import { CampaignType } from '@/types';
 import ProfileWithStats from '../app/components/ProfileCard';
 import { getRandom } from '../app/utils/random';
 
