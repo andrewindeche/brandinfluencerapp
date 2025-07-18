@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, defer } from 'rxjs';
 import axiosInstance, { setAuthToken } from './axiosInstance';
 import { CampaignAPIResponse, CampaignType } from '../types';
 
@@ -35,6 +35,29 @@ export const campaignStore = {
     } catch (err) {
       console.error('Failed to fetch campaigns:', err);
     }
+  },
+
+  joinCampaign: (campaignId: string) => {
+    return defer(async () => {
+      const { data } = await axiosInstance.post(`/campaign/${campaignId}/join`);
+
+      const updatedCampaign: CampaignType = {
+        id: data.campaign._id,
+        title: data.campaign.title,
+        instructions: data.campaign.instructions,
+        images: data.campaign.images,
+        startDate: data.campaign.startDate,
+        endDate: data.campaign.endDate,
+        status: data.campaign.status,
+      };
+
+      const updatedList = campaigns$.value.map((c) =>
+        c.id === updatedCampaign.id ? updatedCampaign : c,
+      );
+
+      campaigns$.next(updatedList);
+      return data;
+    });
   },
 
   createCampaign: async (
