@@ -8,7 +8,8 @@ import { getRandom } from '../utils/random';
 import NotificationWidget from '../components/NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
-import { campaignStore, CampaignType } from '@/rxjs/campaignStore';
+import { campaignStore } from '@/rxjs/campaignStore';
+import { CampaignType } from '../../types';
 import { useSpring, animated } from '@react-spring/web';
 
 const notifications = [
@@ -321,7 +322,6 @@ const CampaignsContent: React.FC = () => {
         <NotificationWidget notifications={notifications} />
       </div>
 
-      {/* Submission Slide-In Panel */}
       <animated.div
         style={slideIn}
         className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50"
