@@ -66,13 +66,14 @@ export class CampaignController {
   @Post(':campaignId/join')
   async joinCampaign(@Param('campaignId') campaignId: string, @Req() req) {
     try {
-      if (!req.user || !req.user.sub) {
-        throw new BadRequestException(
-          'User is not authenticated or missing sub',
-        );
+      const user = req.user;
+
+      const influencerId = user?.sub ?? user?.userId;
+
+      if (!influencerId) {
+        throw new BadRequestException('User is not authenticated');
       }
 
-      const influencerId = req.user.sub.toString();
       if (!isValidObjectId(influencerId)) {
         throw new BadRequestException('Invalid influencer ID');
       }
@@ -85,6 +86,7 @@ export class CampaignController {
       if (campaign.status !== 'active') {
         throw new BadRequestException('Cannot join an inactive campaign');
       }
+
       const alreadyJoined = campaign.influencers.some(
         (inf: any) => inf._id?.toString() === influencerId,
       );
@@ -92,6 +94,7 @@ export class CampaignController {
       if (alreadyJoined) {
         throw new BadRequestException('User has already joined the campaign');
       }
+
       const joinedCampaign = await this.campaignService.joinCampaign(
         campaignId,
         influencerId,
