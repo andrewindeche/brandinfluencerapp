@@ -1,7 +1,8 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Dialog } from '@headlessui/react';
 import Image from 'next/image';
-import { campaignStore, CampaignType } from '../../rxjs/campaignStore';
+import { campaignStore } from '../../rxjs/campaignStore';
+import { CampaignType } from '../../types';
 import { useToast } from '../../hooks/useToast';
 import Toast from './Toast';
 
