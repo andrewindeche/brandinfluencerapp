@@ -59,6 +59,14 @@ export class CampaignsService {
     return existing.save();
   }
 
+  async leaveCampaign(campaignId: string, influencerId: string) {
+  return await this.campaignModel.findByIdAndUpdate(
+    campaignId,
+    { $pull: { influencers: influencerId } },
+    { new: true },
+  );
+}
+
   async deleteCampaign(campaignId: string): Promise<{ success: boolean }> {
     const result = await this.campaignModel.deleteOne({ _id: campaignId });
     if (result.deletedCount === 0) {
