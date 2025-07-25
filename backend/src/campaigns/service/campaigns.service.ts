@@ -97,7 +97,13 @@ export class CampaignsService {
       filter.brand = brandId;
     }
 
-    return this.campaignModel.find(filter).populate('brand').exec();
+    const query = this.campaignModel.find(filter).populate('brand');
+
+    if (!brandId) {
+      query.populate('influencers', '_id');
+    }
+
+    return query.exec();
   }
 
   async addSubmission(
