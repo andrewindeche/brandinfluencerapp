@@ -205,41 +205,54 @@ const CampaignsSection: React.FC<Props> = ({
                   >
                     Submit
                   </button>
-                  <div className="flex justify-between mt-2 space-x-2">
-                    {!campaign.joined ? (
+                  <div className="flex flex-col mt-2 space-y-2">
+                    {campaign.joined ? (
                       <>
+                        <p className="text-sm text-green-400 font-bold text-center">
+                          🎉 Joined
+                        </p>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            campaignStore.joinCampaign(campaign.id).subscribe({
+                            campaignStore.leaveCampaign(campaign.id).subscribe({
                               next: () => {
-                                campaign.joined = true;
+                                campaign.joined = false;
                               },
                               error: (err) => {
                                 alert(
-                                  `Failed to join: ${err.response?.data?.message || err.message}`,
+                                  `Failed to leave: ${
+                                    err.response?.data?.message || err.message
+                                  }`,
                                 );
                               },
                             });
                           }}
-                          className="flex-1 px-3 py-1 text-sm bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition"
-                        >
-                          ✅ Join
-                        </button>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className="flex-1 px-3 py-1 text-sm bg-gray-300 text-black font-semibold rounded-full hover:bg-gray-400 transition"
+                          className="px-3 py-1 text-sm bg-gray-300 text-black font-semibold rounded-full hover:bg-gray-400 transition"
                         >
                           ❌ Leave
                         </button>
                       </>
                     ) : (
-                      <p className="text-sm text-green-400 font-bold">
-                        🎉 Joined
-                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          campaignStore.joinCampaign(campaign.id).subscribe({
+                            next: () => {
+                              campaign.joined = true;
+                            },
+                            error: (err) => {
+                              alert(
+                                `Failed to join: ${
+                                  err.response?.data?.message || err.message
+                                }`,
+                              );
+                            },
+                          });
+                        }}
+                        className="px-3 py-1 text-sm bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition"
+                      >
+                        ✅ Join
+                      </button>
                     )}
                   </div>
                 </div>
