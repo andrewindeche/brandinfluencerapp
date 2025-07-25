@@ -30,6 +30,7 @@ export const campaignStore = {
         startDate: c.startDate,
         endDate: c.endDate,
         status: c.status,
+        joined: c.joined || false,
       }));
       campaignStore.setCampaigns(normalized);
     } catch (err) {

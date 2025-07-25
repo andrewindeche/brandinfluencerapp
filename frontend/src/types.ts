@@ -22,6 +22,7 @@ export type LoginResult =
   | { success: false; message: string; throttle?: true };
 
 export type CampaignAPIResponse = {
+  joined: boolean;
   _id: string;
   title: string;
   instructions: string;
@@ -39,6 +40,7 @@ export type CampaignType = {
   startDate: string;
   endDate: string;
   status: 'active' | 'inactive';
+  joined?: boolean;
 };
 
 export type PasswordResetState = {
