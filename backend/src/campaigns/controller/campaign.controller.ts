@@ -185,6 +185,53 @@ export class CampaignController {
     throw new UnauthorizedException('Invalid user role');
   }
 
+  @Delete(':campaignId/leave')
+  async leaveCampaign(@Param('campaignId') campaignId: string, @Req() req) {
+    try {
+      const user = req.user;
+      const influencerId = user?.sub ?? user?.userId;
+
+      if (!influencerId) {
+        throw new BadRequestException('User is not authenticated');
+      }
+
+      if (!isValidObjectId(influencerId)) {
+        throw new BadRequestException('Invalid influencer ID');
+      }
+
+      const campaign = await this.campaignService.getCampaignById(campaignId);
+      if (!campaign) {
+        throw new BadRequestException('Campaign not found');
+      }
+
+      const alreadyJoined = campaign.influencers.some(
+        (inf: any) => inf._id?.toString() === influencerId,
+      );
+
+      if (!alreadyJoined) {
+        throw new BadRequestException('User has not joined the campaign');
+      }
+
+      const updatedCampaign = await this.campaignService.leaveCampaign(
+        campaignId,
+        influencerId,
+      );
+
+      return {
+        message: 'Successfully left the campaign',
+        campaign: {
+          ...updatedCampaign,
+          joined: false,
+        },
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException(error.message);
+    }
+  }
+
   @Get(':id')
   getCampaign(@Param('id') id: string) {
     return this.campaignService.getCampaignById(id);
