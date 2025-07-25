@@ -102,7 +102,10 @@ export class CampaignController {
 
       return {
         message: 'Successfully joined the campaign',
-        campaign: joinedCampaign,
+        campaign: {
+          ...joinedCampaign,
+          joined: true,
+        },
       };
     } catch (error) {
       if (error instanceof HttpException) {
@@ -156,7 +159,19 @@ export class CampaignController {
     const user = req.user;
 
     if (user.role === 'influencer') {
-      return this.campaignService.getFilteredCampaigns(status, search);
+      const influencerId = user.sub ?? user.userId;
+
+      const campaigns = await this.campaignService.getFilteredCampaigns(
+        status,
+        search,
+      );
+
+      return campaigns.map((campaign) => ({
+        ...campaign.toObject(),
+        joined: campaign.influencers.some(
+          (inf: any) => inf._id.toString() === influencerId,
+        ),
+      }));
     }
 
     if (user.role === 'brand') {
