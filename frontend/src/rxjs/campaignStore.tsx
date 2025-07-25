@@ -153,4 +153,30 @@ export const campaignStore = {
       console.error('❌ Failed to fetch filtered campaigns:', err);
     }
   },
+
+  leaveCampaign: (campaignId: string) => {
+    return defer(async () => {
+      const { data } = await axiosInstance.delete(
+        `/campaign/${campaignId}/leave`,
+      );
+
+      const updatedCampaign: CampaignType = {
+        id: data.campaign._id,
+        title: data.campaign.title,
+        instructions: data.campaign.instructions,
+        images: data.campaign.images,
+        startDate: data.campaign.startDate,
+        endDate: data.campaign.endDate,
+        status: data.campaign.status,
+        joined: false,
+      };
+
+      const updatedList = campaigns$.value.map((c) =>
+        c.id === updatedCampaign.id ? updatedCampaign : c,
+      );
+
+      campaigns$.next(updatedList);
+      return data;
+    });
+  },
 };
