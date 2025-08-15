@@ -122,10 +122,14 @@ export class CampaignController {
     @Req() req,
   ) {
     try {
-      const influencerId = req.user.sub;
+      const influencerId = req.user.sub ?? req.user.userId;
 
       if (!content) {
         throw new BadRequestException('Content is required');
+      }
+
+      if (!isValidObjectId(influencerId)) {
+        throw new BadRequestException('Invalid influencer ID');
       }
 
       const campaign = await this.campaignService.getCampaignById(campaignId);
@@ -135,6 +139,16 @@ export class CampaignController {
 
       if (campaign.status !== 'active') {
         throw new BadRequestException('Cannot submit to an inactive campaign');
+      }
+
+      const hasJoined = campaign.influencers.some(
+        (inf: any) => inf._id.toString() === influencerId,
+      );
+
+      if (!hasJoined) {
+        throw new BadRequestException(
+          'You must join this campaign before submitting content',
+        );
       }
 
       return this.campaignService.addSubmission(
