@@ -6,6 +6,7 @@ import TipBox from './TipBox';
 import SubmissionModal from './SubmissionModal';
 import { CampaignType } from '../../types';
 import { campaignStore } from '@/rxjs/campaignStore';
+import Toast from './Toast';
 
 interface Props {
   campaigns: CampaignType[];
@@ -32,6 +33,19 @@ const CampaignsSection: React.FC<Props> = ({
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
     null,
   );
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>(
+    'success',
+  );
+
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'warning' = 'success',
+  ) => {
+    setToastMessage(message);
+    setToastType(type);
+  };
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 6;
 
@@ -281,6 +295,13 @@ const CampaignsSection: React.FC<Props> = ({
           Next
         </button>
       </div>
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </div>
   );
 };
