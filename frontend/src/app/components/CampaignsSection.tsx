@@ -7,6 +7,7 @@ import SubmissionModal from './SubmissionModal';
 import { CampaignType } from '../../types';
 import { campaignStore } from '@/rxjs/campaignStore';
 import Toast from './Toast';
+import { submissionStore } from '@/rxjs/submissionStore';
 
 interface Props {
   campaigns: CampaignType[];
@@ -21,7 +22,6 @@ const CampaignsSection: React.FC<Props> = ({
   campaigns,
   expanded,
   onExpandToggle,
-  onCampaignAction,
   maxCharCount = 70,
   notificationOpen,
 }) => {
@@ -54,9 +54,21 @@ const CampaignsSection: React.FC<Props> = ({
     setModalOpen(true);
   };
 
-  const handleSubmit = (text: string) => {
-    if (selectedCampaign) {
-      onCampaignAction(`${selectedCampaign.title}: ${text}`);
+  const handleSubmit = async (text: string) => {
+    if (!selectedCampaign) return;
+
+    const newSubmission = await submissionStore.addSubmission(
+      selectedCampaign.id,
+      text,
+    );
+
+    if (newSubmission) {
+      showToast('Submission sent successfully ✅', 'success');
+    } else {
+      showToast(
+        'Failed to submit. Make sure you joined the campaign first!',
+        'error',
+      );
     }
   };
 
@@ -233,10 +245,9 @@ const CampaignsSection: React.FC<Props> = ({
                                 campaign.joined = false;
                               },
                               error: (err) => {
-                                alert(
-                                  `Failed to leave: ${
-                                    err.response?.data?.message || err.message
-                                  }`,
+                                showToast(
+                                  `Failed to leave: ${err.response?.data?.message || err.message}`,
+                                  'error',
                                 );
                               },
                             });
@@ -253,12 +264,15 @@ const CampaignsSection: React.FC<Props> = ({
                           campaignStore.joinCampaign(campaign.id).subscribe({
                             next: () => {
                               campaign.joined = true;
+                              showToast(
+                                'Successfully joined campaign 🎉',
+                                'success',
+                              );
                             },
                             error: (err) => {
-                              alert(
-                                `Failed to join: ${
-                                  err.response?.data?.message || err.message
-                                }`,
+                              showToast(
+                                `Failed to join: ${err.response?.data?.message || err.message}`,
+                                'error',
                               );
                             },
                           });

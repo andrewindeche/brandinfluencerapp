@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance from '../rxjs/axiosInstance';
+import { AxiosError } from 'axios';
 
 interface SubmissionType {
   id: string;
@@ -32,7 +33,7 @@ export const submissionStore: SubmissionStoreType = {
         ...submissions$.getValue(),
         [campaignId]: submissions,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch submissions:', error);
     }
   },
@@ -41,9 +42,7 @@ export const submissionStore: SubmissionStoreType = {
     try {
       const response = await axiosInstance.post(
         `/campaign/${campaignId}/submissions`,
-        {
-          content,
-        },
+        { content },
       );
 
       const newSubmission: SubmissionType = response.data;
@@ -56,8 +55,16 @@ export const submissionStore: SubmissionStoreType = {
 
       submissions$.next(updated);
       return newSubmission;
-    } catch (error) {
-      console.error('Failed to add submission:', error);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (
+          error.response?.status === 400 &&
+          typeof error.response.data?.message === 'string' &&
+          error.response.data.message.toLowerCase().includes('join')
+        ) {
+          return null;
+        }
+      }
       return null;
     }
   },
