@@ -17,9 +17,15 @@ export type AuthFormState = {
   roleDetected: boolean;
 };
 
+export interface ErrorResponseData {
+  code?: string;
+  message?: string;
+  [key: string]: unknown;
+}
+
 export type LoginResult =
   | { success: true; role: Exclude<UserRole, 'unknown'> }
-  | { success: false; message: string; throttle?: true };
+  | ({ success: false; throttle?: true } & ErrorResponseData);
 
 export type CampaignAPIResponse = {
   joined: boolean;
