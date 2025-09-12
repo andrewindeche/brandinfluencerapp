@@ -16,6 +16,7 @@ interface Props {
   onCampaignAction: (title: string) => void;
   maxCharCount?: number;
   notificationOpen: boolean;
+  joined: boolean;
 }
 
 const CampaignsSection: React.FC<Props> = ({
@@ -24,6 +25,7 @@ const CampaignsSection: React.FC<Props> = ({
   onExpandToggle,
   maxCharCount = 70,
   notificationOpen,
+  joined,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
@@ -188,6 +190,7 @@ const CampaignsSection: React.FC<Props> = ({
                   imageSrc={selectedCampaign?.images?.[0] || '/images/fit.jpg'}
                   message={selectedCampaign?.instructions || ''}
                   onSubmit={handleSubmit}
+                  joined={selectedCampaign?.joined ?? false}
                 />
                 <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
                   <div className="flex justify-between items-center">
@@ -227,6 +230,7 @@ const CampaignsSection: React.FC<Props> = ({
                       e.stopPropagation();
                       handleCardClick(campaign);
                     }}
+                    disabled={!joined}
                     className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
                   >
                     Submit
