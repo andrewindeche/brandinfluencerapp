@@ -10,13 +10,12 @@ import { AxiosError } from 'axios';
 import { setUser } from './userStore';
 import { loginSchema } from './validation/loginSchema';
 import { registerSchema } from './validation/registerSchema';
-import { UserRole, AuthFormState, LoginResult } from '../types';
-
-interface ErrorResponseData {
-  code?: string;
-  message?: string;
-  [key: string]: unknown;
-}
+import {
+  UserRole,
+  AuthFormState,
+  LoginResult,
+  ErrorResponseData,
+} from '../types';
 
 interface AxiosCustomError {
   message: string;
@@ -249,12 +248,39 @@ export const authStore = {
       return { success: true, role: data.user.role };
     } catch (error: unknown) {
       console.error('Login error:', error);
-      const isThrottle = isAxiosError(error) && error.response?.status === 429;
-      const message = isAxiosError(error)
-        ? (error.response?.data as ErrorResponseData)?.message || 'Login failed'
-        : error instanceof Error
-          ? error.message
-          : 'Unexpected error occurred during login';
+
+      let message = 'Login failed. Please try again.';
+      let code = 'UNKNOWN_ERROR';
+
+      if (isAxiosError(error)) {
+        const statusCode = error.response?.status;
+        const data = error.response?.data as ErrorResponseData | undefined;
+
+        if (statusCode === 401) {
+          switch (data?.message) {
+            case 'Invalid password':
+              message = 'Incorrect password. Please try again.';
+              code = 'INVALID_PASSWORD';
+              break;
+            case 'User not found or role mismatch':
+              message = 'No account found with that email and role.';
+              code = 'USER_NOT_FOUND';
+              break;
+            default:
+              message = 'Unauthorized. Please check your credentials.';
+              code = 'UNAUTHORIZED';
+              break;
+          }
+        } else if (statusCode === 429) {
+          message = 'Too many login attempts. Please wait and try again.';
+          code = 'TOO_MANY_REQUESTS';
+        } else if (data?.message) {
+          message = data.message;
+          code = data.code || 'UNKNOWN_ERROR';
+        }
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
 
       updateAuthState({
         submitting: false,
@@ -268,7 +294,8 @@ export const authStore = {
       return {
         success: false,
         message,
-        ...(isThrottle ? { throttle: true } : {}),
+        code,
+        throttle: code === 'TOO_MANY_REQUESTS' ? true : undefined,
       };
     }
   },
