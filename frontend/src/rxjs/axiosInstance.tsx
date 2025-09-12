@@ -35,11 +35,13 @@ axiosInstance.interceptors.response.use(
   },
   (error: AxiosError<ErrorResponse>) => {
     if (error.response) {
-      const { data } = error.response;
+      const { data, status } = error.response;
 
       return Promise.reject({
         message: data?.message || 'An unexpected error occurred.',
         code: data?.code || 'UNKNOWN_ERROR',
+        statusCode: status,
+        raw: data,
       });
     }
 
