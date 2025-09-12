@@ -17,6 +17,7 @@ interface Props {
   imageSrc: string;
   message: string;
   onSubmit: (text: string) => void;
+  joined: boolean;
 }
 
 const SubmissionModal: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const SubmissionModal: React.FC<Props> = ({
   imageSrc,
   message,
   onSubmit,
+  joined,
 }) => {
   const [text, setText] = useState('');
 
@@ -101,7 +103,7 @@ const SubmissionModal: React.FC<Props> = ({
                   </button>
                   <button
                     onClick={handleSubmit}
-                    disabled={text.trim() === ''}
+                    disabled={!joined || text.trim() === ''}
                     className={`px-4 py-2 text-sm font-medium rounded-xl text-white transition ${
                       text.trim() === ''
                         ? 'bg-blue-300 cursor-not-allowed'
