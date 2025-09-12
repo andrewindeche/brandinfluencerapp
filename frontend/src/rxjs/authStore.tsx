@@ -86,8 +86,6 @@ function isAxiosError(error: unknown): error is AxiosError {
   return (error as AxiosError).isAxiosError;
 }
 
-let lastDetectedRole: UserRole = 'unknown';
-console.log('Last detected role:', lastDetectedRole);
 const email$ = new BehaviorSubject<string>('');
 
 email$
@@ -130,7 +128,6 @@ email$
         serverMessage: result.error,
         errors: { server: result.error },
       });
-      lastDetectedRole = 'unknown';
     } else if (['brand', 'influencer', 'admin'].includes(result.type)) {
       updateAuthState({
         role: result.type,
@@ -140,7 +137,6 @@ email$
         errors: {},
         roleDetected: true,
       });
-      lastDetectedRole = result.type;
       localStorage.setItem('userType', result.type);
     }
   });
@@ -191,9 +187,9 @@ export const authStore = {
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const key = err.path[0]?.toString() || 'form';
-        fieldErrors[key] = err.message;
+      result.error.issues.forEach((issue) => {
+        const key = issue.path[0]?.toString() || 'form';
+        fieldErrors[key] = issue.message;
       });
       this.setErrors(fieldErrors);
       return { success: false, message: 'Validation failed' };
@@ -282,9 +278,9 @@ export const authStore = {
     const result = registerSchema.safeParse(state);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        const key = err.path[0]?.toString() || 'form';
-        fieldErrors[key] = err.message;
+      result.error.issues.forEach((issue) => {
+        const key = issue.path[0]?.toString() || 'form';
+        fieldErrors[key] = issue.message;
       });
       return this.setErrors(fieldErrors);
     }
