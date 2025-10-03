@@ -1,5 +1,7 @@
-import { ZodSchema } from 'zod';
+import { z, ZodType } from 'zod';
 import { useToast } from './useToast';
+
+type ZodIssue = z.ZodError['issues'][number];
 
 export type ErrorMessages = Record<string, string>;
 
@@ -7,7 +9,7 @@ export function useFormValidation() {
   const { showToast } = useToast();
 
   function validateWithSchema<T>(
-    schema: ZodSchema<T>,
+    schema: ZodType<T>,
     values: unknown,
   ): {
     errors: Record<string, string>;
@@ -17,7 +19,7 @@ export function useFormValidation() {
 
     if (!result.success) {
       const errors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
+      result.error.issues.forEach((err: ZodIssue) => {
         const field = err.path[0]?.toString() || 'form';
         errors[field] = err.message;
       });

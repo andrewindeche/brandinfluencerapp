@@ -246,15 +246,17 @@ export const authStore = {
       );
       localStorage.setItem('bio', data.user.bio || '');
       return { success: true, role: data.user.role };
-    } catch (error: unknown) {
-      console.error('Login error:', error);
+    } catch (err: unknown) {
+      console.error('Login error:', err);
 
       let message = 'Login failed. Please try again.';
       let code = 'UNKNOWN_ERROR';
 
-      if (isAxiosError(error)) {
-        const statusCode = error.response?.status;
-        const data = error.response?.data as ErrorResponseData | undefined;
+      if (isAxiosError(err)) {
+        const statusCode = err.response?.status;
+        const data = err.response?.data as
+          | Partial<{ message: string; code?: string }>
+          | undefined;
 
         if (statusCode === 401) {
           switch (data?.message) {
@@ -276,10 +278,9 @@ export const authStore = {
           code = 'TOO_MANY_REQUESTS';
         } else if (data?.message) {
           message = data.message;
-          code = data.code || 'UNKNOWN_ERROR';
         }
-      } else if (error instanceof Error) {
-        message = error.message;
+      } else if (err instanceof Error) {
+        message = err.message;
       }
 
       updateAuthState({
@@ -295,7 +296,6 @@ export const authStore = {
         success: false,
         message,
         code,
-        throttle: code === 'TOO_MANY_REQUESTS' ? true : undefined,
       };
     }
   },
