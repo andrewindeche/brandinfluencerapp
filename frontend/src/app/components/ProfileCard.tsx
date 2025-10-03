@@ -30,6 +30,7 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const [likes] = useState(() => getRandom(50, 300));
   const [shares] = useState(() => getRandom(10, 100));
   const [campaigns] = useState(() => getRandom(1, 10));
@@ -39,14 +40,12 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
   const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
       const MAX_SIZE_MB = 5;
       const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
       if (file.size > MAX_SIZE_BYTES) {
         showToast(`Image must be smaller than ${MAX_SIZE_MB}MB.`, 'error');
         return;
       }
-
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result as string);
@@ -60,17 +59,35 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
       ? `${profileImage}?t=${Date.now()}`
       : '/images/image4.png');
 
-  const handleSave = async () => {
+  const handleSaveBio = async () => {
     try {
-      await onSave(bioDraft, imageFile);
+      await onSave(bioDraft, null);
       setEditingBio(false);
-      setImageFile(null);
-      setImagePreview(null);
-      showToast('Profile updated successfully!', 'success');
+      showToast('Bio updated successfully!', 'success');
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Network error. Try again.';
       showToast(message, 'error');
+    }
+  };
+
+  const handleSaveImage = async () => {
+    if (!imageFile) {
+      showToast('Please select an image first.', 'error');
+      return;
+    }
+    setImageLoading(true);
+    try {
+      await onSave(bio, imageFile);
+      setImageFile(null);
+      setImagePreview(null);
+      showToast('Profile image updated!', 'success');
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Network error. Try again.';
+      showToast(message, 'error');
+    } finally {
+      setImageLoading(false);
     }
   };
 
@@ -117,8 +134,18 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
             accept="image/*"
             className="hidden"
             onChange={onImageChange}
-            disabled={loading}
+            disabled={loading || imageLoading}
           />
+
+          {imageFile && (
+            <button
+              onClick={handleSaveImage}
+              className="absolute top-12 right-2 bg-yellow-400 text-black px-3 py-1 rounded shadow disabled:opacity-50"
+              disabled={imageLoading}
+            >
+              {imageLoading ? 'Updating...' : 'Update Image'}
+            </button>
+          )}
 
           <div className="absolute transform -translate-x-1/2 rotate-12 px-20 py-3 bottom-6 left-1/2 text-lg bg-black/30 text-white p-2 rounded-full z-10">
             <span className="inline-block transform -rotate-12">
@@ -192,7 +219,7 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
               />
               <div className="flex gap-4 mt-2 justify-center">
                 <button
-                  onClick={handleSave}
+                  onClick={handleSaveBio}
                   className="bg-yellow-400 text-black px-4 py-1 rounded disabled:opacity-50"
                   disabled={loading}
                 >
@@ -202,8 +229,6 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
                   onClick={() => {
                     setEditingBio(false);
                     setBioDraft('');
-                    setImageFile(null);
-                    setImagePreview(null);
                   }}
                   className="bg-gray-600 px-4 py-1 rounded"
                   disabled={loading}
