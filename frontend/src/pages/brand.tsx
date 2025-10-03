@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
-import { Influencer } from '../types';
+import type { Influencer } from '../types';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useRouter } from 'next/router';
@@ -20,6 +20,9 @@ const BrandPage: React.FC = () => {
   );
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
+
+  const MAX_PER_PAGE = 3;
+  const [influencerPage, setInfluencerPage] = useState(1);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -94,6 +97,13 @@ const BrandPage: React.FC = () => {
     },
   ];
 
+  const influencerCount = influencers.length;
+  const influencerMaxPage = Math.ceil(influencerCount / MAX_PER_PAGE);
+  const paginatedInfluencers = influencers.slice(
+    (influencerPage - 1) * MAX_PER_PAGE,
+    influencerPage * MAX_PER_PAGE,
+  );
+
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col items-center px-2 sm:px-4 lg:px-4">
       <div className="absolute top-2 right-6 sm:right-16 z-50">
@@ -147,17 +157,42 @@ const BrandPage: React.FC = () => {
         {activeTab === 'campaigns' ? (
           <CampaignsContent />
         ) : (
-          <div className="flex flex-wrap justify-center gap-20">
-            {influencers.map((influencer) => (
-              <InfluencerCard
-                key={influencer.name}
-                influencer={{
-                  ...influencer,
-                  message: influencer.message,
-                }}
-              />
-            ))}
-          </div>
+          <>
+            <div className="flex flex-wrap justify-center gap-20">
+              {paginatedInfluencers.map((influencer) => (
+                <InfluencerCard
+                  key={influencer.name}
+                  influencer={{
+                    ...influencer,
+                    message: influencer.message,
+                  }}
+                />
+              ))}
+            </div>
+            {influencerMaxPage > 1 && (
+              <div className="flex justify-center mt-4 gap-2">
+                <button
+                  onClick={() => setInfluencerPage((p) => Math.max(1, p - 1))}
+                  disabled={influencerPage === 1}
+                  className="px-3 py-1 rounded bg-gray-200 text-black disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                <span className="px-2">
+                  Page {influencerPage} of {influencerMaxPage}
+                </span>
+                <button
+                  onClick={() =>
+                    setInfluencerPage((p) => Math.min(influencerMaxPage, p + 1))
+                  }
+                  disabled={influencerPage === influencerMaxPage}
+                  className="px-3 py-1 rounded bg-gray-200 text-black disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
