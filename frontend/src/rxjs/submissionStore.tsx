@@ -1,13 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance from '../rxjs/axiosInstance';
 import { AxiosError } from 'axios';
-
-interface SubmissionType {
-  id: string;
-  content: string;
-  submittedAt?: string;
-  influencerId?: string;
-}
+import { SubmissionType } from '../types';
 
 interface SubmissionStoreType {
   submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
@@ -18,7 +12,9 @@ interface SubmissionStoreType {
   ) => Promise<SubmissionType | null>;
 }
 
-const submissions$ = new BehaviorSubject<Record<string, SubmissionType[]>>({});
+export const submissions$ = new BehaviorSubject<
+  Record<string, SubmissionType[]>
+>({});
 
 export const submissionStore: SubmissionStoreType = {
   submissions$,

@@ -83,3 +83,12 @@ export interface Notification {
   date: string;
   message: string;
 }
+
+export interface SubmissionType {
+  id: string;
+  content: string;
+  submittedAt?: string;
+  influencerId?: string;
+  influencerName?: string;
+  date: string;
+}
