@@ -163,6 +163,31 @@ export class CampaignController {
       throw new InternalServerErrorException(error.message);
     }
   }
+  @Get(':campaignId/submissions')
+  async getSubmissions(@Param('campaignId') campaignId: string, @Req() req) {
+    try {
+      if (!isValidObjectId(campaignId)) {
+        throw new BadRequestException('Invalid campaign ID');
+      }
+
+      const submissions: any[] =
+        ((await this.campaignService.getSubmissionsByCampaign(
+          campaignId,
+        )) as any[]) || [];
+
+      if (!submissions || submissions.length === 0) {
+        return {
+          message: 'No submissions found for this campaign yet',
+          submissions: [],
+        };
+      }
+
+      return { count: submissions.length, submissions };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   @Get()
   async getAllCampaigns(

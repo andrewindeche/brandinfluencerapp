@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Inject,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -112,6 +117,31 @@ export class CampaignsService {
     }
 
     return query.exec();
+  }
+
+  async getSubmissionsByCampaign(campaignId: string) {
+    const cacheKey = `submissions_${campaignId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    const campaign = await this.campaignModel
+      .findById(campaignId)
+      .populate('influencers', 'username email')
+      .exec();
+
+    if (!campaign) {
+      throw new NotFoundException('Campaign not found');
+    }
+
+    const submissions = await this.submissionModel
+      .find({ campaign: campaignId })
+      .populate('influencer', 'username email')
+      .sort({ submittedAt: -1 })
+      .lean();
+
+    await this.cacheManager.set(cacheKey, submissions, 600);
+
+    return submissions;
   }
 
   async addSubmission(
