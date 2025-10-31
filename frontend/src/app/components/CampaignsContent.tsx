@@ -9,6 +9,8 @@ import NotificationWidget from '../components/NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
 import { campaignStore } from '@/rxjs/campaignStore';
+import { submissions$, submissionStore } from '@/rxjs/submissionStore';
+import { SubmissionType } from '@/types';
 import { CampaignType } from '../../types';
 import { useSpring, animated } from '@react-spring/web';
 
@@ -31,6 +33,9 @@ const notifications = [
 
 const CampaignsContent: React.FC = () => {
   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+  const [campaignSubmissions, setCampaignSubmissions] = useState<
+    SubmissionType[]
+  >([]);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<
@@ -79,6 +84,20 @@ const CampaignsContent: React.FC = () => {
     campaignStore.fetchCampaigns();
     return () => sub.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!selectedCampaign) return;
+
+    const sub = submissions$.subscribe(
+      (allSubs: Record<string, SubmissionType[]>) => {
+        setCampaignSubmissions(allSubs[selectedCampaign.id] || []);
+      },
+    );
+
+    submissionStore.fetchSubmissions(selectedCampaign.id);
+
+    return () => sub.unsubscribe();
+  }, [selectedCampaign]);
 
   const handleProfileSave = async (
     newBio: string,
@@ -326,23 +345,82 @@ const CampaignsContent: React.FC = () => {
         style={slideIn}
         className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50"
       >
-        <div className="bg-white p-6 w-1/3 h-full overflow-y-auto rounded-l-xl shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Influencer Submissions
-          </h2>
-          <button
-            onClick={handleCloseSubmissions}
-            className="bg-red-500 text-white rounded-full px-4 py-2 mb-4 hover:bg-red-600"
-          >
-            Close
-          </button>
+        <div className="bg-white p-6 w-full sm:w-2/3 md:w-1/2 lg:w-2/5 h-full overflow-y-auto rounded-l-xl shadow-xl">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-800">
+              Influencer Submissions
+            </h2>
+            <button
+              onClick={handleCloseSubmissions}
+              className="bg-red-500 text-white rounded-full px-4 py-2 hover:bg-red-600"
+            >
+              Close
+            </button>
+          </div>
+
           {selectedCampaign && (
             <>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 {selectedCampaign.title}
               </h3>
-              <div className="text-gray-600">
-                <p>No submissions available yet.</p>
+
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1 border border-gray-200 rounded-xl p-4 bg-gray-50">
+                  <h4 className="text-lg font-semibold mb-3">
+                    Submissions ({campaignSubmissions.length})
+                  </h4>
+
+                  {campaignSubmissions.length > 0 ? (
+                    <div className="space-y-4">
+                      {campaignSubmissions.map((sub) => (
+                        <div
+                          key={sub.id}
+                          className="p-3 bg-white rounded-xl shadow-sm border hover:shadow-md transition"
+                        >
+                          <p className="font-semibold text-gray-800 mb-1">
+                            {sub.influencerName || 'Anonymous Influencer'}
+                          </p>
+                          <p className="text-sm text-gray-600 mb-2 line-clamp-3">
+                            {sub.content}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {new Date(sub.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">No submissions yet.</p>
+                  )}
+                </div>
+
+                <div className="w-full md:w-1/3 bg-gradient-to-br from-yellow-100 via-pink-100 to-red-100 rounded-xl p-4 shadow-inner">
+                  <h4 className="text-lg font-semibold mb-3">Overview</h4>
+                  <div className="space-y-2 text-gray-700">
+                    <p>
+                      <strong>Total Submissions:</strong>{' '}
+                      {campaignSubmissions.length}
+                    </p>
+                    <p>
+                      <strong>Start Date:</strong> {selectedCampaign.startDate}
+                    </p>
+                    <p>
+                      <strong>End Date:</strong> {selectedCampaign.endDate}
+                    </p>
+                    <p>
+                      <strong>Status:</strong>{' '}
+                      <span
+                        className={`font-bold ${
+                          selectedCampaign.status === 'active'
+                            ? 'text-green-600'
+                            : 'text-red-600'
+                        }`}
+                      >
+                        {selectedCampaign.status}
+                      </span>
+                    </p>
+                  </div>
+                </div>
               </div>
             </>
           )}
