@@ -85,6 +85,7 @@ export interface Notification {
 }
 
 export interface SubmissionType {
+  status: string;
   id: string;
   content: string;
   submittedAt?: string;
