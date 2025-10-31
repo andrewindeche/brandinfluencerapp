@@ -343,59 +343,63 @@ const CampaignsContent: React.FC = () => {
 
       <animated.div
         style={slideIn}
-        className="fixed inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-75 flex justify-end z-50"
+        className="fixed inset-0 z-50 flex justify-end bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-80"
       >
-        <div className="bg-white p-6 w-full sm:w-2/3 md:w-1/2 lg:w-2/5 h-full overflow-y-auto rounded-l-xl shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Influencer Submissions
-            </h2>
-            <button
-              onClick={handleCloseSubmissions}
-              className="bg-red-500 text-white rounded-full px-4 py-2 hover:bg-red-600"
-            >
-              Close
-            </button>
+        <div className="flex w-full h-full overflow-hidden rounded-l-2xl shadow-2xl">
+          <div className="flex-1 bg-gradient-to-b from-black-700 via-pink-600 to-pink-800 text-white p-6 overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Influencer Submissions</h2>
+              <button
+                onClick={handleCloseSubmissions}
+                className="bg-red-500 text-white rounded-full px-4 py-2 hover:bg-red-600 transition"
+              >
+                Close
+              </button>
+            </div>
+
+            {selectedCampaign && (
+              <>
+                <h3 className="text-xl font-semibold mb-2">
+                  {selectedCampaign.title}
+                </h3>
+
+                <h4 className="text-lg font-semibold mb-3">
+                  Submissions ({campaignSubmissions.length})
+                </h4>
+
+                {campaignSubmissions.length > 0 ? (
+                  <div className="space-y-4">
+                    {campaignSubmissions.map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition"
+                      >
+                        <p className="font-semibold text-white mb-1">
+                          {sub.influencerName || 'Anonymous Influencer'}
+                        </p>
+                        <p className="text-sm text-purple-100 mb-2 line-clamp-3">
+                          {sub.content}
+                        </p>
+                        <p className="text-xs text-purple-300">
+                          {new Date(sub.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-purple-200 italic">No submissions yet.</p>
+                )}
+              </>
+            )}
           </div>
 
-          {selectedCampaign && (
-            <>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {selectedCampaign.title}
-              </h3>
-
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-1 border border-gray-200 rounded-xl p-4 bg-gray-50">
-                  <h4 className="text-lg font-semibold mb-3">
-                    Submissions ({campaignSubmissions.length})
+          <div className="w-full md:w-1/3 bg-gradient-to-br from-yellow-50 via-pink-50 to-red-50 p-6 border-l border-gray-200 flex flex-col justify-between">
+            {selectedCampaign && (
+              <>
+                <div>
+                  <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                    Overview
                   </h4>
-
-                  {campaignSubmissions.length > 0 ? (
-                    <div className="space-y-4">
-                      {campaignSubmissions.map((sub) => (
-                        <div
-                          key={sub.id}
-                          className="p-3 bg-white rounded-xl shadow-sm border hover:shadow-md transition"
-                        >
-                          <p className="font-semibold text-gray-800 mb-1">
-                            {sub.influencerName || 'Anonymous Influencer'}
-                          </p>
-                          <p className="text-sm text-gray-600 mb-2 line-clamp-3">
-                            {sub.content}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(sub.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">No submissions yet.</p>
-                  )}
-                </div>
-
-                <div className="w-full md:w-1/3 bg-gradient-to-br from-yellow-100 via-pink-100 to-red-100 rounded-xl p-4 shadow-inner">
-                  <h4 className="text-lg font-semibold mb-3">Overview</h4>
                   <div className="space-y-2 text-gray-700">
                     <p>
                       <strong>Total Submissions:</strong>{' '}
@@ -421,9 +425,35 @@ const CampaignsContent: React.FC = () => {
                     </p>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
+
+                <div className="mt-6 bg-white/60 p-4 rounded-xl shadow-inner">
+                  <h5 className="font-semibold text-gray-800 mb-2">
+                    Quick Stats
+                  </h5>
+                  <div className="flex items-center justify-between text-sm text-gray-700">
+                    <span>Accepted:</span>
+                    <span className="font-medium text-green-600">
+                      {
+                        campaignSubmissions.filter(
+                          (s) => s.status === 'accepted',
+                        ).length
+                      }
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-gray-700">
+                    <span>Rejected:</span>
+                    <span className="font-medium text-red-600">
+                      {
+                        campaignSubmissions.filter(
+                          (s) => s.status === 'rejected',
+                        ).length
+                      }
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </animated.div>
     </div>
