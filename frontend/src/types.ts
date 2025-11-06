@@ -85,7 +85,7 @@ export interface Notification {
 }
 
 export interface SubmissionType {
-  status: string;
+  status?: 'pending' | 'accepted' | 'rejected'; 
   id: string;
   content: string;
   submittedAt?: string;
