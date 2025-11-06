@@ -24,7 +24,7 @@ export const submissionStore: SubmissionStoreType = {
       const response = await axiosInstance.get(
         `/campaign/${campaignId}/submissions`,
       );
-      const submissions = response.data as SubmissionType[];
+      const submissions = (response.data.submissions || []) as SubmissionType[];
       submissions$.next({
         ...submissions$.getValue(),
         [campaignId]: submissions,
