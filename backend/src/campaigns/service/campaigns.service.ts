@@ -138,9 +138,6 @@ export class CampaignsService {
       .populate('influencer', 'username email')
       .sort({ submittedAt: -1 })
       .lean();
-
-    await this.cacheManager.set(cacheKey, submissions, 600);
-
     return submissions;
   }
 
