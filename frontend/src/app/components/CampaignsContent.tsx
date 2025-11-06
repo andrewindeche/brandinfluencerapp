@@ -14,7 +14,13 @@ import { SubmissionType } from '@/types';
 import { CampaignType } from '../../types';
 import { useSpring, animated } from '@react-spring/web';
 
-const notifications = [
+const notifications: {
+  id: number;
+  campaign: string;
+  status: 'accepted' | 'rejected';
+  date: string;
+  message: string;
+}[] = [
   {
     id: 1,
     campaign: 'Sport Campaign',
@@ -434,9 +440,11 @@ const CampaignsContent: React.FC = () => {
                     <span>Accepted:</span>
                     <span className="font-medium text-green-600">
                       {
-                        campaignSubmissions.filter(
-                          (s) => s.status === 'accepted',
-                        ).length
+                        Array.isArray(campaignSubmissions)
+                          ? campaignSubmissions.filter(
+                              (s) => s.status === 'accepted',
+                            ).length
+                          : 0
                       }
                     </span>
                   </div>
@@ -444,9 +452,11 @@ const CampaignsContent: React.FC = () => {
                     <span>Rejected:</span>
                     <span className="font-medium text-red-600">
                       {
-                        campaignSubmissions.filter(
-                          (s) => s.status === 'rejected',
-                        ).length
+                        Array.isArray(campaignSubmissions)
+                          ? campaignSubmissions.filter(
+                              (s) => s.status === 'rejected',
+                            ).length
+                          : 0
                       }
                     </span>
                   </div>
