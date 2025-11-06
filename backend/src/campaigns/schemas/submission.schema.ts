@@ -5,13 +5,22 @@ const SubmissionSchema = new Schema({
   influencer: { type: Types.ObjectId, ref: 'User', required: true },
   content: { type: String, required: true },
   submittedAt: { type: Date, default: Date.now },
-});
+
+   status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending',
+    },
+  },
+  { timestamps: true }
+);
 
 export interface Submission extends Document {
   campaign: Types.ObjectId;
   influencer: Types.ObjectId;
   content: string;
   submittedAt: Date;
+  status: 'pending' | 'accepted' | 'rejected';
 }
 
 export const SubmissionModel = model<Submission>(
