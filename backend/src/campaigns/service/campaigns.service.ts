@@ -85,7 +85,9 @@ export class CampaignsService {
   }
 
   async getCampaignsByBrandId(brandId: string) {
-    return this.campaignModel.find({ brand: brandId }).exec();
+    return this.campaignModel
+      .find({ brand: new Types.ObjectId(brandId) })
+      .exec();
   }
 
   async getFilteredCampaigns(
