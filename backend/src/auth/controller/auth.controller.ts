@@ -158,7 +158,7 @@ export class AuthController {
 
     if (!user) throw new UnauthorizedException('Invalid refresh token');
 
-    const payload = { username: user.username, sub: user.id, role: user.role };
+    const payload = { username: user.username, sub: user._id, role: user.role };
     const newAccessToken = this.jwtService.sign(payload, { expiresIn: '20m' });
 
     return { access_token: newAccessToken };
@@ -191,7 +191,7 @@ export class AuthController {
     if (!user) throw new NotFoundException('User not found');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await this.usersService.updatePassword(user.id, password);
+    await this.usersService.updatePassword(user._id, password);
     await this.forgotPasswordService.invalidateToken(token);
 
     return { message: 'Password reset successful' };

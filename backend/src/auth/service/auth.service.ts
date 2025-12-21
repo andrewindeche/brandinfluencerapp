@@ -17,7 +17,7 @@ export class AuthService {
   async loginInfluencer(influencer: Influencer) {
     const payload = {
       username: influencer.username,
-      sub: influencer.id,
+      sub: influencer._id,
       role: 'influencer',
     };
     const fullUser = await this.userModel.findById(influencer._id).lean();

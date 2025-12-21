@@ -85,11 +85,13 @@ export interface Notification {
 }
 
 export interface SubmissionType {
-  status?: 'pending' | 'accepted' | 'rejected'; 
-  id: string;
+  _id: string;
   content: string;
   submittedAt?: string;
-  influencerId?: string;
-  influencerName?: string;
-  date: string;
+  status?: 'pending' | 'accepted' | 'rejected'; 
+  influencer: {
+    _id: string;
+    username: string;
+    email?: string;
+  };
 }

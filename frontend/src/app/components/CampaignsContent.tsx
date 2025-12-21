@@ -375,19 +375,22 @@ const CampaignsContent: React.FC = () => {
 
                 {campaignSubmissions.length > 0 ? (
                   <div className="space-y-4">
+                    
                     {campaignSubmissions.map((sub) => (
                       <div
-                        key={sub.id}
+                        key={sub._id}
                         className="bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition"
                       >
                         <p className="font-semibold text-white mb-1">
-                          {sub.influencerName || 'Anonymous Influencer'}
+                          {sub.influencer?.username || 'Anonymous Influencer'}
                         </p>
                         <p className="text-sm text-purple-100 mb-2 line-clamp-3">
                           {sub.content}
                         </p>
                         <p className="text-xs text-purple-300">
-                          {new Date(sub.date).toLocaleDateString()}
+                          {sub.submittedAt
+                            ? new Date(sub.submittedAt).toLocaleDateString()
+                            : 'No date'}
                         </p>
                       </div>
                     ))}
@@ -439,25 +442,21 @@ const CampaignsContent: React.FC = () => {
                   <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Accepted:</span>
                     <span className="font-medium text-green-600">
-                      {
-                        Array.isArray(campaignSubmissions)
-                          ? campaignSubmissions.filter(
-                              (s) => s.status === 'accepted',
-                            ).length
-                          : 0
-                      }
+                      {Array.isArray(campaignSubmissions)
+                        ? campaignSubmissions.filter(
+                            (s) => s.status === 'accepted',
+                          ).length
+                        : 0}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Rejected:</span>
                     <span className="font-medium text-red-600">
-                      {
-                        Array.isArray(campaignSubmissions)
-                          ? campaignSubmissions.filter(
-                              (s) => s.status === 'rejected',
-                            ).length
-                          : 0
-                      }
+                      {Array.isArray(campaignSubmissions)
+                        ? campaignSubmissions.filter(
+                            (s) => s.status === 'rejected',
+                          ).length
+                        : 0}
                     </span>
                   </div>
                 </div>
