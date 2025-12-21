@@ -18,11 +18,10 @@ export class Campaign {
   @Prop({ type: [String], default: [] })
   images: string[];
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
   influencers: Types.ObjectId[];
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
-  brand: MongooseSchema.Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'User' }) brand: Types.ObjectId;
 
   @Prop({ enum: ['active', 'inactive'], default: 'active' })
   status: 'active' | 'inactive';
