@@ -18,8 +18,8 @@ export class Campaign {
   @Prop({ type: [String], default: [] })
   images: string[];
 
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'User' }])
-  influencers: MongooseSchema.Types.ObjectId[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }] })
+  influencers: Types.ObjectId[];
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   brand: MongooseSchema.Types.ObjectId;
