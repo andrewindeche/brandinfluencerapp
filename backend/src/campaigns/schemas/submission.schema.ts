@@ -1,18 +1,19 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-const SubmissionSchema = new Schema({
-  campaign: { type: Types.ObjectId, ref: 'Campaign', required: true },
-  influencer: { type: Types.ObjectId, ref: 'User', required: true },
-  content: { type: String, required: true },
-  submittedAt: { type: Date, default: Date.now },
+const SubmissionSchema = new Schema(
+  {
+    campaign: { type: Types.ObjectId, ref: 'Campaign', required: true },
+    influencer: { type: Types.ObjectId, ref: 'User', required: true },
+    content: { type: String, required: true },
+    submittedAt: { type: Date, default: Date.now },
 
-   status: {
+    status: {
       type: String,
       enum: ['pending', 'accepted', 'rejected'],
       default: 'pending',
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export interface Submission extends Document {
