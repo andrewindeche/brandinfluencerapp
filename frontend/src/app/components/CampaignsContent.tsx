@@ -2,10 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronDown, Pencil, Eye, Trash2 } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
-import ProfileWithStats from '../components/ProfileCard';
-import CreateCampaignModal from '../components/CreateCampaignModal';
+import ProfileWithStats from './ProfileCard';
+import CreateCampaignModal from './CreateCampaignModal';
 import { getRandom } from '../utils/random';
-import NotificationWidget from '../components/NotificationWidget';
+import NotificationWidget from './NotificationWidget';
 import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
 import { campaignStore } from '@/rxjs/campaignStore';
@@ -375,7 +375,6 @@ const CampaignsContent: React.FC = () => {
 
                 {campaignSubmissions.length > 0 ? (
                   <div className="space-y-4">
-                    
                     {campaignSubmissions.map((sub) => (
                       <div
                         key={sub._id}
