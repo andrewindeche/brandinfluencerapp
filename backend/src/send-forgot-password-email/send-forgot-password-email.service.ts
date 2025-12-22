@@ -18,16 +18,16 @@ export class SendForgotPasswordEmailService {
   }
 
   private async initializeTransporter() {
-  this.transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.ETHEREAL_USER,
-      pass: process.env.ETHEREAL_PASS,
-    },
-  });
-}
+    this.transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.ETHEREAL_USER,
+        pass: process.env.ETHEREAL_PASS,
+      },
+    });
+  }
 
   async sendEmail(to: string, resetLink: string): Promise<string> {
     const mailOptions = {
