@@ -28,6 +28,9 @@ export class Campaign {
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }] })
   submissions: Types.ObjectId[];
+
+  @Prop({ type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' })
+  approvalStatus: string;
 }
 
 export const CampaignSchema = SchemaFactory.createForClass(Campaign);
