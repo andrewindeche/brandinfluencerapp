@@ -126,10 +126,7 @@ export class CampaignsService {
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) return cached;
 
-    const campaign = await this.campaignModel
-      .findById(campaignId)
-      .populate('influencers', 'username email')
-      .exec();
+    const campaign = await this.campaignModel.findById(campaignId).exec();
 
     if (!campaign) {
       throw new NotFoundException('Campaign not found');
@@ -137,9 +134,14 @@ export class CampaignsService {
 
     const submissions = await this.submissionModel
       .find({ campaign: campaignId })
-      .populate('influencer', 'username email')
+      .populate({
+        path: 'influencer',
+        select: 'username profileImage email',
+      })
       .sort({ submittedAt: -1 })
-      .lean();
+      .lean()
+      .exec();
+    await this.cacheManager.set(cacheKey, submissions, 300);
     return submissions;
   }
 
@@ -333,5 +335,61 @@ export class CampaignsService {
       influencer,
       submissions: influencer.submissions || [],
     }));
+  }
+
+  async acceptSubmission(
+    submissionId: string,
+    brandId: string,
+  ): Promise<Submission> {
+    const submission = await this.submissionModel
+      .findById(submissionId)
+      .populate('campaign')
+      .exec();
+
+    if (!submission) throw new NotFoundException('Submission not found');
+
+    const campaign: any = submission.campaign;
+    if (!campaign)
+      throw new NotFoundException('Campaign not found on submission');
+
+    if (campaign.brand && campaign.brand.toString() !== brandId.toString()) {
+      throw new BadRequestException('Not authorized');
+    }
+
+    (submission as any).status = 'accepted';
+    await (submission as any).save();
+
+    await this.cacheManager.del(`submissions_${campaign._id || campaign}`);
+
+    return submission as any;
+  }
+
+  async rejectSubmission(
+    submissionId: string,
+    brandId: string,
+  ): Promise<Submission> {
+    const submission = await this.submissionModel
+      .findById(submissionId)
+      .populate('campaign')
+      .exec();
+    if (!submission) throw new NotFoundException('Submission not found');
+
+    const campaign: any = (submission as any).campaign;
+    if (
+      campaign &&
+      campaign.brand &&
+      campaign.brand.toString() !== brandId.toString()
+    ) {
+      throw new BadRequestException(
+        'You are not authorized to reject this submission',
+      );
+    }
+
+    (submission as any).status = 'rejected';
+    await (submission as any).save();
+
+    await this.cacheManager.del(`submissions_${campaign?._id || campaign}`);
+
+    return submission as any;
   }
 }
