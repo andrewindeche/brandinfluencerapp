@@ -1,16 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance from '../rxjs/axiosInstance';
 import { AxiosError } from 'axios';
-import { SubmissionType } from '../types';
-
-interface SubmissionStoreType {
-  submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
-  fetchSubmissions: (campaignId: string) => Promise<void>;
-  addSubmission: (
-    campaignId: string,
-    content: string,
-  ) => Promise<SubmissionType | null>;
-}
+import { SubmissionType,SubmissionStoreType } from '../types';
 
 export const submissions$ = new BehaviorSubject<
   Record<string, SubmissionType[]>
@@ -61,6 +52,56 @@ export const submissionStore: SubmissionStoreType = {
           return null;
         }
       }
+      return null;
+    }
+  },
+
+  async acceptSubmission(campaignId: string, submissionId: string) {
+    try {
+      const response = await axiosInstance.patch(
+        `/campaign/${campaignId}/submissions/${submissionId}/accept`,
+      );
+
+      const updatedSubmission: SubmissionType = response.data;
+
+      const currentSubmissions = submissions$.getValue()[campaignId] || [];
+      const updatedSubmissions = currentSubmissions.map((s) =>
+        s._id === submissionId ? updatedSubmission : s,
+      );
+
+      submissions$.next({
+        ...submissions$.getValue(),
+        [campaignId]: updatedSubmissions,
+      });
+
+      return updatedSubmission;
+    } catch (error: unknown) {
+      console.error('Failed to accept submission:', error);
+      return null;
+    }
+  },
+
+  async rejectSubmission(campaignId: string, submissionId: string) {
+    try {
+      const response = await axiosInstance.patch(
+        `/campaign/${campaignId}/submissions/${submissionId}/reject`,
+      );
+
+      const updatedSubmission: SubmissionType = response.data;
+
+      const currentSubmissions = submissions$.getValue()[campaignId] || [];
+      const updatedSubmissions = currentSubmissions.map((s) =>
+        s._id === submissionId ? updatedSubmission : s,
+      );
+
+      submissions$.next({
+        ...submissions$.getValue(),
+        [campaignId]: updatedSubmissions,
+      });
+
+      return updatedSubmission;
+    } catch (error: unknown) {
+      console.error('Failed to reject submission:', error);
       return null;
     }
   },

@@ -1,3 +1,5 @@
+import { BehaviorSubject } from 'rxjs';
+
 export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
 export type AuthFormState = {
@@ -93,5 +95,21 @@ export interface SubmissionType {
     _id: string;
     username: string;
     email?: string;
-  };
+  }
 }
+export interface SubmissionStoreType {
+    submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
+    fetchSubmissions: (campaignId: string) => Promise<void>;
+    addSubmission: (
+      campaignId: string,
+      content: string,
+    ) => Promise<SubmissionType | null>;
+    acceptSubmission: (
+      campaignId: string,
+      submissionId: string,
+    ) => Promise<SubmissionType | null>;
+    rejectSubmission: (
+      campaignId: string,
+      submissionId: string,
+    ) => Promise<SubmissionType | null>;
+  }
