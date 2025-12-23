@@ -285,4 +285,15 @@ export class CampaignController {
   async getCampaignsByInfluencer(@Param('influencerId') influencerId: string) {
     return this.campaignService.getCampaignsByInfluencer(influencerId);
   }
+
+  @Patch('submissions/:id/accept')
+  async acceptSubmission(@Param('id') id: string, @Req() req) {
+    return this.campaignService.acceptSubmission(id, req.user.brandId);
+  }
+
+  @Patch('submissions/:id/reject')
+  async rejectSubmission(@Param('id') id: string, @Req() req) {
+    return this.campaignService.rejectSubmission(id, req.user.brandId);
+  }
+
 }
