@@ -295,5 +295,4 @@ export class CampaignController {
   async rejectSubmission(@Param('id') id: string, @Req() req) {
     return this.campaignService.rejectSubmission(id, req.user.brandId);
   }
-
 }
