@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import axiosInstance from '../rxjs/axiosInstance';
 import { AxiosError } from 'axios';
-import { SubmissionType,SubmissionStoreType } from '../types';
+import { SubmissionType, SubmissionStoreType } from '../types';
 
 export const submissions$ = new BehaviorSubject<
   Record<string, SubmissionType[]>
