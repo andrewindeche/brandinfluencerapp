@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronDown, Pencil, Eye, Trash2 } from 'lucide-react';
@@ -13,6 +15,7 @@ import { submissions$, submissionStore } from '@/rxjs/submissionStore';
 import { SubmissionType } from '@/types';
 import { CampaignType } from '../../types';
 import { useSpring, animated } from '@react-spring/web';
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 
 const notifications: {
   id: number;
@@ -378,19 +381,89 @@ const CampaignsContent: React.FC = () => {
                     {campaignSubmissions.map((sub) => (
                       <div
                         key={sub._id}
-                        className="bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition"
+                        className="flex items-center justify-between bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition"
                       >
-                        <p className="font-semibold text-white mb-1">
-                          {sub.influencer?.username || 'Anonymous Influencer'}
-                        </p>
-                        <p className="text-sm text-purple-100 mb-2 line-clamp-3">
-                          {sub.content}
-                        </p>
-                        <p className="text-xs text-purple-300">
-                          {sub.submittedAt
-                            ? new Date(sub.submittedAt).toLocaleDateString()
-                            : 'No date'}
-                        </p>
+                        <div className="flex-1">
+                          <p className="font-semibold text-white mb-1">
+                            {sub.influencer?.username || 'Anonymous Influencer'}
+                          </p>
+                          <p className="text-sm text-purple-100 mb-2 line-clamp-3">
+                            {sub.content}
+                          </p>
+                          <p className="text-xs text-purple-300">
+                            {sub.submittedAt
+                              ? new Date(sub.submittedAt).toLocaleDateString()
+                              : 'No date'}
+                          </p>
+                        </div>
+
+                        <div className="mx-4 text-center">
+                          <p
+                            className={`text-sm font-bold ${
+                              sub.status === 'accepted'
+                                ? 'text-green-400'
+                                : sub.status === 'rejected'
+                                  ? 'text-red-400'
+                                  : 'text-yellow-400'
+                            }`}
+                          >
+                            {sub.status ? sub.status.toUpperCase() : 'PENDING'}
+                          </p>
+                        </div>
+
+                        {sub.status === 'pending' && (
+                          <div className="flex gap-3">
+                            <button
+                              onClick={async () => {
+                                const updated =
+                                  await submissionStore.acceptSubmission(
+                                    selectedCampaign!.id,
+                                    sub._id,
+                                  );
+
+                                if (updated) {
+                                  setCampaignSubmissions((prev) =>
+                                    prev.map((s) =>
+                                      s._id === sub._id
+                                        ? { ...s, status: 'accepted' }
+                                        : s,
+                                    ),
+                                  );
+                                  showToast('Submission accepted!', 'success');
+                                }
+                              }}
+                              title="Accept submission"
+                              className="text-green-400 hover:text-green-300 transition"
+                            >
+                              <CheckCircleIcon className="w-6 h-6 fill-green-400 hover:fill-green-300" />
+                            </button>
+
+                            <button
+                              onClick={async () => {
+                                const updated =
+                                  await submissionStore.rejectSubmission(
+                                    selectedCampaign!.id,
+                                    sub._id,
+                                  );
+
+                                if (updated) {
+                                  setCampaignSubmissions((prev) =>
+                                    prev.filter((s) => s._id !== sub._id),
+                                  );
+
+                                  showToast(
+                                    'Submission rejected and removed.',
+                                    'error',
+                                  );
+                                }
+                              }}
+                              title="Reject submission"
+                              className="p-1 rounded-full hover:bg-white/10 transition"
+                            >
+                              <XCircleIcon className="w-6 h-6" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
