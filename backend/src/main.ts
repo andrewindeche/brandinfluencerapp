@@ -9,6 +9,7 @@ import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 import { MongoExceptionFilter } from '../filters/mongo-exception.filter';
 import { AllExceptionsFilter } from '../filters/all-exceptions.filter';
+import { DatabaseUnavailableFilter } from '../filters/database-unavailable.filter';
 import { AdminService } from './admin/admin.service';
 import * as bodyParser from 'body-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -68,7 +69,7 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
-  app.useGlobalFilters(new MongoExceptionFilter(), new AllExceptionsFilter());
+  app.useGlobalFilters(new MongoExceptionFilter(), new AllExceptionsFilter(), new DatabaseUnavailableFilter());
 
   const adminService = app.get(AdminService);
   await adminService.bootstrapSuperUserFromEnv();
