@@ -3,14 +3,13 @@ import { z } from 'zod';
 export const loginSchema = z
   .object({
     email: z
-      .string({ required_error: 'Email is required' })
-      .nonempty('Email is required')
-      .email('Invalid email format')
-      .regex(/^[a-zA-Z0-9@._-]+$/, 'Invalid characters in email')
+      .email({ message: 'Invalid email format' })   
+      .min(1, { message: 'Email is required' })  
+      .regex(/^[a-zA-Z0-9@._-]+$/, { message: 'Invalid characters in email' })
       .transform((val) => val.trim()),
 
     password: z
-      .string({ required_error: 'Password is required' })
+      .string()
       .nonempty('Password is required')
       .min(8, 'Password must be at least 8 characters long')
       .regex(/^(?=.*[A-Z])(?=.*\d).+$/, {
@@ -28,7 +27,7 @@ export const loginSchema = z
     if (data.username && data.password && data.username === data.password) {
       ctx.addIssue({
         path: ['password'],
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'Username and password must not match!',
       });
     }
