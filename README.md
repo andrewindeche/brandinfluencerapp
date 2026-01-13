@@ -139,7 +139,7 @@ https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bw
 ![Brand Dashboard - campaigns](<frontend/public/images/screenshots/Screenshot 2025-02-03 154431.png>)
 ![Influencer Dashboard](<frontend/public/images/screenshots/Screenshot 2025-01-17 231458.png>)
 
-## <h1> Warnings </h1>
+## <h1> Note </h1>
 RXJs is not a state mangement library/it was used in the project purposely for learning. Use state management libraries like Zustand or Redux instead.
 
 ## <h1> Author </h1>
