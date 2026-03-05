@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const registerSchema = z
   .object({
     username: z
-      .string({ required_error: 'Username is required' })
+      .string()
       .nonempty('Username is required')
       .min(3, 'Username must be at least 3 characters long')
       .max(20, 'Username must be at most 20 characters long')
@@ -13,14 +13,12 @@ export const registerSchema = z
       }),
 
     email: z
-      .string({ required_error: 'Email is required' })
-      .nonempty('Email is required')
-      .email('Invalid email address')
-      .regex(/^[a-zA-Z0-9@._-]+$/, 'Invalid characters in email')
+      .email({ message: 'Invalid email format' })
+      .regex(/^[a-zA-Z0-9@._-]+$/, { message: 'Invalid characters in email' })
       .transform((val) => val.trim()),
 
     password: z
-      .string({ required_error: 'Password is required' })
+      .string()
       .nonempty('Password is required')
       .min(8, 'Password must be at least 8 characters long')
       .regex(
@@ -36,14 +34,15 @@ export const registerSchema = z
       ),
 
     confirmPassword: z
-      .string({ required_error: 'Confirmation password is required' })
+      .string()
       .nonempty('Confirmation password is required'),
 
-    role: z.enum(['brand', 'influencer', 'admin', 'superuser'], {
-      required_error: 'Role is required',
-      invalid_type_error:
-        'Role must be one of the following: brand, influencer, admin, superuser',
-    }),
+    role: z
+      .enum(['brand', 'influencer', 'admin', 'superuser'])
+      .refine((val) => val !== undefined, {
+        message:
+          'Role must be one of the following: brand, influencer, admin, superuser',
+      }),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
