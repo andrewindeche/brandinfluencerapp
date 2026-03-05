@@ -190,7 +190,11 @@ export const authStore = {
         const key = issue.path[0]?.toString() || 'form';
         fieldErrors[key] = issue.message;
       });
-      this.setErrors(fieldErrors);
+      updateAuthState({
+        errors: fieldErrors,
+        submitting: false,
+        success: false,
+      });
       return { success: false, message: 'Validation failed' };
     }
 
@@ -249,7 +253,8 @@ export const authStore = {
     } catch (err: unknown) {
       console.error('Login error:', err);
 
-      let message = 'Login failed. Please Check Password or Username and try again.';
+      let message =
+        'Login failed. Please Check Password or Username and try again.';
       let code = 'UNKNOWN_ERROR';
 
       if (isAxiosError(err)) {
