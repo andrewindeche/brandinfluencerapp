@@ -445,7 +445,8 @@ const CampaignsContent: React.FC = () => {
                 </h3>
 
                 <h4 className="text-lg font-semibold mb-3">
-                  Submissions ({campaignSubmissions.length})
+                  Submissions (
+                  {campaignSubmissions.length - fadingOutSubmissions.size})
                 </h4>
 
                 {campaignSubmissions.length > 0 ? (
@@ -532,7 +533,7 @@ const CampaignsContent: React.FC = () => {
                   <div className="space-y-2 text-gray-700">
                     <p>
                       <strong>Total Submissions:</strong>{' '}
-                      {campaignSubmissions.length}
+                      {campaignSubmissions.length - fadingOutSubmissions.size}
                     </p>
                     <p>
                       <strong>Start Date:</strong> {selectedCampaign.startDate}
