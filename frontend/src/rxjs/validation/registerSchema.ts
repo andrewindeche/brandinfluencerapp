@@ -49,7 +49,7 @@ export const registerSchema = z
     if (data.password !== data.confirmPassword) {
       ctx.addIssue({
         path: ['confirmPassword'],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: 'Confirmation password must match the password',
       });
     }
@@ -57,7 +57,7 @@ export const registerSchema = z
     if (data.username && data.password && data.username === data.password) {
       ctx.addIssue({
         path: ['password'],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: 'Username and password must not match!',
       });
     }
