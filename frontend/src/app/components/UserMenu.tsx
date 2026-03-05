@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { authStore } from '@/rxjs/authStore';
 import Loader from './Loader';
 import PageSpinner from './PageSpinner';
@@ -21,7 +23,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showPageSpinner, setShowPageSpinner] = useState(false);
   const [user, setUser] = useState(authStore.getCurrentUser());
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,6 +31,12 @@ const UserMenu: React.FC<UserMenuProps> = ({
       setUser(authStore.getCurrentUser());
     });
     return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   const handleMouseEnter = () => {
@@ -46,9 +54,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const handleLogoutConfirm = async () => {
     setIsLoggingOut(true);
 
-    setTimeout(() => {
-      setShowPageSpinner(true);
-    }, 1500);
+    setTimeout(() => setShowPageSpinner(true), 1500);
 
     setTimeout(() => {
       onLogout?.();
@@ -56,9 +62,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
     }, 3000);
   };
 
-  if (showPageSpinner) {
-    return <PageSpinner />;
-  }
+  if (showPageSpinner) return <PageSpinner />;
 
   return (
     <div
@@ -74,7 +78,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
               alt={userName || 'User'}
               width={60}
               height={60}
-              className="w-full h-full object-cover"
+              style={{ objectFit: 'cover' }}
             />
           </div>
         </div>
@@ -82,7 +86,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-40 bg-black/90 text-white rounded-lg shadow-lg z-10 p-2 text-sm space-y-1">
-          <p className="text-center font-bold">{user.username || 'User'}</p>
+          <p className="text-center font-bold">{user?.username || 'User'}</p>
           <hr className="border-gray-600" />
 
           {!confirmLogout ? (
