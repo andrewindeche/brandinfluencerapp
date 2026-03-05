@@ -40,6 +40,75 @@ const notifications: {
   },
 ];
 
+const SubmissionCard: React.FC<{
+  sub: SubmissionType;
+  isFadingOut: boolean;
+  onAccept: () => Promise<void>;
+  onReject: () => void;
+}> = ({ sub, isFadingOut, onAccept, onReject }) => {
+  const fadeAnimation = useSpring({
+    opacity: isFadingOut ? 0 : 1,
+    transform: isFadingOut
+      ? 'scale(0.95) translateX(20px)'
+      : 'scale(1) translateX(0)',
+    config: { duration: 300 },
+  });
+
+  return (
+    <animated.div key={sub._id} style={fadeAnimation}>
+      <div className="flex items-center justify-between bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition">
+        <div className="flex-1">
+          <p className="font-semibold text-white mb-1">
+            {sub.influencer?.username || 'Anonymous Influencer'}
+          </p>
+          <p className="text-sm text-purple-100 mb-2 line-clamp-3">
+            {sub.content}
+          </p>
+          <p className="text-xs text-purple-300">
+            {sub.submittedAt
+              ? new Date(sub.submittedAt).toLocaleDateString()
+              : 'No date'}
+          </p>
+        </div>
+
+        <div className="mx-4 text-center">
+          <p
+            className={`text-sm font-bold ${
+              sub.status === 'accepted'
+                ? 'text-green-400'
+                : sub.status === 'rejected'
+                  ? 'text-red-400'
+                  : 'text-yellow-400'
+            }`}
+          >
+            {sub.status ? sub.status.toUpperCase() : 'PENDING'}
+          </p>
+        </div>
+
+        {sub.status === 'pending' && (
+          <div className="flex gap-3">
+            <button
+              onClick={onAccept}
+              title="Accept submission"
+              className="text-green-400 hover:text-green-300 transition"
+            >
+              <CheckCircleIcon className="w-6 h-6 fill-green-400 hover:fill-green-300" />
+            </button>
+
+            <button
+              onClick={onReject}
+              title="Reject submission"
+              className="p-1 rounded-full hover:bg-white/10 transition"
+            >
+              <XCircleIcon className="w-6 h-6" />
+            </button>
+          </div>
+        )}
+      </div>
+    </animated.div>
+  );
+};
+
 const CampaignsContent: React.FC = () => {
   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [campaignSubmissions, setCampaignSubmissions] = useState<
@@ -58,6 +127,9 @@ const CampaignsContent: React.FC = () => {
     null,
   );
   const [showSubmissions, setShowSubmissions] = useState(false);
+  const [fadingOutSubmissions, setFadingOutSubmissions] = useState<Set<string>>(
+    new Set(),
+  );
 
   const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
@@ -378,94 +450,70 @@ const CampaignsContent: React.FC = () => {
 
                 {campaignSubmissions.length > 0 ? (
                   <div className="space-y-4">
-                    {campaignSubmissions.map((sub) => (
-                      <div
-                        key={sub._id}
-                        className="flex items-center justify-between bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition"
-                      >
-                        <div className="flex-1">
-                          <p className="font-semibold text-white mb-1">
-                            {sub.influencer?.username || 'Anonymous Influencer'}
-                          </p>
-                          <p className="text-sm text-purple-100 mb-2 line-clamp-3">
-                            {sub.content}
-                          </p>
-                          <p className="text-xs text-purple-300">
-                            {sub.submittedAt
-                              ? new Date(sub.submittedAt).toLocaleDateString()
-                              : 'No date'}
-                          </p>
-                        </div>
+                    {campaignSubmissions.map((sub) => {
+                      const isFadingOut = fadingOutSubmissions.has(sub._id);
 
-                        <div className="mx-4 text-center">
-                          <p
-                            className={`text-sm font-bold ${
-                              sub.status === 'accepted'
-                                ? 'text-green-400'
-                                : sub.status === 'rejected'
-                                  ? 'text-red-400'
-                                  : 'text-yellow-400'
-                            }`}
-                          >
-                            {sub.status ? sub.status.toUpperCase() : 'PENDING'}
-                          </p>
-                        </div>
+                      const handleAccept = async () => {
+                        const updated = await submissionStore.acceptSubmission(
+                          selectedCampaign!.id,
+                          sub._id,
+                        );
 
-                        {sub.status === 'pending' && (
-                          <div className="flex gap-3">
-                            <button
-                              onClick={async () => {
-                                const updated =
-                                  await submissionStore.acceptSubmission(
-                                    selectedCampaign!.id,
-                                    sub._id,
-                                  );
+                        if (updated) {
+                          setCampaignSubmissions((prev) =>
+                            prev.map((s) =>
+                              s._id === sub._id
+                                ? { ...s, status: 'accepted' }
+                                : s,
+                            ),
+                          );
+                          showToast('Submission accepted!', 'success');
+                        }
+                      };
 
-                                if (updated) {
-                                  setCampaignSubmissions((prev) =>
-                                    prev.map((s) =>
-                                      s._id === sub._id
-                                        ? { ...s, status: 'accepted' }
-                                        : s,
-                                    ),
-                                  );
-                                  showToast('Submission accepted!', 'success');
-                                }
-                              }}
-                              title="Accept submission"
-                              className="text-green-400 hover:text-green-300 transition"
-                            >
-                              <CheckCircleIcon className="w-6 h-6 fill-green-400 hover:fill-green-300" />
-                            </button>
+                      const handleReject = () => {
+                        setFadingOutSubmissions((prev) => {
+                          const updated = new Set(prev);
+                          updated.add(sub._id);
+                          return updated;
+                        });
 
-                            <button
-                              onClick={async () => {
-                                const updated =
-                                  await submissionStore.rejectSubmission(
-                                    selectedCampaign!.id,
-                                    sub._id,
-                                  );
+                        setTimeout(async () => {
+                          const updated =
+                            await submissionStore.rejectSubmission(
+                              selectedCampaign!.id,
+                              sub._id,
+                            );
 
-                                if (updated) {
-                                  setCampaignSubmissions((prev) =>
-                                    prev.filter((s) => s._id !== sub._id),
-                                  );
+                          if (updated) {
+                            setCampaignSubmissions((prev) =>
+                              prev.filter((s) => s._id !== sub._id),
+                            );
 
-                                  showToast(
-                                    'Submission rejected and removed.',
-                                    'error',
-                                  );
-                                }
-                              }}
-                              title="Reject submission"
-                              className="p-1 rounded-full hover:bg-white/10 transition"
-                            >
-                              <XCircleIcon className="w-6 h-6" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                            setFadingOutSubmissions((prev) => {
+                              const updated = new Set(prev);
+                              updated.delete(sub._id);
+                              return updated;
+                            });
+
+                            showToast(
+                              'Submission rejected and removed.',
+                              'error',
+                            );
+                          }
+                        }, 300);
+                      };
+
+                      return (
+                        <SubmissionCard
+                          key={sub._id}
+                          sub={sub}
+                          isFadingOut={isFadingOut}
+                          onAccept={handleAccept}
+                          onReject={handleReject}
+                        />
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-purple-200 italic">No submissions yet.</p>
