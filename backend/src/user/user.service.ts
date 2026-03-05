@@ -80,7 +80,7 @@ export class UserService {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       { profileImage: imageUrl },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!user) throw new NotFoundException('User not found');
@@ -91,7 +91,7 @@ export class UserService {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       { bio },
-      { new: true },
+      { returnDocument: 'after' }
     );
 
     if (!user) throw new NotFoundException('User not found');
