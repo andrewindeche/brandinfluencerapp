@@ -249,7 +249,7 @@ export const authStore = {
     } catch (err: unknown) {
       console.error('Login error:', err);
 
-      let message = 'Login failed. Please try again.';
+      let message = 'Login failed. Please Check Password or Username and try again.';
       let code = 'UNKNOWN_ERROR';
 
       if (isAxiosError(err)) {
