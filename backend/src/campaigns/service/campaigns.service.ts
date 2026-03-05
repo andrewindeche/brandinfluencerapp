@@ -11,6 +11,7 @@ import { Campaign } from '../schemas/campaign.schema';
 import { Submission } from '../../auth/schema/submission.schema';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { InjectModel } from '@nestjs/mongoose';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class CampaignsService {
@@ -19,6 +20,7 @@ export class CampaignsService {
     @InjectModel(Submission.name)
     private readonly submissionModel: Model<Submission>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly redisService: RedisService,
   ) {}
 
   async createCampaign(
@@ -68,7 +70,7 @@ export class CampaignsService {
     return await this.campaignModel.findByIdAndUpdate(
       campaignId,
       { $pull: { influencers: influencerId } },
-      { new: true },
+      { returnDocument: 'after' },
     );
   }
 
@@ -278,6 +280,13 @@ export class CampaignsService {
     campaignId: string,
     influencerId: string,
   ): Promise<Campaign> {
+    const key = `joinCampaign:${campaignId}:${influencerId}`;
+    const ttl = 60;
+    await this.redisService.rateLimitOrThrow(
+      key,
+      ttl,
+      `Rate limit exceeded. Try again after ${ttl} seconds.`,
+    );
     const campaign = await this.campaignModel
       .findById(campaignId)
       .populate('influencers', 'username');
