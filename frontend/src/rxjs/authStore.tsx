@@ -31,6 +31,17 @@ function isAxiosCustomError(err: unknown): err is AxiosCustomError {
   );
 }
 
+function zodErrors(error: any) {
+  const fieldErrors: Record<string, string> = {};
+
+  error.issues.forEach((issue: any) => {
+    const key = issue.path[0]?.toString() || "form";
+    if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+  });
+
+  return fieldErrors;
+}
+
 export const initialAuthState: AuthFormState = {
   email: '',
   role: 'unknown',
@@ -96,7 +107,6 @@ email$
         roleDetected: false,
         role: 'unknown',
         serverMessage: null,
-        errors: {},
       });
 
       return axiosInstance
@@ -185,18 +195,12 @@ export const authStore = {
   async login(email: string, password: string): Promise<LoginResult> {
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        const key = issue.path[0]?.toString() || 'form';
-        fieldErrors[key] = issue.message;
-      });
-      updateAuthState({
-        errors: fieldErrors,
-        submitting: false,
-        success: false,
-      });
-      return { success: false, message: 'Validation failed' };
-    }
+  updateAuthState({
+    errors: zodErrors(result.error),
+    submitting: false
+  });
+  return { success: false, message: 'Validation failed' };
+}
 
     if (
       _authState$.value.role === 'unknown' ||
@@ -309,13 +313,12 @@ export const authStore = {
     const state = _authState$.value;
     const result = registerSchema.safeParse(state);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        const key = issue.path[0]?.toString() || 'form';
-        fieldErrors[key] = issue.message;
-      });
-      return this.setErrors(fieldErrors);
-    }
+  updateAuthState({
+    errors: zodErrors(result.error),
+    submitting: false
+  });
+  return;
+}
 
     updateAuthState({ submitting: true, success: false });
     try {
