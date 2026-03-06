@@ -550,13 +550,13 @@ const CampaignsContent: React.FC = () => {
         style={slideIn}
         className="fixed inset-0 z-50 flex justify-end bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 bg-opacity-80"
       >
-        <div className="flex w-full h-full overflow-hidden rounded-l-2xl shadow-2xl">
-          <div className="flex-1 bg-gradient-to-b from-black-700 via-pink-600 to-pink-800 text-white p-6 overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Influencer Submissions</h2>
+        <div className="flex flex-col md:flex-row w-full h-full overflow-hidden rounded-l-2xl shadow-2xl">
+          <div className="flex-1 bg-gradient-to-b from-black-700 via-pink-600 to-pink-800 text-white p-4 sm:p-6 overflow-y-auto">
+            <div className="flex justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold flex-1">Influencer Submissions</h2>
               <button
                 onClick={handleCloseSubmissions}
-                className="bg-red-500 text-white rounded-full px-4 py-2 hover:bg-red-600 transition"
+                className="bg-red-500 text-white rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base hover:bg-red-600 transition flex-shrink-0"
               >
                 Close
               </button>
