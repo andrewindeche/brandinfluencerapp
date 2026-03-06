@@ -90,8 +90,8 @@ export const submissionStore: SubmissionStoreType = {
       const updatedSubmission: SubmissionType = response.data;
 
       const currentSubmissions = submissions$.getValue()[campaignId] || [];
-      const updatedSubmissions = currentSubmissions.filter(
-        (s) => s._id !== submissionId,
+      const updatedSubmissions = currentSubmissions.map((s) =>
+        s._id === submissionId ? updatedSubmission : s,
       );
 
       submissions$.next({
