@@ -45,7 +45,8 @@ const SubmissionCard: React.FC<{
   isFadingOut: boolean;
   onAccept: () => Promise<void>;
   onReject: () => void;
-}> = ({ sub, isFadingOut, onAccept, onReject }) => {
+  isProcessing?: boolean;
+}> = ({ sub, isFadingOut, onAccept, onReject, isProcessing = false }) => {
   const fadeAnimation = useSpring({
     opacity: isFadingOut ? 0 : 1,
     transform: isFadingOut
@@ -94,18 +95,32 @@ const SubmissionCard: React.FC<{
           <animated.div style={buttonsFadeAnimation} className="flex gap-3">
             <button
               onClick={onAccept}
+              disabled={isProcessing}
               title="Accept submission"
-              className="text-green-400 hover:text-green-300 transition"
+              className={`text-green-400 hover:text-green-300 transition ${
+                isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              <CheckCircleIcon className="w-6 h-6 fill-green-400 hover:fill-green-300" />
+              {isProcessing ? (
+                <div className="w-6 h-6 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <CheckCircleIcon className="w-6 h-6 fill-green-400 hover:fill-green-300" />
+              )}
             </button>
 
             <button
               onClick={onReject}
+              disabled={isProcessing}
               title="Reject submission"
-              className="p-1 rounded-full hover:bg-white/10 transition"
+              className={`p-1 rounded-full hover:bg-white/10 transition ${
+                isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              <XCircleIcon className="w-6 h-6" />
+              {isProcessing ? (
+                <div className="w-6 h-6 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <XCircleIcon className="w-6 h-6" />
+              )}
             </button>
           </animated.div>
         )}
@@ -120,6 +135,9 @@ const CampaignsContent: React.FC = () => {
     SubmissionType[]
   >([]);
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<
+    SubmissionType[]
+  >([]);
+  const [rejectedSubmissions, setRejectedSubmissions] = useState<
     SubmissionType[]
   >([]);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
@@ -138,6 +156,15 @@ const CampaignsContent: React.FC = () => {
   const [fadingOutSubmissions, setFadingOutSubmissions] = useState<Set<string>>(
     new Set(),
   );
+  const [submissionSearchQuery, setSubmissionSearchQuery] = useState('');
+  const [submissionPage, setSubmissionPage] = useState(1);
+  const [processingSubmissions, setProcessingSubmissions] = useState<
+    Set<string>
+  >(new Set());
+  const [submissionStatusFilter, setSubmissionStatusFilter] = useState<
+    'all' | 'pending' | 'accepted' | 'rejected'
+  >('all');
+  const submissionsPerPage = 10;
 
   const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
@@ -179,7 +206,20 @@ const CampaignsContent: React.FC = () => {
 
     const sub = submissions$.subscribe(
       (allSubs: Record<string, SubmissionType[]>) => {
-        setCampaignSubmissions(allSubs[selectedCampaign.id] || []);
+        const allCampaignSubs = allSubs[selectedCampaign.id] || [];
+        const pendingSubs = allCampaignSubs.filter(
+          (sub) => sub.status === 'pending' || !sub.status,
+        );
+        const acceptedSubs = allCampaignSubs.filter(
+          (sub) => sub.status === 'accepted',
+        );
+        const rejectedSubs = allCampaignSubs.filter(
+          (sub) => sub.status === 'rejected',
+        );
+
+        setCampaignSubmissions(pendingSubs);
+        setAcceptedSubmissions(acceptedSubs);
+        setRejectedSubmissions(rejectedSubs);
       },
     );
 
@@ -215,7 +255,12 @@ const CampaignsContent: React.FC = () => {
     setShowSubmissions(true);
   };
 
-  const handleCloseSubmissions = () => setShowSubmissions(false);
+  const handleCloseSubmissions = () => {
+    setShowSubmissions(false);
+    setSubmissionSearchQuery('');
+    setSubmissionStatusFilter('all');
+    setSubmissionPage(1);
+  };
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(({ title, status }) => {
@@ -235,6 +280,77 @@ const CampaignsContent: React.FC = () => {
     const start = (currentPage - 1) * pageSize;
     return filteredCampaigns.slice(start, start + pageSize);
   }, [filteredCampaigns, currentPage]);
+
+  const filteredPendingSubmissions = useMemo(() => {
+    return campaignSubmissions.filter(
+      (sub) =>
+        (submissionStatusFilter === 'all' ||
+          submissionStatusFilter === 'pending') &&
+        (sub.content
+          .toLowerCase()
+          .includes(submissionSearchQuery.toLowerCase()) ||
+          sub.influencer?.username
+            .toLowerCase()
+            .includes(submissionSearchQuery.toLowerCase())),
+    );
+  }, [campaignSubmissions, submissionSearchQuery, submissionStatusFilter]);
+
+  const filteredAcceptedSubmissions = useMemo(() => {
+    return acceptedSubmissions.filter(
+      (sub) =>
+        (submissionStatusFilter === 'all' ||
+          submissionStatusFilter === 'accepted') &&
+        (sub.content
+          .toLowerCase()
+          .includes(submissionSearchQuery.toLowerCase()) ||
+          sub.influencer?.username
+            .toLowerCase()
+            .includes(submissionSearchQuery.toLowerCase())),
+    );
+  }, [acceptedSubmissions, submissionSearchQuery, submissionStatusFilter]);
+
+  const filteredRejectedSubmissions = useMemo(() => {
+    return rejectedSubmissions.filter(
+      (sub) =>
+        (submissionStatusFilter === 'all' ||
+          submissionStatusFilter === 'rejected') &&
+        (sub.content
+          .toLowerCase()
+          .includes(submissionSearchQuery.toLowerCase()) ||
+          sub.influencer?.username
+            .toLowerCase()
+            .includes(submissionSearchQuery.toLowerCase())),
+    );
+  }, [rejectedSubmissions, submissionSearchQuery, submissionStatusFilter]);
+
+  const paginatedPendingSubmissions = useMemo(() => {
+    const start = (submissionPage - 1) * submissionsPerPage;
+    return filteredPendingSubmissions.slice(start, start + submissionsPerPage);
+  }, [filteredPendingSubmissions, submissionPage]);
+
+  const paginatedAcceptedSubmissions = useMemo(() => {
+    const start = (submissionPage - 1) * submissionsPerPage;
+    return filteredAcceptedSubmissions.slice(start, start + submissionsPerPage);
+  }, [filteredAcceptedSubmissions, submissionPage]);
+
+  const paginatedRejectedSubmissions = useMemo(() => {
+    const start = (submissionPage - 1) * submissionsPerPage;
+    return filteredRejectedSubmissions.slice(start, start + submissionsPerPage);
+  }, [filteredRejectedSubmissions, submissionPage]);
+
+  const totalSubmissionPages = Math.ceil(
+    Math.max(
+      submissionStatusFilter === 'all' || submissionStatusFilter === 'pending'
+        ? filteredPendingSubmissions.length
+        : 0,
+      submissionStatusFilter === 'all' || submissionStatusFilter === 'accepted'
+        ? filteredAcceptedSubmissions.length
+        : 0,
+      submissionStatusFilter === 'all' || submissionStatusFilter === 'rejected'
+        ? filteredRejectedSubmissions.length
+        : 0,
+    ) / submissionsPerPage,
+  );
 
   const slideIn = useSpring({
     transform: showSubmissions ? 'translateX(0)' : 'translateX(100%)',
@@ -448,88 +564,265 @@ const CampaignsContent: React.FC = () => {
 
             {selectedCampaign && (
               <>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-xl font-semibold mb-4">
                   {selectedCampaign.title}
                 </h3>
 
-                <h4 className="text-lg font-semibold mb-3">
-                  Pending Submissions (
-                  {campaignSubmissions.length - fadingOutSubmissions.size})
-                </h4>
+                <div className="mb-6 flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="text"
+                    placeholder="Search submissions by content or username..."
+                    value={submissionSearchQuery}
+                    onChange={(e) => {
+                      setSubmissionSearchQuery(e.target.value);
+                      setSubmissionPage(1);
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
+                  <div className="relative w-full sm:w-[200px]">
+                    <select
+                      value={submissionStatusFilter}
+                      onChange={(e) => {
+                        setSubmissionStatusFilter(
+                          e.target.value as
+                            | 'all'
+                            | 'pending'
+                            | 'accepted'
+                            | 'rejected',
+                        );
+                        setSubmissionPage(1);
+                      }}
+                      className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="pending">Pending Only</option>
+                      <option value="accepted">Accepted Only</option>
+                      <option value="rejected">Rejected Only</option>
+                    </select>
+                    <ChevronDown
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none"
+                      size={16}
+                    />
+                  </div>
+                </div>
 
-                {campaignSubmissions.length > 0 ||
-                acceptedSubmissions.length > 0 ? (
-                  <div className="space-y-4">
-                    {[...campaignSubmissions, ...acceptedSubmissions].map(
-                      (sub) => {
-                        const isFadingOut = fadingOutSubmissions.has(sub._id);
+                {(submissionStatusFilter === 'all' ||
+                  submissionStatusFilter === 'pending') && (
+                  <>
+                    <h4 className="text-lg font-semibold mb-3">
+                      Pending Submissions ({filteredPendingSubmissions.length})
+                    </h4>
 
-                        const handleAccept = async () => {
-                          const updated =
-                            await submissionStore.acceptSubmission(
-                              selectedCampaign!.id,
-                              sub._id,
+                    {paginatedPendingSubmissions.length > 0 ? (
+                      <div className="space-y-4 mb-6">
+                        {paginatedPendingSubmissions.map((sub) => {
+                          const isFadingOut = fadingOutSubmissions.has(sub._id);
+
+                          const handleAccept = async () => {
+                            setProcessingSubmissions((prev) =>
+                              new Set(prev).add(sub._id),
                             );
+                            try {
+                              const updated =
+                                await submissionStore.acceptSubmission(
+                                  selectedCampaign!.id,
+                                  sub._id,
+                                );
 
-                          if (updated) {
-                            setCampaignSubmissions((prev) =>
-                              prev.filter((s) => s._id !== sub._id),
-                            );
-                            setAcceptedSubmissions((prev) => [
-                              { ...sub, status: 'accepted' },
-                              ...prev,
-                            ]);
-                            showToast('Submission accepted!', 'success');
-                          }
-                        };
-
-                        const handleReject = () => {
-                          setFadingOutSubmissions((prev) => {
-                            const updated = new Set(prev);
-                            updated.add(sub._id);
-                            return updated;
-                          });
-
-                          setTimeout(async () => {
-                            const updated =
-                              await submissionStore.rejectSubmission(
-                                selectedCampaign!.id,
-                                sub._id,
+                              if (updated) {
+                                showToast('Submission accepted!', 'success');
+                              } else {
+                                showToast(
+                                  'Failed to accept submission. Please try again.',
+                                  'error',
+                                );
+                              }
+                            } catch (error) {
+                              console.error(
+                                'Error accepting submission:',
+                                error,
                               );
-
-                            if (updated) {
-                              setCampaignSubmissions((prev) =>
-                                prev.filter((s) => s._id !== sub._id),
+                              showToast(
+                                'Failed to accept submission. Please try again.',
+                                'error',
                               );
-
-                              setFadingOutSubmissions((prev) => {
+                            } finally {
+                              setProcessingSubmissions((prev) => {
                                 const updated = new Set(prev);
                                 updated.delete(sub._id);
                                 return updated;
                               });
-
-                              showToast(
-                                'Submission rejected and removed.',
-                                'error',
-                              );
                             }
-                          }, 300);
-                        };
+                          };
 
-                        return (
-                          <SubmissionCard
-                            key={sub._id}
-                            sub={sub}
-                            isFadingOut={isFadingOut}
-                            onAccept={handleAccept}
-                            onReject={handleReject}
-                          />
-                        );
-                      },
+                          const handleReject = () => {
+                            setFadingOutSubmissions((prev) => {
+                              const updated = new Set(prev);
+                              updated.add(sub._id);
+                              return updated;
+                            });
+
+                            setTimeout(async () => {
+                              setProcessingSubmissions((prev) =>
+                                new Set(prev).add(sub._id),
+                              );
+                              try {
+                                const updated =
+                                  await submissionStore.rejectSubmission(
+                                    selectedCampaign!.id,
+                                    sub._id,
+                                  );
+
+                                if (updated) {
+                                  setFadingOutSubmissions((prev) => {
+                                    const updated = new Set(prev);
+                                    updated.delete(sub._id);
+                                    return updated;
+                                  });
+                                  showToast('Submission rejected!', 'error');
+                                } else {
+                                  setFadingOutSubmissions((prev) => {
+                                    const updated = new Set(prev);
+                                    updated.delete(sub._id);
+                                    return updated;
+                                  });
+                                  showToast(
+                                    'Failed to reject submission. Please try again.',
+                                    'error',
+                                  );
+                                }
+                              } catch (error) {
+                                console.error(
+                                  'Error rejecting submission:',
+                                  error,
+                                );
+                                setFadingOutSubmissions((prev) => {
+                                  const updated = new Set(prev);
+                                  updated.delete(sub._id);
+                                  return updated;
+                                });
+                                showToast(
+                                  'Failed to reject submission. Please try again.',
+                                  'error',
+                                );
+                              } finally {
+                                setProcessingSubmissions((prev) => {
+                                  const updated = new Set(prev);
+                                  updated.delete(sub._id);
+                                  return updated;
+                                });
+                              }
+                            }, 300);
+                          };
+
+                          return (
+                            <SubmissionCard
+                              key={sub._id}
+                              sub={sub}
+                              isFadingOut={isFadingOut}
+                              onAccept={handleAccept}
+                              onReject={handleReject}
+                              isProcessing={processingSubmissions.has(sub._id)}
+                            />
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-purple-200 italic mb-6">
+                        No pending submissions.
+                      </p>
                     )}
+                  </>
+                )}
+
+                {(submissionStatusFilter === 'all' ||
+                  submissionStatusFilter === 'accepted') && (
+                  <>
+                    <h4 className="text-lg font-semibold mb-3">
+                      Accepted Submissions ({filteredAcceptedSubmissions.length}
+                      )
+                    </h4>
+
+                    {paginatedAcceptedSubmissions.length > 0 ? (
+                      <div className="space-y-4 mb-6">
+                        {paginatedAcceptedSubmissions.map((sub) => {
+                          return (
+                            <SubmissionCard
+                              key={sub._id}
+                              sub={{ ...sub, status: 'accepted' }}
+                              isFadingOut={false}
+                              onAccept={async () => {}}
+                              onReject={() => {}}
+                              isProcessing={false}
+                            />
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-purple-200 italic mb-6">
+                        No accepted submissions yet.
+                      </p>
+                    )}
+                  </>
+                )}
+
+                {(submissionStatusFilter === 'all' ||
+                  submissionStatusFilter === 'rejected') && (
+                  <>
+                    <h4 className="text-lg font-semibold mb-3">
+                      Rejected Submissions ({filteredRejectedSubmissions.length}
+                      )
+                    </h4>
+
+                    {paginatedRejectedSubmissions.length > 0 ? (
+                      <div className="space-y-4">
+                        {paginatedRejectedSubmissions.map((sub) => {
+                          return (
+                            <SubmissionCard
+                              key={sub._id}
+                              sub={{ ...sub, status: 'rejected' }}
+                              isFadingOut={false}
+                              onAccept={async () => {}}
+                              onReject={() => {}}
+                              isProcessing={false}
+                            />
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-purple-200 italic">
+                        No rejected submissions yet.
+                      </p>
+                    )}
+                  </>
+                )}
+
+                {totalSubmissionPages > 1 && (
+                  <div className="flex justify-center mt-6 space-x-4 items-center">
+                    <button
+                      onClick={() =>
+                        setSubmissionPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={submissionPage === 1}
+                      className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
+                    <span className="font-semibold text-white">
+                      Page {submissionPage} of {totalSubmissionPages}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setSubmissionPage((prev) =>
+                          Math.min(prev + 1, totalSubmissionPages),
+                        )
+                      }
+                      disabled={submissionPage === totalSubmissionPages}
+                      className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+                    >
+                      Next
+                    </button>
                   </div>
-                ) : (
-                  <p className="text-purple-200 italic">No submissions yet.</p>
                 )}
               </>
             )}
@@ -545,7 +838,9 @@ const CampaignsContent: React.FC = () => {
                   <div className="space-y-2 text-gray-700">
                     <p>
                       <strong>Total Submissions:</strong>{' '}
-                      {campaignSubmissions.length - fadingOutSubmissions.size}
+                      {campaignSubmissions.length +
+                        acceptedSubmissions.length +
+                        rejectedSubmissions.length}
                     </p>
                     <p>
                       <strong>Start Date:</strong> {selectedCampaign.startDate}
@@ -580,7 +875,9 @@ const CampaignsContent: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Rejected:</span>
-                    <span className="font-medium text-red-600">0</span>
+                    <span className="font-medium text-red-600">
+                      {rejectedSubmissions.length}
+                    </span>
                   </div>
                 </div>
               </>
