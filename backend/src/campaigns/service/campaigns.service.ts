@@ -135,7 +135,7 @@ export class CampaignsService {
     }
 
     const submissions = await this.submissionModel
-      .find({ campaign: campaignId })
+      .find({ campaign: campaignId, status: 'pending' })
       .populate({
         path: 'influencer',
         select: 'username profileImage email',

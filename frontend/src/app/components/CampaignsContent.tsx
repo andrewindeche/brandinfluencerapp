@@ -54,6 +54,11 @@ const SubmissionCard: React.FC<{
     config: { duration: 300 },
   });
 
+  const buttonsFadeAnimation = useSpring({
+    opacity: sub.status === 'accepted' ? 0 : 1,
+    config: { duration: 300 },
+  });
+
   return (
     <animated.div key={sub._id} style={fadeAnimation}>
       <div className="flex items-center justify-between bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition">
@@ -86,7 +91,7 @@ const SubmissionCard: React.FC<{
         </div>
 
         {sub.status === 'pending' && (
-          <div className="flex gap-3">
+          <animated.div style={buttonsFadeAnimation} className="flex gap-3">
             <button
               onClick={onAccept}
               title="Accept submission"
@@ -102,7 +107,7 @@ const SubmissionCard: React.FC<{
             >
               <XCircleIcon className="w-6 h-6" />
             </button>
-          </div>
+          </animated.div>
         )}
       </div>
     </animated.div>
@@ -112,6 +117,9 @@ const SubmissionCard: React.FC<{
 const CampaignsContent: React.FC = () => {
   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [campaignSubmissions, setCampaignSubmissions] = useState<
+    SubmissionType[]
+  >([]);
+  const [acceptedSubmissions, setAcceptedSubmissions] = useState<
     SubmissionType[]
   >([]);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
@@ -445,43 +453,20 @@ const CampaignsContent: React.FC = () => {
                 </h3>
 
                 <h4 className="text-lg font-semibold mb-3">
-                  Submissions (
+                  Pending Submissions (
                   {campaignSubmissions.length - fadingOutSubmissions.size})
                 </h4>
 
-                {campaignSubmissions.length > 0 ? (
+                {campaignSubmissions.length > 0 ||
+                acceptedSubmissions.length > 0 ? (
                   <div className="space-y-4">
-                    {campaignSubmissions.map((sub) => {
-                      const isFadingOut = fadingOutSubmissions.has(sub._id);
+                    {[...campaignSubmissions, ...acceptedSubmissions].map(
+                      (sub) => {
+                        const isFadingOut = fadingOutSubmissions.has(sub._id);
 
-                      const handleAccept = async () => {
-                        const updated = await submissionStore.acceptSubmission(
-                          selectedCampaign!.id,
-                          sub._id,
-                        );
-
-                        if (updated) {
-                          setCampaignSubmissions((prev) =>
-                            prev.map((s) =>
-                              s._id === sub._id
-                                ? { ...s, status: 'accepted' }
-                                : s,
-                            ),
-                          );
-                          showToast('Submission accepted!', 'success');
-                        }
-                      };
-
-                      const handleReject = () => {
-                        setFadingOutSubmissions((prev) => {
-                          const updated = new Set(prev);
-                          updated.add(sub._id);
-                          return updated;
-                        });
-
-                        setTimeout(async () => {
+                        const handleAccept = async () => {
                           const updated =
-                            await submissionStore.rejectSubmission(
+                            await submissionStore.acceptSubmission(
                               selectedCampaign!.id,
                               sub._id,
                             );
@@ -490,31 +475,58 @@ const CampaignsContent: React.FC = () => {
                             setCampaignSubmissions((prev) =>
                               prev.filter((s) => s._id !== sub._id),
                             );
-
-                            setFadingOutSubmissions((prev) => {
-                              const updated = new Set(prev);
-                              updated.delete(sub._id);
-                              return updated;
-                            });
-
-                            showToast(
-                              'Submission rejected and removed.',
-                              'error',
-                            );
+                            setAcceptedSubmissions((prev) => [
+                              { ...sub, status: 'accepted' },
+                              ...prev,
+                            ]);
+                            showToast('Submission accepted!', 'success');
                           }
-                        }, 300);
-                      };
+                        };
 
-                      return (
-                        <SubmissionCard
-                          key={sub._id}
-                          sub={sub}
-                          isFadingOut={isFadingOut}
-                          onAccept={handleAccept}
-                          onReject={handleReject}
-                        />
-                      );
-                    })}
+                        const handleReject = () => {
+                          setFadingOutSubmissions((prev) => {
+                            const updated = new Set(prev);
+                            updated.add(sub._id);
+                            return updated;
+                          });
+
+                          setTimeout(async () => {
+                            const updated =
+                              await submissionStore.rejectSubmission(
+                                selectedCampaign!.id,
+                                sub._id,
+                              );
+
+                            if (updated) {
+                              setCampaignSubmissions((prev) =>
+                                prev.filter((s) => s._id !== sub._id),
+                              );
+
+                              setFadingOutSubmissions((prev) => {
+                                const updated = new Set(prev);
+                                updated.delete(sub._id);
+                                return updated;
+                              });
+
+                              showToast(
+                                'Submission rejected and removed.',
+                                'error',
+                              );
+                            }
+                          }, 300);
+                        };
+
+                        return (
+                          <SubmissionCard
+                            key={sub._id}
+                            sub={sub}
+                            isFadingOut={isFadingOut}
+                            onAccept={handleAccept}
+                            onReject={handleReject}
+                          />
+                        );
+                      },
+                    )}
                   </div>
                 ) : (
                   <p className="text-purple-200 italic">No submissions yet.</p>
@@ -563,22 +575,12 @@ const CampaignsContent: React.FC = () => {
                   <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Accepted:</span>
                     <span className="font-medium text-green-600">
-                      {Array.isArray(campaignSubmissions)
-                        ? campaignSubmissions.filter(
-                            (s) => s.status === 'accepted',
-                          ).length
-                        : 0}
+                      {acceptedSubmissions.length}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Rejected:</span>
-                    <span className="font-medium text-red-600">
-                      {Array.isArray(campaignSubmissions)
-                        ? campaignSubmissions.filter(
-                            (s) => s.status === 'rejected',
-                          ).length
-                        : 0}
-                    </span>
+                    <span className="font-medium text-red-600">0</span>
                   </div>
                 </div>
               </>

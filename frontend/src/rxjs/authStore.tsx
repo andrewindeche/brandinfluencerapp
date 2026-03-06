@@ -35,7 +35,7 @@ function zodErrors(error: any) {
   const fieldErrors: Record<string, string> = {};
 
   error.issues.forEach((issue: any) => {
-    const key = issue.path[0]?.toString() || "form";
+    const key = issue.path[0]?.toString() || 'form';
     if (!fieldErrors[key]) fieldErrors[key] = issue.message;
   });
 
@@ -195,12 +195,12 @@ export const authStore = {
   async login(email: string, password: string): Promise<LoginResult> {
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
-  updateAuthState({
-    errors: zodErrors(result.error),
-    submitting: false
-  });
-  return { success: false, message: 'Validation failed' };
-}
+      updateAuthState({
+        errors: zodErrors(result.error),
+        submitting: false,
+      });
+      return { success: false, message: 'Validation failed' };
+    }
 
     if (
       _authState$.value.role === 'unknown' ||
@@ -313,12 +313,12 @@ export const authStore = {
     const state = _authState$.value;
     const result = registerSchema.safeParse(state);
     if (!result.success) {
-  updateAuthState({
-    errors: zodErrors(result.error),
-    submitting: false
-  });
-  return;
-}
+      updateAuthState({
+        errors: zodErrors(result.error),
+        submitting: false,
+      });
+      return;
+    }
 
     updateAuthState({ submitting: true, success: false });
     try {
