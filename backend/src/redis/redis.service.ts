@@ -50,4 +50,26 @@ export class RedisService {
     if (isLimited) throw new Error(message);
     await this.setRateLimit(key, ttlSeconds);
   }
+
+  async incrementCounterRateLimit(
+    key: string,
+    maxCount: number,
+    ttlSeconds: number,
+  ): Promise<number> {
+    const current = await this.client.incr(key);
+    if (current === 1) {
+      await this.client.expire(key, ttlSeconds);
+    }
+    if (current > maxCount) {
+      throw new Error(
+        `Rate limit exceeded. Maximum ${maxCount} actions allowed per session. Try again later.`,
+      );
+    }
+    return current;
+  }
+
+  async getCounterValue(key: string): Promise<number> {
+    const value = await this.client.get(key);
+    return value ? parseInt(value, 10) : 0;
+  }
 }

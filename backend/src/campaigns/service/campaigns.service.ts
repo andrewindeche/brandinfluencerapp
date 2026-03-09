@@ -276,6 +276,17 @@ export class CampaignsService {
     campaignId: string,
     influencerId: string,
   ): Promise<Campaign> {
+    // Rate limit: max 5 joins per 30-minute session
+    const sessionKey = `joinCampaignSession:${influencerId}`;
+    const maxJoinsPerSession = 5;
+    const sessionTtl = 30 * 60; // 30 minutes
+
+    await this.redisService.incrementCounterRateLimit(
+      sessionKey,
+      maxJoinsPerSession,
+      sessionTtl,
+    );
+
     const key = `joinCampaign:${campaignId}:${influencerId}`;
     const ttl = 60;
     await this.redisService.rateLimitOrThrow(
