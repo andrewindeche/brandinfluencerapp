@@ -90,26 +90,27 @@ export interface SubmissionType {
   _id: string;
   content: string;
   submittedAt?: string;
-  status?: 'pending' | 'accepted' | 'rejected'; 
+  status?: 'pending' | 'accepted' | 'rejected';
   influencer: {
     _id: string;
     username: string;
     email?: string;
-  }
+    profileImage?: string;
+  };
 }
 export interface SubmissionStoreType {
-    submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
-    fetchSubmissions: (campaignId: string) => Promise<void>;
-    addSubmission: (
-      campaignId: string,
-      content: string,
-    ) => Promise<SubmissionType | null>;
-    acceptSubmission: (
-      campaignId: string,
-      submissionId: string,
-    ) => Promise<SubmissionType | null>;
-    rejectSubmission: (
-      campaignId: string,
-      submissionId: string,
-    ) => Promise<SubmissionType | null>;
-  }
+  submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
+  fetchSubmissions: (campaignId: string) => Promise<void>;
+  addSubmission: (
+    campaignId: string,
+    content: string,
+  ) => Promise<SubmissionType | null>;
+  acceptSubmission: (
+    campaignId: string,
+    submissionId: string,
+  ) => Promise<SubmissionType | null>;
+  rejectSubmission: (
+    campaignId: string,
+    submissionId: string,
+  ) => Promise<SubmissionType | null>;
+}

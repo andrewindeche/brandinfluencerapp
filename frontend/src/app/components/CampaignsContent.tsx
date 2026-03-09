@@ -77,9 +77,18 @@ const SubmissionCard: React.FC<{
     <animated.div key={sub._id} style={fadeAnimation}>
       <div className="flex items-center justify-between bg-black backdrop-blur-sm border border-white-500 p-4 rounded-xl shadow-md hover:shadow-lg transition">
         <div className="flex-1">
-          <p className="font-semibold text-white mb-1">
-            {sub.influencer?.username || 'Anonymous Influencer'}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Image
+              src={sub.influencer?.profileImage || '/images/image4.png'}
+              alt={sub.influencer?.username || 'User'}
+              width={24}
+              height={24}
+              className="rounded-full"
+            />
+            <p className="font-semibold text-white">
+              {sub.influencer?.username || 'Anonymous Influencer'}
+            </p>
+          </div>
           <p className="text-sm text-purple-100 mb-2 line-clamp-3">
             {sub.content}
           </p>
@@ -800,7 +809,9 @@ const CampaignsContent: React.FC = () => {
                               isFadingOut={isFadingOut}
                               onAccept={handleAccept}
                               onReject={handleReject}
-                              isProcessing={processingSubmissions.has(sub._id)} isFadingIn={false}                            />
+                              isProcessing={processingSubmissions.has(sub._id)}
+                              isFadingIn={false}
+                            />
                           );
                         })}
                       </div>
