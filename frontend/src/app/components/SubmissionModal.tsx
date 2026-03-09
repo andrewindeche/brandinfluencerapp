@@ -10,7 +10,6 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { TransitionChild } from '@headlessui/react';
 import { SubmissionModalProps } from '../../interfaces';
-}
 
 const SubmissionModal: React.FC<SubmissionModalProps> = ({
   isOpen,
