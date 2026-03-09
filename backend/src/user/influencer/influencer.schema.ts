@@ -21,3 +21,5 @@ export const InfluencerModel = UserModel.discriminator<Influencer>(
   InfluencerSchema,
   'influencer',
 );
+
+export type { Influencer };
