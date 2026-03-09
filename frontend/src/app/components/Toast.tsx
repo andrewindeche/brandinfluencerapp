@@ -1,10 +1,5 @@
 import React, { useEffect } from 'react';
-
-interface ToastProps {
-  message: string;
-  type?: 'success' | 'error' | 'warning';
-  onClose: () => void;
-}
+import { ToastProps } from '../../interfaces';
 
 const Toast: React.FC<ToastProps> = ({
   message,

@@ -4,14 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { authStore } from '@/rxjs/authStore';
+import { UserMenuProps } from '@/interfaces';
 import Loader from './Loader';
 import PageSpinner from './PageSpinner';
-
-interface UserMenuProps {
-  userName?: string;
-  imageSrc?: string;
-  onLogout?: () => void;
-}
 
 const UserMenu: React.FC<UserMenuProps> = ({
   userName,

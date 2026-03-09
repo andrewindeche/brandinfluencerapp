@@ -1,9 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-
-interface ErrorResponse {
-  code?: string;
-  message?: string;
-}
+import { ErrorResponse } from '../interfaces';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:4000',

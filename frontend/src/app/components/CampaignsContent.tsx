@@ -12,7 +12,7 @@ import { profileUpdateStore } from '@/rxjs/profileUpdateStore';
 import { authState$ } from '@/rxjs/authStore';
 import { campaignStore } from '@/rxjs/campaignStore';
 import { submissions$, submissionStore } from '@/rxjs/submissionStore';
-import { SubmissionType } from '@/types';
+import { SubmissionType } from '@/interfaces';
 import { CampaignType } from '../../types';
 import { useSpring, animated } from '@react-spring/web';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';

@@ -1,21 +1,7 @@
 import { Schema } from 'mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
-import { Submission } from '../../auth/schema/submission.schema';
+import { Submission, Influencer } from '../../interfaces';
 import { User, UserModel } from '../user.schema';
-
-export interface Influencer extends User {
-  socialMediaHandles: {
-    instagram?: string;
-    youtube?: string;
-    twitter?: string;
-  };
-  category: string;
-  bio: string;
-  submissions: Submission[];
-  campaign?: MongooseSchema.Types.ObjectId;
-  role: 'influencer';
-  profileImage?: string;
-}
 
 export const InfluencerSchema = new Schema<Influencer>({
   socialMediaHandles: {

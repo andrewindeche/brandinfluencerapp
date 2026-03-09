@@ -1,5 +1,6 @@
 import { Schema, model, Document, Types } from 'mongoose';
 import { Campaign } from '../../campaigns/schemas/campaign.schema';
+import { SubmissionDocument } from '../../interfaces';
 
 const SubmissionSchema = new Schema(
   {
@@ -17,15 +18,7 @@ const SubmissionSchema = new Schema(
   { timestamps: true },
 );
 
-export interface Submission extends Document {
-  campaign: Types.ObjectId | Campaign;
-  influencer: Types.ObjectId;
-  content: string;
-  submittedAt: Date;
-  status: 'pending' | 'accepted' | 'rejected';
-}
-
-export const SubmissionModel = model<Submission>(
+export const SubmissionModel = model<SubmissionDocument>(
   'Submission',
   SubmissionSchema,
 );

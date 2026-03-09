@@ -3,11 +3,7 @@ import axiosInstance from './axiosInstance';
 import { AxiosError } from 'axios';
 import { authStore } from './authStore';
 import { ProfileUpdateStatus } from '../types';
-
-interface ProfileUpdateState {
-  status: ProfileUpdateStatus;
-  error: string | null;
-}
+import { ProfileUpdateState } from '../interfaces';
 
 const _state$ = new BehaviorSubject<ProfileUpdateState>({
   status: 'idle',

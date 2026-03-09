@@ -10,17 +10,8 @@ import { AxiosError } from 'axios';
 import { setUser } from './userStore';
 import { loginSchema } from './validation/loginSchema';
 import { registerSchema } from './validation/registerSchema';
-import {
-  UserRole,
-  AuthFormState,
-  LoginResult,
-  ErrorResponseData,
-} from '../types';
-
-interface AxiosCustomError {
-  message: string;
-  code?: string;
-}
+import { UserRole, AuthFormState, LoginResult } from '../types';
+import { ErrorResponseData, AxiosCustomError } from '../interfaces';
 
 function isAxiosCustomError(err: unknown): err is AxiosCustomError {
   return (

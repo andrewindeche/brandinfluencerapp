@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-
-const MAX_CHAR_COUNT = 70;
-
-interface Influencer {
-  alt: string;
-  likes: number;
-  image: string;
-  name: string;
-  message: string;
-}
+import { Influencer } from '../../interfaces';
 
 const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
   influencer,

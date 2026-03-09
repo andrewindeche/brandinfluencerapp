@@ -5,21 +5,12 @@ import { ChevronDown } from 'lucide-react';
 import TipBox from './TipBox';
 import SubmissionModal from './SubmissionModal';
 import { CampaignType } from '../../types';
+import { CampaignsSectionProps } from '../../interfaces';
 import { campaignStore } from '@/rxjs/campaignStore';
 import Toast from './Toast';
 import { submissionStore } from '@/rxjs/submissionStore';
 
-interface Props {
-  campaigns: CampaignType[];
-  expanded: { [key: string]: boolean };
-  onExpandToggle: (title: string) => void;
-  onCampaignAction: (title: string) => void;
-  maxCharCount?: number;
-  notificationOpen: boolean;
-  joined: boolean;
-}
-
-const CampaignsSection: React.FC<Props> = ({
+const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   campaigns,
   expanded,
   onExpandToggle,

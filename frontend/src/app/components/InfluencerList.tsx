@@ -1,13 +1,6 @@
 import React from 'react';
 import InfluencerCard from './InfluencerCard';
-
-interface Influencer {
-  alt: string;
-  likes: number;
-  image: string;
-  name: string;
-  message: string;
-}
+import { Influencer } from '../../interfaces';
 
 const InfluencerList: React.FC<{ influencers: Influencer[] }> = ({
   influencers,

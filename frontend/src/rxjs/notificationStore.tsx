@@ -1,12 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-
-interface NotificationType {
-  id: number;
-  campaignTitle: string;
-  type: 'submission' | 'status';
-  message: string;
-  timestamp: string;
-}
+import { NotificationType } from '../interfaces';
 
 const notifications$ = new BehaviorSubject<NotificationType[]>([]);
 

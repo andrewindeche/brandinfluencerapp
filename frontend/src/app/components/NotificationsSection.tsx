@@ -1,20 +1,8 @@
 import React from 'react';
 import NotificationCard from './NotificationCard';
+import { Notification, NotificationsSectionProps } from '../../interfaces';
 
-interface Notification {
-  id: number;
-  campaign: string;
-  status: 'accepted' | 'rejected';
-}
-
-interface Props {
-  notifications: Notification[];
-  show: boolean;
-  toggleShow: () => void;
-  message: string;
-}
-
-const NotificationsSection: React.FC<Props> = ({
+const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   notifications,
   show,
   toggleShow,

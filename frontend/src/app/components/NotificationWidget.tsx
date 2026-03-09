@@ -1,19 +1,10 @@
 import React, { useState } from 'react';
 import NotificationCard from './NotificationCard';
+import { Notification, NotificationWidgetProps } from '../../interfaces';
 
-interface Notification {
-  id: number;
-  campaign: string;
-  status: 'accepted' | 'rejected';
-  date: string;
-  message: string;
-}
-
-interface Props {
-  notifications: Notification[];
-}
-
-const NotificationWidget: React.FC<Props> = ({ notifications }) => {
+const NotificationWidget: React.FC<NotificationWidgetProps> = ({
+  notifications,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

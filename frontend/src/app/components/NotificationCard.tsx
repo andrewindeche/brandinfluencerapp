@@ -1,13 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-
-interface NotificationCardProps {
-  imageSrc: string;
-  campaignName: string;
-  status: 'accepted' | 'rejected';
-  date: string;
-  message: string;
-}
+import { NotificationCardProps } from '../../interfaces';
 
 const NotificationCard: React.FC<NotificationCardProps> = ({
   imageSrc,

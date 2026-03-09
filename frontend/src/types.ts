@@ -1,5 +1,3 @@
-import { BehaviorSubject } from 'rxjs';
-
 export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
 export type AuthFormState = {
@@ -18,12 +16,6 @@ export type AuthFormState = {
   serverMessage: string | null;
   roleDetected: boolean;
 };
-
-export interface ErrorResponseData {
-  code?: string;
-  message?: string;
-  [key: string]: unknown;
-}
 
 export type LoginResult =
   | { success: true; role: Exclude<UserRole, 'unknown'> }
@@ -77,40 +69,3 @@ export type AuthState = {
 };
 
 export type NotificationStatus = 'accepted' | 'rejected' | 'new_submission';
-
-export interface Notification {
-  id: number;
-  campaign: string;
-  status: NotificationStatus;
-  date: string;
-  message: string;
-}
-
-export interface SubmissionType {
-  _id: string;
-  content: string;
-  submittedAt?: string;
-  status?: 'pending' | 'accepted' | 'rejected';
-  influencer: {
-    _id: string;
-    username: string;
-    email?: string;
-    profileImage?: string;
-  };
-}
-export interface SubmissionStoreType {
-  submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
-  fetchSubmissions: (campaignId: string) => Promise<void>;
-  addSubmission: (
-    campaignId: string,
-    content: string,
-  ) => Promise<SubmissionType | null>;
-  acceptSubmission: (
-    campaignId: string,
-    submissionId: string,
-  ) => Promise<SubmissionType | null>;
-  rejectSubmission: (
-    campaignId: string,
-    submissionId: string,
-  ) => Promise<SubmissionType | null>;
-}

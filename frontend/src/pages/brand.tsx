@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
-import type { Influencer } from '../types';
+import type { Influencer } from '../interfaces';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useRouter } from 'next/router';

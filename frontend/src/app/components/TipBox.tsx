@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
-
-interface TipBoxProps {
-  tip: string;
-  duration?: number;
-}
+import { TipBoxProps } from '../../interfaces';
 
 const TipBox: React.FC<TipBoxProps> = ({ tip, duration = 10000 }) => {
   const [open, setOpen] = useState(false);

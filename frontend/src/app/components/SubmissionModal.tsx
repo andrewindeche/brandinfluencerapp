@@ -9,18 +9,10 @@ import {
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { TransitionChild } from '@headlessui/react';
-
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  campaignTitle: string;
-  imageSrc: string;
-  message: string;
-  onSubmit: (text: string) => void;
-  joined: boolean;
+import { SubmissionModalProps } from '../../interfaces';
 }
 
-const SubmissionModal: React.FC<Props> = ({
+const SubmissionModal: React.FC<SubmissionModalProps> = ({
   isOpen,
   onClose,
   campaignTitle,

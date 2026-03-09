@@ -1,9 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-
-interface WithAuthProps {
-  role: 'brand' | 'influencer' | 'admin' | 'superuser';
-}
+import { WithAuthProps } from '../../interfaces';
 
 const withAuth = (WrappedComponent: React.FC, allowedRoles: string[]) => {
   const AuthComponent: React.FC<WithAuthProps> = ({ role, ...props }) => {

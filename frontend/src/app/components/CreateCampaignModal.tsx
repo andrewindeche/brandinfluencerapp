@@ -3,15 +3,9 @@ import { Dialog } from '@headlessui/react';
 import Image from 'next/image';
 import { campaignStore } from '../../rxjs/campaignStore';
 import { CampaignType } from '../../types';
+import { CreateCampaignModalProps } from '../../interfaces';
 import { useToast } from '../../hooks/useToast';
 import Toast from './Toast';
-
-interface CreateCampaignModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  campaignToEdit?: CampaignType | null;
-  onCreate?: (newCampaign: CampaignType) => void;
-}
 
 const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   isOpen,
