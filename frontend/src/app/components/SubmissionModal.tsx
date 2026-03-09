@@ -19,6 +19,7 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
   message,
   onSubmit,
   joined,
+  status,
 }) => {
   const [text, setText] = useState('');
 
@@ -94,9 +95,11 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
                   </button>
                   <button
                     onClick={handleSubmit}
-                    disabled={!joined || text.trim() === ''}
+                    disabled={
+                      !joined || text.trim() === '' || status === 'inactive'
+                    }
                     className={`px-4 py-2 text-sm font-medium rounded-xl text-white transition ${
-                      text.trim() === ''
+                      text.trim() === '' || status === 'inactive'
                         ? 'bg-blue-300 cursor-not-allowed'
                         : 'bg-blue-600 hover:bg-blue-700'
                     }`}

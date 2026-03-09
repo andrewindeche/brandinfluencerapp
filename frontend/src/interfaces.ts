@@ -139,4 +139,5 @@ export interface SubmissionModalProps {
   message: string;
   onSubmit: (text: string) => void;
   joined: boolean;
+  status: 'active' | 'inactive';
 }

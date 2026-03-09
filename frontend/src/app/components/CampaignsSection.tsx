@@ -50,6 +50,11 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   const handleSubmit = async (text: string) => {
     if (!selectedCampaign) return;
 
+    if (selectedCampaign.status === 'inactive') {
+      showToast('Cannot submit to an inactive campaign.', 'error');
+      return;
+    }
+
     const newSubmission = await submissionStore.addSubmission(
       selectedCampaign.id,
       text,
@@ -188,6 +193,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                   message={selectedCampaign?.instructions || ''}
                   onSubmit={handleSubmit}
                   joined={selectedCampaign?.joined ?? false}
+                  status={selectedCampaign?.status ?? 'inactive'}
                 />
                 <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
                   <div className="flex justify-between items-center">
