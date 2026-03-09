@@ -20,7 +20,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
-    'all' | 'active' | 'inactive'
+    'all' | 'active' | 'inactive' | 'joined'
   >('all');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignType | null>(
@@ -72,7 +72,10 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
         campaign.instructions.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesStatus =
-        statusFilter === 'all' || campaign.status === statusFilter;
+        statusFilter === 'all' ||
+        (statusFilter === 'joined'
+          ? campaign.joined
+          : campaign.status === statusFilter);
 
       return matchesSearch && matchesStatus;
     });
@@ -122,7 +125,9 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => {
-              setStatusFilter(e.target.value as 'all' | 'active' | 'inactive');
+              setStatusFilter(
+                e.target.value as 'all' | 'active' | 'inactive' | 'joined',
+              );
               setCurrentPage(1);
             }}
             className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -130,6 +135,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
+            <option value="joined">Joined</option>
           </select>
           <ChevronDown
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none"
