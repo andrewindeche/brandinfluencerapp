@@ -221,7 +221,6 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       e.stopPropagation();
                       handleCardClick(campaign);
                     }}
-                    disabled={!joined}
                     className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
                   >
                     Submit
