@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ChevronDown, Pencil, Eye, Trash2 } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
@@ -43,15 +43,28 @@ const notifications: {
 const SubmissionCard: React.FC<{
   sub: SubmissionType;
   isFadingOut: boolean;
+  isFadingIn: boolean;
   onAccept: () => Promise<void>;
   onReject: () => void;
   isProcessing?: boolean;
-}> = ({ sub, isFadingOut, onAccept, onReject, isProcessing = false }) => {
+}> = ({
+  sub,
+  isFadingOut,
+  isFadingIn,
+  onAccept,
+  onReject,
+  isProcessing = false,
+}) => {
   const fadeAnimation = useSpring({
     opacity: isFadingOut ? 0 : 1,
     transform: isFadingOut
       ? 'scale(0.95) translateX(20px)'
-      : 'scale(1) translateX(0)',
+      : isFadingIn
+        ? 'scale(1) translateX(0)'
+        : 'scale(1) translateX(0)',
+    from: isFadingIn
+      ? { opacity: 0, transform: 'scale(0.95) translateX(-20px)' }
+      : undefined,
     config: { duration: 300 },
   });
 
@@ -156,6 +169,11 @@ const CampaignsContent: React.FC = () => {
   const [fadingOutSubmissions, setFadingOutSubmissions] = useState<Set<string>>(
     new Set(),
   );
+  const [fadingInSubmissions, setFadingInSubmissions] = useState<Set<string>>(
+    new Set(),
+  );
+  const prevAcceptedRef = useRef<SubmissionType[]>([]);
+  const prevRejectedRef = useRef<SubmissionType[]>([]);
   const [submissionSearchQuery, setSubmissionSearchQuery] = useState('');
   const [submissionPage, setSubmissionPage] = useState(1);
   const [processingSubmissions, setProcessingSubmissions] = useState<
@@ -217,9 +235,44 @@ const CampaignsContent: React.FC = () => {
           (sub) => sub.status === 'rejected',
         );
 
+        // Detect new accepted submissions
+        const newAccepted = acceptedSubs.filter(
+          (sub) =>
+            !prevAcceptedRef.current.some((prev) => prev._id === sub._id),
+        );
+        // Detect new rejected submissions
+        const newRejected = rejectedSubs.filter(
+          (sub) =>
+            !prevRejectedRef.current.some((prev) => prev._id === sub._id),
+        );
+
         setCampaignSubmissions(pendingSubs);
         setAcceptedSubmissions(acceptedSubs);
         setRejectedSubmissions(rejectedSubs);
+
+        // Add new submissions to fading in
+        if (newAccepted.length > 0 || newRejected.length > 0) {
+          setFadingInSubmissions((prev) => {
+            const updated = new Set(prev);
+            newAccepted.forEach((sub) => updated.add(sub._id));
+            newRejected.forEach((sub) => updated.add(sub._id));
+            return updated;
+          });
+
+          // Remove from fading in after animation
+          setTimeout(() => {
+            setFadingInSubmissions((prev) => {
+              const updated = new Set(prev);
+              newAccepted.forEach((sub) => updated.delete(sub._id));
+              newRejected.forEach((sub) => updated.delete(sub._id));
+              return updated;
+            });
+          }, 300);
+        }
+
+        // Update refs
+        prevAcceptedRef.current = acceptedSubs;
+        prevRejectedRef.current = rejectedSubs;
       },
     );
 
@@ -553,7 +606,9 @@ const CampaignsContent: React.FC = () => {
         <div className="flex flex-col md:flex-row w-full h-full overflow-hidden rounded-l-2xl shadow-2xl">
           <div className="flex-1 bg-gradient-to-b from-black-700 via-pink-600 to-pink-800 text-white p-4 sm:p-6 overflow-y-auto">
             <div className="flex justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
-              <h2 className="text-xl sm:text-2xl font-bold flex-1">Influencer Submissions</h2>
+              <h2 className="text-xl sm:text-2xl font-bold flex-1">
+                Influencer Submissions
+              </h2>
               <button
                 onClick={handleCloseSubmissions}
                 className="bg-red-500 text-white rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base hover:bg-red-600 transition flex-shrink-0"
@@ -564,22 +619,22 @@ const CampaignsContent: React.FC = () => {
 
             {selectedCampaign && (
               <>
-                <h3 className="text-xl font-semibold mb-4">
+                <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 truncate">
                   {selectedCampaign.title}
                 </h3>
 
-                <div className="mb-6 flex flex-col sm:flex-row gap-4">
+                <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4">
                   <input
                     type="text"
-                    placeholder="Search submissions by content or username..."
+                    placeholder="Search submissions..."
                     value={submissionSearchQuery}
                     onChange={(e) => {
                       setSubmissionSearchQuery(e.target.value);
                       setSubmissionPage(1);
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-3 sm:px-4 py-2 text-sm border border-gray-600 text-gray-800 bg-gray-100 rounded-lg sm:rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
-                  <div className="relative w-full sm:w-[200px]">
+                  <div className="relative w-full">
                     <select
                       value={submissionStatusFilter}
                       onChange={(e) => {
@@ -592,7 +647,7 @@ const CampaignsContent: React.FC = () => {
                         );
                         setSubmissionPage(1);
                       }}
-                      className="w-full appearance-none px-4 py-2 border border-gray-600 text-gray-800 bg-gray-100 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      className="w-full appearance-none px-3 sm:px-4 py-2 text-sm border border-gray-600 text-gray-800 bg-gray-100 rounded-lg sm:rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                     >
                       <option value="all">All Statuses</option>
                       <option value="pending">Pending Only</option>
@@ -609,8 +664,8 @@ const CampaignsContent: React.FC = () => {
                 {(submissionStatusFilter === 'all' ||
                   submissionStatusFilter === 'pending') && (
                   <>
-                    <h4 className="text-lg font-semibold mb-3">
-                      Pending Submissions ({filteredPendingSubmissions.length})
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3">
+                      Pending ({filteredPendingSubmissions.length})
                     </h4>
 
                     {paginatedPendingSubmissions.length > 0 ? (
@@ -619,40 +674,63 @@ const CampaignsContent: React.FC = () => {
                           const isFadingOut = fadingOutSubmissions.has(sub._id);
 
                           const handleAccept = async () => {
-                            setProcessingSubmissions((prev) =>
-                              new Set(prev).add(sub._id),
-                            );
-                            try {
-                              const updated =
-                                await submissionStore.acceptSubmission(
-                                  selectedCampaign!.id,
-                                  sub._id,
-                                );
+                            setFadingOutSubmissions((prev) => {
+                              const updated = new Set(prev);
+                              updated.add(sub._id);
+                              return updated;
+                            });
 
-                              if (updated) {
-                                showToast('Submission accepted!', 'success');
-                              } else {
+                            setTimeout(async () => {
+                              setProcessingSubmissions((prev) =>
+                                new Set(prev).add(sub._id),
+                              );
+                              try {
+                                const updated =
+                                  await submissionStore.acceptSubmission(
+                                    selectedCampaign!.id,
+                                    sub._id,
+                                  );
+
+                                if (updated) {
+                                  setFadingOutSubmissions((prev) => {
+                                    const updated = new Set(prev);
+                                    updated.delete(sub._id);
+                                    return updated;
+                                  });
+                                  showToast('Submission accepted!', 'success');
+                                } else {
+                                  setFadingOutSubmissions((prev) => {
+                                    const updated = new Set(prev);
+                                    updated.delete(sub._id);
+                                    return updated;
+                                  });
+                                  showToast(
+                                    'Failed to accept submission. Please try again.',
+                                    'error',
+                                  );
+                                }
+                              } catch (error) {
+                                console.error(
+                                  'Error accepting submission:',
+                                  error,
+                                );
+                                setFadingOutSubmissions((prev) => {
+                                  const updated = new Set(prev);
+                                  updated.delete(sub._id);
+                                  return updated;
+                                });
                                 showToast(
                                   'Failed to accept submission. Please try again.',
                                   'error',
                                 );
+                              } finally {
+                                setProcessingSubmissions((prev) => {
+                                  const updated = new Set(prev);
+                                  updated.delete(sub._id);
+                                  return updated;
+                                });
                               }
-                            } catch (error) {
-                              console.error(
-                                'Error accepting submission:',
-                                error,
-                              );
-                              showToast(
-                                'Failed to accept submission. Please try again.',
-                                'error',
-                              );
-                            } finally {
-                              setProcessingSubmissions((prev) => {
-                                const updated = new Set(prev);
-                                updated.delete(sub._id);
-                                return updated;
-                              });
-                            }
+                            }, 300);
                           };
 
                           const handleReject = () => {
@@ -722,8 +800,7 @@ const CampaignsContent: React.FC = () => {
                               isFadingOut={isFadingOut}
                               onAccept={handleAccept}
                               onReject={handleReject}
-                              isProcessing={processingSubmissions.has(sub._id)}
-                            />
+                              isProcessing={processingSubmissions.has(sub._id)} isFadingIn={false}                            />
                           );
                         })}
                       </div>
@@ -738,9 +815,8 @@ const CampaignsContent: React.FC = () => {
                 {(submissionStatusFilter === 'all' ||
                   submissionStatusFilter === 'accepted') && (
                   <>
-                    <h4 className="text-lg font-semibold mb-3">
-                      Accepted Submissions ({filteredAcceptedSubmissions.length}
-                      )
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3">
+                      Accepted ({filteredAcceptedSubmissions.length})
                     </h4>
 
                     {paginatedAcceptedSubmissions.length > 0 ? (
@@ -751,6 +827,7 @@ const CampaignsContent: React.FC = () => {
                               key={sub._id}
                               sub={{ ...sub, status: 'accepted' }}
                               isFadingOut={false}
+                              isFadingIn={fadingInSubmissions.has(sub._id)}
                               onAccept={async () => {}}
                               onReject={() => {}}
                               isProcessing={false}
@@ -769,9 +846,8 @@ const CampaignsContent: React.FC = () => {
                 {(submissionStatusFilter === 'all' ||
                   submissionStatusFilter === 'rejected') && (
                   <>
-                    <h4 className="text-lg font-semibold mb-3">
-                      Rejected Submissions ({filteredRejectedSubmissions.length}
-                      )
+                    <h4 className="text-sm sm:text-lg font-semibold mb-3">
+                      Rejected ({filteredRejectedSubmissions.length})
                     </h4>
 
                     {paginatedRejectedSubmissions.length > 0 ? (
@@ -782,6 +858,7 @@ const CampaignsContent: React.FC = () => {
                               key={sub._id}
                               sub={{ ...sub, status: 'rejected' }}
                               isFadingOut={false}
+                              isFadingIn={fadingInSubmissions.has(sub._id)}
                               onAccept={async () => {}}
                               onReject={() => {}}
                               isProcessing={false}
@@ -798,18 +875,25 @@ const CampaignsContent: React.FC = () => {
                 )}
 
                 {totalSubmissionPages > 1 && (
-                  <div className="flex justify-center mt-6 space-x-4 items-center">
+                  <div className="flex justify-center mt-4 sm:mt-6 space-x-2 sm:space-x-4 items-center flex-wrap">
                     <button
                       onClick={() =>
                         setSubmissionPage((prev) => Math.max(prev - 1, 1))
                       }
                       disabled={submissionPage === 1}
-                      className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+                      className="px-2 sm:px-4 py-1 sm:py-2 text-sm rounded bg-blue-600 text-white disabled:opacity-50 hover:bg-blue-700 transition"
                     >
-                      Previous
+                      Prev
                     </button>
-                    <span className="font-semibold text-white">
-                      Page {submissionPage} of {totalSubmissionPages}
+                    <span className="font-semibold text-white text-xs sm:text-base">
+                      <span className="hidden sm:inline">Page </span>
+                      {submissionPage}
+                      <span className="hidden sm:inline">
+                        /{totalSubmissionPages}
+                      </span>
+                      <span className="inline sm:hidden">
+                        /{totalSubmissionPages}
+                      </span>
                     </span>
                     <button
                       onClick={() =>
@@ -818,7 +902,7 @@ const CampaignsContent: React.FC = () => {
                         )
                       }
                       disabled={submissionPage === totalSubmissionPages}
-                      className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+                      className="px-2 sm:px-4 py-1 sm:py-2 text-sm rounded bg-blue-600 text-white disabled:opacity-50 hover:bg-blue-700 transition"
                     >
                       Next
                     </button>
@@ -828,14 +912,14 @@ const CampaignsContent: React.FC = () => {
             )}
           </div>
 
-          <div className="w-full md:w-1/3 bg-gradient-to-br from-yellow-50 via-pink-50 to-red-50 p-6 border-l border-gray-200 flex flex-col justify-between">
+          <div className="w-full md:w-1/3 bg-gradient-to-br from-yellow-50 via-pink-50 to-red-50 p-4 sm:p-6 border-t md:border-t-0 md:border-l border-gray-300 md:border-gray-200 flex flex-col justify-between">
             {selectedCampaign && (
               <>
                 <div>
-                  <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                  <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">
                     Overview
                   </h4>
-                  <div className="space-y-2 text-gray-700">
+                  <div className="space-y-1.5 sm:space-y-2 text-sm sm:text-base text-gray-700">
                     <p>
                       <strong>Total Submissions:</strong>{' '}
                       {campaignSubmissions.length +
@@ -863,17 +947,17 @@ const CampaignsContent: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 bg-white/60 p-4 rounded-xl shadow-inner">
-                  <h5 className="font-semibold text-gray-800 mb-2">
+                <div className="mt-4 sm:mt-6 bg-white/60 p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-inner">
+                  <h5 className="font-semibold text-sm sm:text-base text-gray-800 mb-2">
                     Quick Stats
                   </h5>
-                  <div className="flex items-center justify-between text-sm text-gray-700">
+                  <div className="flex items-center justify-between text-xs sm:text-sm text-gray-700">
                     <span>Accepted:</span>
                     <span className="font-medium text-green-600">
                       {acceptedSubmissions.length}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-700">
+                  <div className="flex items-center justify-between text-xs sm:text-sm text-gray-700">
                     <span>Rejected:</span>
                     <span className="font-medium text-red-600">
                       {rejectedSubmissions.length}

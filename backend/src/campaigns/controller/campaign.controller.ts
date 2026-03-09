@@ -288,11 +288,11 @@ export class CampaignController {
 
   @Patch('submissions/:id/accept')
   async acceptSubmission(@Param('id') id: string, @Req() req) {
-    return this.campaignService.acceptSubmission(id, req.user.brandId);
+    return this.campaignService.acceptSubmission(id, req.user.userId);
   }
 
   @Patch('submissions/:id/reject')
   async rejectSubmission(@Param('id') id: string, @Req() req) {
-    return this.campaignService.rejectSubmission(id, req.user.brandId);
+    return this.campaignService.rejectSubmission(id, req.user.userId);
   }
 }
