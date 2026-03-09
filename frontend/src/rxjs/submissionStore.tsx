@@ -59,7 +59,7 @@ export const submissionStore: SubmissionStoreType = {
   async acceptSubmission(campaignId: string, submissionId: string) {
     try {
       const response = await axiosInstance.patch(
-        `/campaign/${campaignId}/submissions/${submissionId}/accept`,
+        `/campaign/submissions/${submissionId}/accept`,
       );
 
       const updatedSubmission: SubmissionType = response.data;
@@ -84,7 +84,7 @@ export const submissionStore: SubmissionStoreType = {
   async rejectSubmission(campaignId: string, submissionId: string) {
     try {
       const response = await axiosInstance.patch(
-        `/campaign/${campaignId}/submissions/${submissionId}/reject`,
+        `/campaign/submissions/${submissionId}/reject`,
       );
 
       const updatedSubmission: SubmissionType = response.data;
