@@ -69,7 +69,11 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
-  app.useGlobalFilters(new MongoExceptionFilter(), new AllExceptionsFilter(), new DatabaseUnavailableFilter());
+  app.useGlobalFilters(
+    new MongoExceptionFilter(),
+    new AllExceptionsFilter(),
+    new DatabaseUnavailableFilter(),
+  );
 
   const adminService = app.get(AdminService);
   await adminService.bootstrapSuperUserFromEnv();

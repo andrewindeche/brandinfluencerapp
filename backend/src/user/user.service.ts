@@ -91,7 +91,7 @@ export class UserService {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       { bio },
-      { returnDocument: 'after' }
+      { returnDocument: 'after' },
     );
 
     if (!user) throw new NotFoundException('User not found');
