@@ -136,12 +136,8 @@ export class CampaignsService {
 
     const submissions = await this.submissionModel
       .find({ campaign: campaignId })
-      .populate({
-        path: 'influencer',
-        select: 'username profileImage email',
-      })
+      .populate('influencer')
       .sort({ submittedAt: -1 })
-      .lean()
       .exec();
     await this.cacheManager.set(cacheKey, submissions, 300);
     return submissions;
