@@ -36,7 +36,6 @@ axiosInstance.interceptors.response.use(
       console.log('Error response data:', data);
       console.log('Error response status:', status);
 
-      // Handle different response data formats
       let message = 'An unexpected error occurred.';
 
       if (typeof data === 'object' && data !== null) {
