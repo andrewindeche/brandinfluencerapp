@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -47,7 +47,7 @@ export class RedisService {
     message = 'Too many requests',
   ): Promise<void> {
     const isLimited = await this.isRateLimited(key);
-    if (isLimited) throw new Error(message);
+    if (isLimited) throw new BadRequestException(message);
     await this.setRateLimit(key, ttlSeconds);
   }
 
@@ -61,8 +61,8 @@ export class RedisService {
       await this.client.expire(key, ttlSeconds);
     }
     if (current > maxCount) {
-      throw new Error(
-        `Rate limit exceeded. Maximum ${maxCount} actions allowed per session. Try again later.`,
+      throw new BadRequestException(
+        `Rate limit exceeded. Maximum ${maxCount} joins per campaign allowed per session.`,
       );
     }
     return current;
@@ -71,5 +71,10 @@ export class RedisService {
   async getCounterValue(key: string): Promise<number> {
     const value = await this.client.get(key);
     return value ? parseInt(value, 10) : 0;
+  }
+
+  async decrementCounter(key: string): Promise<number> {
+    const current = await this.client.decr(key);
+    return current;
   }
 }

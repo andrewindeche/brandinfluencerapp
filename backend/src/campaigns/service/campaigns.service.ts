@@ -67,11 +67,18 @@ export class CampaignsService {
   }
 
   async leaveCampaign(campaignId: string, influencerId: string) {
-    return await this.campaignModel.findByIdAndUpdate(
+    const sessionKey = `joinCampaignSession:${influencerId}:${campaignId}`;
+    await this.redisService.decrementCounter(sessionKey);
+
+    const influencerObjectId = new Types.ObjectId(influencerId);
+    const result = await this.campaignModel.findByIdAndUpdate(
       campaignId,
-      { $pull: { influencers: influencerId } },
+      { $pull: { influencers: influencerObjectId } },
       { returnDocument: 'after' },
     );
+
+    await this.cacheManager.del(`campaign_${campaignId}`);
+    return result;
   }
 
   async deleteCampaign(campaignId: string): Promise<{ success: boolean }> {
@@ -276,14 +283,14 @@ export class CampaignsService {
     campaignId: string,
     influencerId: string,
   ): Promise<Campaign> {
-    // Rate limit: max 5 joins per 30-minute session
-    const sessionKey = `joinCampaignSession:${influencerId}`;
-    const maxJoinsPerSession = 5;
+    // Rate limit: max 6 joins per campaign per 30-minute session
+    const sessionKey = `joinCampaignSession:${influencerId}:${campaignId}`;
+    const maxJoinsPerCampaign = 6;
     const sessionTtl = 30 * 60; // 30 minutes
 
     await this.redisService.incrementCounterRateLimit(
       sessionKey,
-      maxJoinsPerSession,
+      maxJoinsPerCampaign,
       sessionTtl,
     );
 
@@ -321,6 +328,7 @@ export class CampaignsService {
     if (!influencerExists) {
       campaign.influencers.push(influencerObjectId as any);
       await campaign.save();
+      await this.cacheManager.del(`campaign_${campaignId}`);
     }
     return campaign.populate('influencers', 'username');
   }

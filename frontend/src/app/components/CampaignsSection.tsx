@@ -251,8 +251,10 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                                 campaign.joined = false;
                               },
                               error: (err) => {
+                                console.log('Leave error:', err);
+                                console.log('Error message:', err.message);
                                 showToast(
-                                  `Failed to leave: ${err.response?.data?.message || err.message}`,
+                                  `${err.message || 'Failed to leave campaign'}`,
                                   'error',
                                 );
                               },
@@ -276,8 +278,10 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                               );
                             },
                             error: (err) => {
+                              console.log('Join error:', err);
+                              console.log('Error message:', err.message);
                               showToast(
-                                `Failed to join: ${err.response?.data?.message || err.message}`,
+                                `${err.message || 'Failed to join campaign'}`,
                                 'error',
                               );
                             },

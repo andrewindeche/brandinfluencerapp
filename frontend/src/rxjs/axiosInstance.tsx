@@ -33,9 +33,26 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       const { data, status } = error.response;
 
+      console.log('Error response data:', data);
+      console.log('Error response status:', status);
+
+      // Handle different response data formats
+      let message = 'An unexpected error occurred.';
+
+      if (typeof data === 'object' && data !== null) {
+        message =
+          (data as any)?.message ||
+          (data as any)?.error ||
+          'An unexpected error occurred.';
+      } else if (typeof data === 'string') {
+        message = data;
+      }
+
+      console.log('Extracted message:', message);
+
       return Promise.reject({
-        message: data?.message || 'An unexpected error occurred.',
-        code: data?.code || 'UNKNOWN_ERROR',
+        message,
+        code: (data as any)?.code || 'UNKNOWN_ERROR',
         statusCode: status,
         raw: data,
       });

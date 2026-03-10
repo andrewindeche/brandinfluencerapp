@@ -108,10 +108,15 @@ export class CampaignController {
         },
       };
     } catch (error) {
+      console.log('Join controller error:', error);
+      console.log('Error message:', error?.message);
+      console.log('Error instance:', error instanceof HttpException);
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new BadRequestException(error.message);
+      const message = error?.message || 'An unexpected error occurred';
+      console.log('Final message:', message);
+      throw new BadRequestException(message);
     }
   }
 
@@ -264,10 +269,15 @@ export class CampaignController {
         },
       };
     } catch (error) {
+      console.log('Leave controller error:', error);
+      console.log('Error message:', error?.message);
+      console.log('Error instance:', error instanceof HttpException);
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new BadRequestException(error.message);
+      const message = error?.message || 'An unexpected error occurred';
+      console.log('Final message:', message);
+      throw new BadRequestException(message);
     }
   }
 
