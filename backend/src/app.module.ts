@@ -19,6 +19,7 @@ import { SendForgotPasswordEmailService } from './send-forgot-password-email/sen
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { RedisModule } from './redis/redis.module';
 import mongoose from 'mongoose';
+import { KafkaService } from './kafka/kafka.service';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import mongoose from 'mongoose';
     SessionService,
     SendForgotPasswordEmailService,
     ForgotPasswordService,
+    KafkaService,
   ],
 })
 export class AppModule implements OnModuleInit {

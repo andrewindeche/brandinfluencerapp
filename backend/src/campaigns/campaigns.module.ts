@@ -10,6 +10,7 @@ import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
+import { KafkaService } from '../kafka/kafka.service';
 
 @Module({
   imports: [
@@ -25,8 +26,8 @@ import { InfluencerSchema } from '../user/influencer/influencer.schema';
     }),
     RedisModule,
   ],
-  providers: [CampaignsService, SessionService, RedisService],
+  providers: [CampaignsService, SessionService, RedisService,KafkaService],
   controllers: [CampaignController],
-  exports: [MongooseModule, CampaignsService, SessionService, RedisService],
+  exports: [MongooseModule, CampaignsService, SessionService, RedisService,KafkaService],
 })
 export class CampaignsModule {}
