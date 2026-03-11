@@ -48,6 +48,7 @@
     "express-rate-limit": "^8.2.1",
     "ioredis": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
+    "kafkajs": "^2.2.4",
     "lodash": "^4.17.23",
     "mongoose": "^9.2.4",
     "nodemailer": "^8.0.1",
