@@ -7,6 +7,7 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const fullMessage = influencer.message.split('\n').slice(2).join(' ');
+  const MAX_CHAR_COUNT = 100;
   const displayedMessage = expanded
     ? fullMessage
     : `${fullMessage.slice(0, MAX_CHAR_COUNT)}${fullMessage.length > MAX_CHAR_COUNT ? '...' : ''}`;
