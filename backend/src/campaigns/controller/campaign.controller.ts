@@ -169,7 +169,11 @@ export class CampaignController {
     }
   }
   @Get(':campaignId/submissions')
-  async getSubmissions(@Param('campaignId') campaignId: string, @Req() req) {
+  async getSubmissions(
+    @Param('campaignId') campaignId: string,
+    @Req() req,
+    @Query('search') search?: string,
+  ) {
     try {
       if (!isValidObjectId(campaignId)) {
         throw new BadRequestException('Invalid campaign ID');
@@ -187,7 +191,18 @@ export class CampaignController {
         };
       }
 
-      return { count: submissions.length, submissions };
+      let filtered = submissions;
+      if (search) {
+        const q = search.toLowerCase();
+        filtered = submissions.filter(
+          (s) =>
+            s.title?.toLowerCase().includes(q) ||
+            s.author?.toLowerCase().includes(q) ||
+            s.id?.toString().includes(q),
+        );
+      }
+
+      return { count: filtered.length, submissions: filtered };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(error.message);
