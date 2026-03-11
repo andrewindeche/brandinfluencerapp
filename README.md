@@ -57,6 +57,15 @@ npm install
 
 2. For scripts and detailed instructions on NextJs VISIT: [this README](frontend/README.md)
 
+<p><b>Kafka</b></p>
+A dockerized version of Kafka has been used for local Development for message brokering between the Influencer and brand.
+
+1. Run command to start the dockerized service
+
+```bash
+docker-compose up -d
+```
+
 ## <h1> Endpoints </h1>
 
 1. Register User POST: http://localhost:4000/auth/influencer/register
