@@ -33,7 +33,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async subscribe(topic: string, handler: (key: string, value: any) => Promise<void>) {
+  async subscribe(
+    topic: string,
+    handler: (key: string, value: any) => Promise<void>,
+  ) {
     await this.consumer.subscribe({ topic, fromBeginning: false });
     await this.consumer.run({
       eachMessage: async ({ message }) => {
