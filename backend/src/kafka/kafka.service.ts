@@ -10,7 +10,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   constructor() {
     this.kafka = new Kafka({
       clientId: 'nest-app',
-      brokers: (process.env.KAFKA_BROKERS || 'localhost:9092').split(','),
+      brokers: ['localhost:9092']
     });
     this.producer = this.kafka.producer();
     this.consumer = this.kafka.consumer({ groupId: 'notification-service' });
