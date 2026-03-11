@@ -29,7 +29,7 @@ export interface SubmissionType {
 }
 export interface SubmissionStoreType {
   submissions$: BehaviorSubject<Record<string, SubmissionType[]>>;
-  fetchSubmissions: (campaignId: string) => Promise<void>;
+  fetchSubmissions: (campaignId: string, query?: string) => Promise<void>;
   addSubmission: (
     campaignId: string,
     content: string,
