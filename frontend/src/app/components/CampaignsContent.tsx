@@ -156,6 +156,10 @@ const CampaignsContent: React.FC = () => {
   const [campaignSubmissions, setCampaignSubmissions] = useState<
     SubmissionType[]
   >([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<
+    SubmissionType[]
+  >([]);
+  const [currentCampaignId, setCurrentCampaignId] = useState<string>('');
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<
     SubmissionType[]
   >([]);
@@ -274,7 +278,7 @@ const CampaignsContent: React.FC = () => {
             });
           }, 300);
         }
-        
+
         prevAcceptedRef.current = acceptedSubs;
         prevRejectedRef.current = rejectedSubs;
       },
@@ -285,10 +289,23 @@ const CampaignsContent: React.FC = () => {
     return () => sub.unsubscribe();
   }, [selectedCampaign]);
 
-  const handleProfileSave = async (
+  useEffect(() => {
+    const subscription = submissions$.subscribe((allSubs) => {
+      const subsForCampaign = allSubs[currentCampaignId] || [];
+      setFilteredSubmissions(subsForCampaign);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [currentCampaignId]);
+
+  useEffect(() => {
+    submissionStore.fetchSubmissions(currentCampaignId, submissionSearchQuery);
+  }, [submissionSearchQuery, currentCampaignId]);
+
+  async function handleProfileSave(
     newBio: string,
     newImage: File | string | null,
-  ) => {
+  ) {
     setLoading(true);
     try {
       const imagePath = await profileUpdateStore.updateProfile(
@@ -301,7 +318,7 @@ const CampaignsContent: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const toggleExpand = (title: string) => {
     setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
