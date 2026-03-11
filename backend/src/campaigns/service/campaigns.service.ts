@@ -296,10 +296,9 @@ export class CampaignsService {
     campaignId: string,
     influencerId: string,
   ): Promise<Campaign> {
-    // Rate limit: max 6 joins per campaign per 30-minute session
     const sessionKey = `joinCampaignSession:${influencerId}:${campaignId}`;
     const maxJoinsPerCampaign = 6;
-    const sessionTtl = 30 * 60; // 30 minutes
+    const sessionTtl = 30 * 60;
 
     await this.redisService.incrementCounterRateLimit(
       sessionKey,
@@ -398,6 +397,16 @@ export class CampaignsService {
 
     await this.cacheManager.del(`submissions_${campaign._id || campaign}`);
 
+    await this.kafkaService.sendMessage(
+      'submission-events',
+      'submission.accepted',
+      {
+        submissionId,
+        campaignId: campaign._id.toString(),
+        brandId,
+      },
+    );
+
     return submission as any;
   }
 
@@ -426,6 +435,16 @@ export class CampaignsService {
     await (submission as any).save();
 
     await this.cacheManager.del(`submissions_${campaign?._id || campaign}`);
+
+    await this.kafkaService.sendMessage(
+      'submission-events',
+      'submission.rejected',
+      {
+        submissionId,
+        campaignId: campaign._id.toString(),
+        brandId,
+      },
+    );
 
     return submission as any;
   }
