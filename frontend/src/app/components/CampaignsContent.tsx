@@ -244,12 +244,10 @@ const CampaignsContent: React.FC = () => {
           (sub) => sub.status === 'rejected',
         );
 
-        // Detect new accepted submissions
         const newAccepted = acceptedSubs.filter(
           (sub) =>
             !prevAcceptedRef.current.some((prev) => prev._id === sub._id),
         );
-        // Detect new rejected submissions
         const newRejected = rejectedSubs.filter(
           (sub) =>
             !prevRejectedRef.current.some((prev) => prev._id === sub._id),
@@ -259,7 +257,6 @@ const CampaignsContent: React.FC = () => {
         setAcceptedSubmissions(acceptedSubs);
         setRejectedSubmissions(rejectedSubs);
 
-        // Add new submissions to fading in
         if (newAccepted.length > 0 || newRejected.length > 0) {
           setFadingInSubmissions((prev) => {
             const updated = new Set(prev);
@@ -268,7 +265,6 @@ const CampaignsContent: React.FC = () => {
             return updated;
           });
 
-          // Remove from fading in after animation
           setTimeout(() => {
             setFadingInSubmissions((prev) => {
               const updated = new Set(prev);
@@ -278,8 +274,7 @@ const CampaignsContent: React.FC = () => {
             });
           }, 300);
         }
-
-        // Update refs
+        
         prevAcceptedRef.current = acceptedSubs;
         prevRejectedRef.current = rejectedSubs;
       },
