@@ -10,10 +10,13 @@ export const submissions$ = new BehaviorSubject<
 export const submissionStore: SubmissionStoreType = {
   submissions$,
 
-  async fetchSubmissions(campaignId: string) {
+  async fetchSubmissions(campaignId: string, query?: string) {
     try {
       const response = await axiosInstance.get(
         `/campaign/${campaignId}/submissions`,
+        {
+        params: query ? { search: query } : {}
+        }
       );
       const submissions = (response.data.submissions || []) as SubmissionType[];
       submissions$.next({
