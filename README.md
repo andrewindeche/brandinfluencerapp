@@ -145,7 +145,7 @@ https://www.figma.com/design/j0J8gezE9uhoGrCG9dvzPe/Untitled?node-id=1001-2&t=bw
 
 ## <h1> Note </h1>
 
-RXJs is not a state mangement library/it was used in the project purposely for learning. Use state management libraries like Zustand or Redux instead.
+RXJs is not a state mangement library. Substitute with state management libraries like Zustand or Redux instead.
 
 ## <h1> Author </h1>
 
