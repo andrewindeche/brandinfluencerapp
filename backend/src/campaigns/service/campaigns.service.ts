@@ -12,6 +12,8 @@ import { Submission } from '../../auth/schema/submission.schema';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { RedisService } from 'src/redis/redis.service';
+import { KafkaService } from 'src/kafka/kafka.service';
+import { producer } from '../../kafka/kafka.provider';
 
 @Injectable()
 export class CampaignsService {
@@ -21,6 +23,7 @@ export class CampaignsService {
     private readonly submissionModel: Model<Submission>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly redisService: RedisService,
+    private readonly kafkaService: KafkaService,
   ) {}
 
   async createCampaign(
@@ -184,6 +187,16 @@ export class CampaignsService {
 
     campaign.submissions.push(submission._id as Types.ObjectId);
     await campaign.save();
+
+    await this.kafkaService.sendMessage(
+      'submission-events',
+      'submission.created',
+      {
+        submissionId: submission._id.toString(),
+        campaignId,
+        influencerId,
+      },
+    );
 
     return { id: submission._id.toString(), content: submission.content };
   }
@@ -415,5 +428,12 @@ export class CampaignsService {
     await this.cacheManager.del(`submissions_${campaign?._id || campaign}`);
 
     return submission as any;
+  }
+
+  async notifySubmissionEvent(eventType: string, payload: any) {
+    await producer.send({
+      topic: 'submission-events',
+      messages: [{ key: eventType, value: JSON.stringify(payload) }],
+    });
   }
 }
