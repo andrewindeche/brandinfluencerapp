@@ -15,6 +15,7 @@ export interface Notification {
   influencerId?: string;
   brandId?: string;
   timestamp: number;
+  date: string;
   message?: string;
 }
 
