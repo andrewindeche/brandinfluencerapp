@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { NotificationStatus, ProfileUpdateStatus, CampaignType } from './types';
+import { ProfileUpdateStatus, CampaignType } from './types';
 
 export interface ErrorResponseData {
   code?: string;
@@ -7,16 +7,26 @@ export interface ErrorResponseData {
   [key: string]: unknown;
 }
 
-export interface Notification {
-  id: number;
-  type: 'submission.accepted' | 'submission.rejected' | 'submission.created';
+export interface BaseNotification {
+  id: string;
   campaignId: string;
   submissionId: string;
   influencerId?: string;
   brandId?: string;
+  message?: string;
+}
+
+export interface KafkaNotification extends BaseNotification {
+  type: 'submission' | 'status';
+  campaignTitle: string;
+  timestamp: number;
+  date: Date;
+}
+
+export interface Notification extends BaseNotification {
+  type: 'submission.accepted' | 'submission.rejected' | 'submission.created';
   timestamp: number;
   date: string;
-  message?: string;
 }
 
 export interface SubmissionType {
@@ -66,11 +76,16 @@ export interface ErrorResponse {
 }
 
 export interface NotificationType {
-  id: number;
+  id: string;
   campaignTitle: string;
   type: 'submission' | 'status';
   message: string;
   timestamp: string;
+  campaignId: string;
+  submissionId: string;
+  influencerId?: string;
+  brandId?: string;
+  date: Date;
 }
 
 export interface AxiosCustomError {
