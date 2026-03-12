@@ -9,9 +9,12 @@ export interface ErrorResponseData {
 
 export interface Notification {
   id: number;
-  campaign: string;
-  status: NotificationStatus;
-  date?: string;
+  type: 'submission.accepted' | 'submission.rejected' | 'submission.created';
+  campaignId: string;
+  submissionId: string;
+  influencerId?: string;
+  brandId?: string;
+  timestamp: number;
   message?: string;
 }
 
