@@ -26,8 +26,14 @@ import { KafkaService } from '../kafka/kafka.service';
     }),
     RedisModule,
   ],
-  providers: [CampaignsService, SessionService, RedisService,KafkaService],
+  providers: [CampaignsService, SessionService, RedisService, KafkaService],
   controllers: [CampaignController],
-  exports: [MongooseModule, CampaignsService, SessionService, RedisService,KafkaService],
+  exports: [
+    MongooseModule,
+    CampaignsService,
+    SessionService,
+    RedisService,
+    KafkaService,
+  ],
 })
 export class CampaignsModule {}
