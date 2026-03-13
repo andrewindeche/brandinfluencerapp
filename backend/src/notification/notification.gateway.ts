@@ -1,7 +1,4 @@
-import {
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
 @WebSocketGateway({ cors: true })
@@ -14,6 +11,8 @@ export class NotificationGateway {
   }
 
   sendToInfluencer(influencerId: string, payload: any) {
-    this.server.to(`influencer-${influencerId}`).emit('submission-event', payload);
+    this.server
+      .to(`influencer-${influencerId}`)
+      .emit('submission-event', payload);
   }
 }
