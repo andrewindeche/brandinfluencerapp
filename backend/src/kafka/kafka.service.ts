@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Kafka, Producer, Consumer } from 'kafkajs';
+import { kafka } from './kafka.provider';
 
 @Injectable()
 export class KafkaService implements OnModuleInit, OnModuleDestroy {
@@ -23,6 +24,14 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     await this.producer.connect();
     await this.consumer.connect();
+    const admin = kafka.admin();
+    await admin.connect();
+    await admin.createTopics({
+      topics: [
+        { topic: 'submission-events', numPartitions: 1, replicationFactor: 1 },
+      ],
+    });
+    await admin.disconnect();
   }
 
   async onModuleDestroy() {
