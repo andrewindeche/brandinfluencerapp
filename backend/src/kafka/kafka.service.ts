@@ -1,25 +1,11 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { Kafka, Producer, Consumer } from 'kafkajs';
+import { Producer, Consumer } from 'kafkajs';
 import { kafka } from './kafka.provider';
 
 @Injectable()
 export class KafkaService implements OnModuleInit, OnModuleDestroy {
-  private kafka: Kafka;
   private producer: Producer;
   private consumer: Consumer;
-
-  constructor() {
-    this.kafka = new Kafka({
-      clientId: 'nest-app',
-      brokers: ['localhost:9092'],
-      retry: {
-        initialRetryTime: 300,
-        retries: 10,
-      },
-    });
-    this.producer = this.kafka.producer();
-    this.consumer = this.kafka.consumer({ groupId: 'notification-service' });
-  }
 
   async onModuleInit() {
     await this.producer.connect();
