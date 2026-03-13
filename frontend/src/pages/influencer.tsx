@@ -11,6 +11,8 @@ import { campaignStore } from '../rxjs/campaignStore';
 import { CampaignType } from '@/types';
 import ProfileWithStats from '../app/components/ProfileCard';
 import { getRandom } from '../app/utils/random';
+import { notificationStore } from '../rxjs/notificationStore';
+import { NotificationType } from '@/types';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -29,9 +31,8 @@ const InfluencerPage: React.FC = () => {
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
-  const message = `I hope this message finds you well! My name is [Your Name] from [Your Brand], and we would love to have you onboard. We love how your content aligns with our brand! Your engagement metrics are phenomenal, and we believe our partnership will bring great value to both sides.`;
-
-  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
   useEffect(() => {
     campaignStore.fetchCampaigns().then(() => {
@@ -63,21 +64,15 @@ const InfluencerPage: React.FC = () => {
     }
   }, [showToast]);
 
+   useEffect(() => {
+    const sub = notificationStore.influencerNotifications$.subscribe(setNotifications);
+    return () => sub.unsubscribe();
+  }, []);
+
   const handleLogout = () => {
     localStorage.clear();
     router.push('/login');
   };
-
-  type Notification = {
-    id: number;
-    campaign: string;
-    status: 'accepted' | 'rejected';
-  };
-
-  const notifications: Notification[] = [
-    { id: 1, campaign: 'Sports Campaign', status: 'accepted' },
-    { id: 2, campaign: 'Fashion Campaign', status: 'rejected' },
-  ];
 
   const handleToggleExpand = (title: string): void => {
     setExpandedCards((prevState) => ({
@@ -170,7 +165,7 @@ const InfluencerPage: React.FC = () => {
             notifications={notifications}
             show={showNotifications}
             toggleShow={() => setShowNotifications(!showNotifications)}
-            message={message}
+            message="Notifications"
           />
 
           <CampaignsSection
