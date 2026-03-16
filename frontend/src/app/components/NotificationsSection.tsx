@@ -28,10 +28,10 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
             <NotificationCard
               key={n.id}
               imageSrc="/images/fit.jpg"
-              campaignName={n.campaign}
-              status={n.status}
-              date="16/01/2025"
-              message={message}
+              campaignName={n.campaignTitle}
+              status={n.type === "new_submission" ? "accepted" : n.type}
+              date={new Date(n.timestamp).toLocaleDateString()}
+              message={n.message}
             />
           ))}
         </div>
