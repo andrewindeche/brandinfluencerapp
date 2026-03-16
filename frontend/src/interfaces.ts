@@ -124,14 +124,14 @@ export interface WithAuthProps {
 }
 
 export interface NotificationsSectionProps {
-  notifications: Notification[];
+  notifications: NotificationType[];
   show: boolean;
   toggleShow: () => void;
   message: string;
 }
 
 export interface NotificationWidgetProps {
-  notifications: Notification[];
+  notifications: NotificationType[];
 }
 
 export interface NotificationCardProps {
