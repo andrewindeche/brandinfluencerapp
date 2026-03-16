@@ -14,11 +14,19 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     const admin = kafka.admin();
     await admin.connect();
 
-    await admin.createTopics({
-      topics: [
-        { topic: 'submission-events', numPartitions: 1, replicationFactor: 1 },
-      ],
-    });
+    const topics = await admin.listTopics();
+
+    if (!topics.includes('submission-events')) {
+      await admin.createTopics({
+        topics: [
+          {
+            topic: 'submission-events',
+            numPartitions: 1,
+            replicationFactor: 1,
+          },
+        ],
+      });
+    }
 
     await admin.disconnect();
   }
