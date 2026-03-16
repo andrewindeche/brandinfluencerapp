@@ -25,7 +25,7 @@ export interface KafkaNotification extends BaseNotification {
 
 export interface Notification extends BaseNotification {
   campaign: string;
-  status: "accepted" | "rejected";
+  status: "accepted" | "rejected"| 'new_submission';
   type?: 'submission.accepted' | 'submission.rejected' | 'submission.created';
   timestamp?: number;
   date: string;
@@ -80,7 +80,7 @@ export interface ErrorResponse {
 export interface NotificationType {
   id: string;
   campaignTitle: string;
-  type: 'submission' | 'status';
+  type: 'accepted' | 'rejected' | 'new_submission';
   message: string;
   timestamp: string;
   campaignId: string;
