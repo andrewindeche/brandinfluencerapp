@@ -12,7 +12,7 @@ import { CampaignType } from '@/types';
 import ProfileWithStats from '../app/components/ProfileCard';
 import { getRandom } from '../app/utils/random';
 import { notificationStore } from '../rxjs/notificationStore';
-import { NotificationType } from '@/types';
+import { NotificationType } from '@/interfaces';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -31,7 +31,7 @@ const InfluencerPage: React.FC = () => {
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
-   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
   useEffect(() => {
@@ -64,8 +64,9 @@ const InfluencerPage: React.FC = () => {
     }
   }, [showToast]);
 
-   useEffect(() => {
-    const sub = notificationStore.influencerNotifications$.subscribe(setNotifications);
+  useEffect(() => {
+    const sub =
+      notificationStore.influencerNotifications$.subscribe(setNotifications);
     return () => sub.unsubscribe();
   }, []);
 
@@ -147,7 +148,7 @@ const InfluencerPage: React.FC = () => {
             <ProfileWithStats
               username={username}
               profileImage={profileImage}
-              bio={bio || message}
+              bio={bio}
               likes={likes}
               shares={shares}
               campaigns={campaigns.length}
@@ -174,6 +175,7 @@ const InfluencerPage: React.FC = () => {
             onExpandToggle={handleToggleExpand}
             onCampaignAction={handleCampaignAction}
             notificationOpen={showNotifications}
+            joined={false}
           />
         </div>
       </div>
