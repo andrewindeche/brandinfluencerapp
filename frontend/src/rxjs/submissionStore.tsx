@@ -1,4 +1,4 @@
-import { BehaviorSubject,combineLatest  } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import axiosInstance from '../rxjs/axiosInstance';
 import { AxiosError } from 'axios';
@@ -14,7 +14,7 @@ export const currentCampaignId$ = new BehaviorSubject<string>('');
 export const filteredSubmissions$ = combineLatest([
   submissions$,
   submissionSearchQuery$,
-  currentCampaignId$
+  currentCampaignId$,
 ]).pipe(
   map(([allSubs, query, campaignId]) => {
     const subsForCampaign = allSubs[campaignId] || [];
@@ -24,10 +24,9 @@ export const filteredSubmissions$ = combineLatest([
     const q = query.toLowerCase();
     return subsForCampaign.filter(
       (s) =>
-        s.influencer?.toString().includes(q) ||
-        s._id?.toString().includes(q)
+        s.influencer?.toString().includes(q) || s._id?.toString().includes(q),
     );
-  })
+  }),
 );
 
 export const submissionStore: SubmissionStoreType = {

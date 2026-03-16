@@ -28,10 +28,7 @@ export const notificationStore = {
   },
 
   addBrandNotification(notification: NotificationType) {
-    brandNotifications$.next([
-      notification,
-      ...brandNotifications$.getValue(),
-    ]);
+    brandNotifications$.next([notification, ...brandNotifications$.getValue()]);
   },
 
   handleKafkaEvent(key: string, payload: any) {
