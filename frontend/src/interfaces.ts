@@ -87,7 +87,7 @@ export interface NotificationType {
   submissionId: string;
   influencerId?: string;
   brandId?: string;
-  date: Date;
+  date: string | Date;
 }
 
 export interface AxiosCustomError {
@@ -127,7 +127,7 @@ export interface NotificationsSectionProps {
   notifications: NotificationType[];
   show: boolean;
   toggleShow: () => void;
-  message: string;
+  message?: string;
 }
 
 export interface NotificationWidgetProps {
