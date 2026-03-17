@@ -16,13 +16,18 @@ export class NotificationService implements OnModuleInit {
         console.log('Kafka event received:', key, payload);
         switch (key) {
           case 'submission.created':
-             this.notificationGateway.sendToUser(payload.brandId, {
+            this.notificationGateway.sendToInfluencer(payload.brandId, {
               key,
               payload,
+            });
             break;
+
           case 'submission.accepted':
-            break;
           case 'submission.rejected':
+            this.notificationGateway.sendToBrand(payload.influencerId, {
+              key,
+              payload,
+            });
             break;
         }
       },
