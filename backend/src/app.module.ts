@@ -20,6 +20,7 @@ import { ForgotPasswordService } from './forgot-password/forgot-password.service
 import { RedisModule } from './redis/redis.module';
 import mongoose from 'mongoose';
 import { KafkaService } from './kafka/kafka.service';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { KafkaService } from './kafka/kafka.service';
     PassportModule,
     MetricsModule,
     RedisModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
