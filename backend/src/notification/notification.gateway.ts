@@ -1,4 +1,10 @@
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -27,9 +33,9 @@ export class NotificationGateway {
     client.join(`brand-${campaignId}`);
     console.log(`Brand joined room: brand-${campaignId}`);
   }
-  
-  sendToBrand(campaignId: string, payload: any) {
-    this.server.to(`brand-${campaignId}`).emit('submission-event', payload);
+
+  sendToBrand(brandId: string, payload: any) {
+    this.server.to(`brand-${brandId}`).emit('submission-event', payload);
   }
 
   sendToInfluencer(influencerId: string, payload: any) {
