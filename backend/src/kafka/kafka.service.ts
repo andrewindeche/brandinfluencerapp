@@ -11,8 +11,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   private subscribedTopics = new Set<string>();
 
   async onModuleInit() {
-    console.log('🚀 KafkaService initializing...');
-
     await this.producer.connect();
     await this.consumer.connect();
 
@@ -22,8 +20,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     const topics = await admin.listTopics();
 
     if (!topics.includes('submission-events')) {
-      console.log('📌 Creating topic: submission-events');
-
       await admin.createTopics({
         topics: [
           {
@@ -37,7 +33,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
     await admin.disconnect();
 
-    console.log('✅ KafkaService initialized');
   }
 
   async onModuleDestroy() {
@@ -46,8 +41,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   }
 
   async sendMessage(topic: string, key: string, value: any) {
-    console.log('📤 Sending Kafka message:', key, value);
-
     await this.producer.send({
       topic,
       messages: [{ key, value: JSON.stringify(value) }],
@@ -65,8 +58,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   async subscribeToTopic(topic: string, p0: (key: any, payload: any) => Promise<void>) {
     if (this.subscribedTopics.has(topic)) return;
 
-    console.log('📥 Subscribing to topic:', topic);
-
     await this.consumer.subscribe({
       topic,
       fromBeginning: false,
@@ -79,13 +70,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     handler: (key: string, value: any) => Promise<void>,
   ) {
     if (this.isRunning) {
-      console.log('⚠️ Consumer already running, skipping...');
       return;
     }
 
     this.isRunning = true;
-
-    console.log('🏃 Starting Kafka consumer...');
 
     await this.consumer.run({
       eachMessage: async ({ message }: EachMessagePayload) => {
@@ -94,9 +82,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
           const value = JSON.parse(
             message.value?.toString() || '{}',
           );
-
-          console.log('📩 Kafka message received:', key, value);
-
           await handler(key, value);
         } catch (err) {
           console.error('❌ Error processing Kafka message:', err);

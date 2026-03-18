@@ -14,18 +14,13 @@ class SocketHandler {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket connected:', this.socket?.id);
-
       this.joinUserRooms();
     });
 
     this.socket.on('disconnect', () => {
-      console.log('❌ Socket disconnected');
     });
 
     this.socket.on('submission-event', (data) => {
-      console.log('📩 Incoming event:', data);
-
       const { key, payload } = data;
 
       notificationStore.handleKafkaEvent(key, payload);
@@ -50,8 +45,6 @@ class SocketHandler {
       console.warn('⚠️ No user found for socket room join');
       return;
     }
-
-    console.log('Joining rooms for:', user);
 
     if (user.role === 'influencer') {
       this.socket?.emit('join-influencer', user.id);

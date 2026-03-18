@@ -22,7 +22,6 @@ export class NotificationGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.join(`influencer-${influencerId}`);
-    console.log(`Influencer joined room: influencer-${influencerId}`);
   }
 
   @SubscribeMessage('join-brand')
@@ -31,7 +30,6 @@ export class NotificationGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.join(`brand-${brandId}`);
-    console.log(`Brand joined room: brand-${brandId}`);
   }
 
   sendToBrand(brandId: string, payload: any) {

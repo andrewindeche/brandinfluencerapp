@@ -14,6 +14,7 @@ import { campaignStore } from '@/rxjs/campaignStore';
 import { submissions$, submissionStore } from '@/rxjs/submissionStore';
 import { SubmissionType } from '@/interfaces';
 import { CampaignType } from '../../types';
+import { NotificationType } from '@/interfaces';
 import { useSpring, animated } from '@react-spring/web';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 
@@ -185,6 +186,7 @@ const CampaignsContent: React.FC = () => {
   const [fadingInSubmissions, setFadingInSubmissions] = useState<Set<string>>(
     new Set(),
   );
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const prevAcceptedRef = useRef<SubmissionType[]>([]);
   const prevRejectedRef = useRef<SubmissionType[]>([]);
   const [submissionSearchQuery, setSubmissionSearchQuery] = useState('');
@@ -326,6 +328,7 @@ const CampaignsContent: React.FC = () => {
 
   const handleViewSubmissions = (campaign: CampaignType) => {
     setSelectedCampaign(campaign);
+    setCurrentCampaignId(campaign.id);
     setShowSubmissions(true);
   };
 

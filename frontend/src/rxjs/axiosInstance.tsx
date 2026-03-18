@@ -32,10 +32,6 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError<ErrorResponse>) => {
     if (error.response) {
       const { data, status } = error.response;
-
-      console.log('Error response data:', data);
-      console.log('Error response status:', status);
-
       let message = 'An unexpected error occurred.';
 
       if (typeof data === 'object' && data !== null) {
@@ -46,8 +42,6 @@ axiosInstance.interceptors.response.use(
       } else if (typeof data === 'string') {
         message = data;
       }
-
-      console.log('Extracted message:', message);
 
       return Promise.reject({
         message,
