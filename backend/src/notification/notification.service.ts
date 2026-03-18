@@ -6,7 +6,7 @@ import { NotificationGateway } from './notification.gateway';
 export class NotificationService implements OnModuleInit {
   constructor(
     private readonly kafkaService: KafkaService,
-    private readonly notificationGateway: NotificationGateway
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   async onModuleInit() {
@@ -14,9 +14,10 @@ export class NotificationService implements OnModuleInit {
       'submission-events',
       async (key, payload) => {
         console.log('Kafka event received:', key, payload);
+
         switch (key) {
           case 'submission.created':
-            this.notificationGateway.sendToInfluencer(payload.brandId, {
+            this.notificationGateway.sendToBrand(payload.brandId, {
               key,
               payload,
             });
@@ -24,7 +25,7 @@ export class NotificationService implements OnModuleInit {
 
           case 'submission.accepted':
           case 'submission.rejected':
-            this.notificationGateway.sendToBrand(payload.influencerId, {
+            this.notificationGateway.sendToInfluencer(payload.influencerId, {
               key,
               payload,
             });
