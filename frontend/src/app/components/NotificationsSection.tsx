@@ -29,7 +29,7 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
               key={n.id}
               imageSrc="/images/fit.jpg"
               campaignName={n.campaignTitle}
-              status={n.type === "new_submission" ? "accepted" : n.type}
+              status={n.type === 'new_submission' ? 'accepted' : n.type}
               date={new Date(n.timestamp).toLocaleDateString()}
               message={n.message}
             />
