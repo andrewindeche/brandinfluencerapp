@@ -1,8 +1,10 @@
-import { NotificationService } from "./notification.service";
+import { NotificationService } from './notification.service';
 import { Module } from '@nestjs/common';
-import { NotificationGateway } from "./notification.gateway";
+import { NotificationGateway } from './notification.gateway';
+import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
+  imports: [KafkaModule],
   providers: [NotificationService, NotificationGateway],
   exports: [NotificationService],
 })
