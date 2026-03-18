@@ -10,7 +10,7 @@ import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
-import { KafkaService } from '../kafka/kafka.service';
+import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
   imports: [
@@ -25,15 +25,16 @@ import { KafkaService } from '../kafka/kafka.service';
       port: 6380,
     }),
     RedisModule,
+    KafkaModule,
   ],
-  providers: [CampaignsService, SessionService, RedisService, KafkaService],
+  providers: [CampaignsService, SessionService, RedisService],
   controllers: [CampaignController],
   exports: [
     MongooseModule,
     CampaignsService,
     SessionService,
     RedisService,
-    KafkaService,
+    KafkaModule,
   ],
 })
 export class CampaignsModule {}

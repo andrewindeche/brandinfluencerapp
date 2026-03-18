@@ -59,7 +59,6 @@ import { NotificationGateway } from './notification/notification.gateway';
     MetricsModule,
     RedisModule,
     NotificationModule,
-    KafkaModule,
   ],
   controllers: [AppController],
   providers: [
@@ -70,9 +69,6 @@ import { NotificationGateway } from './notification/notification.gateway';
     SessionService,
     SendForgotPasswordEmailService,
     ForgotPasswordService,
-    KafkaService,
-    NotificationService,
-    NotificationGateway,
   ],
 })
 export class AppModule implements OnModuleInit {

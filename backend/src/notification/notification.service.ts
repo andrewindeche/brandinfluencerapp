@@ -10,7 +10,7 @@ export class NotificationService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.kafkaService.subscribe(
+    await this.kafkaService.subscribeToTopic(
       'submission-events',
       async (key, payload) => {
         console.log('Kafka event received:', key, payload);
