@@ -21,6 +21,8 @@ import { RedisModule } from './redis/redis.module';
 import mongoose from 'mongoose';
 import { KafkaService } from './kafka/kafka.service';
 import { NotificationModule } from './notification/notification.module';
+import { KafkaModule } from './kafka/kafka.module';
+import { NotificationService } from './notification/notification.service';
 
 @Module({
   imports: [
@@ -56,6 +58,7 @@ import { NotificationModule } from './notification/notification.module';
     MetricsModule,
     RedisModule,
     NotificationModule,
+    KafkaModule,
   ],
   controllers: [AppController],
   providers: [
@@ -67,6 +70,7 @@ import { NotificationModule } from './notification/notification.module';
     SendForgotPasswordEmailService,
     ForgotPasswordService,
     KafkaService,
+    NotificationService,
   ],
 })
 export class AppModule implements OnModuleInit {
