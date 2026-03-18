@@ -31,6 +31,14 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     await admin.disconnect();
   }
 
+  async testKafka() {
+    return this.sendMessage('submission-events', 'submission.accepted', {
+      campaignId: '123',
+      brandId: 'b1',
+      influencerId: 'i1',
+    });
+  }
+
   async onModuleDestroy() {
     await this.producer.disconnect();
     await this.consumer.disconnect();
