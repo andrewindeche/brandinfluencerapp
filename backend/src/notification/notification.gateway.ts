@@ -27,11 +27,11 @@ export class NotificationGateway {
 
   @SubscribeMessage('join-brand')
   handleJoinBrand(
-    @MessageBody() campaignId: string,
+    @MessageBody() brandId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    client.join(`brand-${campaignId}`);
-    console.log(`Brand joined room: brand-${campaignId}`);
+    client.join(`brand-${brandId}`);
+    console.log(`Brand joined room: brand-${brandId}`);
   }
 
   sendToBrand(brandId: string, payload: any) {
