@@ -23,6 +23,7 @@ import { KafkaService } from './kafka/kafka.service';
 import { NotificationModule } from './notification/notification.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { NotificationService } from './notification/notification.service';
+import { NotificationGateway } from './notification/notification.gateway';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { NotificationService } from './notification/notification.service';
     ForgotPasswordService,
     KafkaService,
     NotificationService,
+    NotificationGateway,
   ],
 })
 export class AppModule implements OnModuleInit {
