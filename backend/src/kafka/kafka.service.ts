@@ -51,10 +51,14 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
     await this.consumer.run({
       eachMessage: async ({ message }) => {
-        const key = message.key?.toString() || '';
-        const value = JSON.parse(message.value?.toString() || '{}');
+        try {
+          const key = message.key?.toString() || '';
+          const value = JSON.parse(message.value?.toString() || '{}');
 
-        await handler(key, value);
+          await handler(key, value);
+        } catch (err) {
+          console.error('Error processing Kafka message:', err);
+        }
       },
     });
   }
