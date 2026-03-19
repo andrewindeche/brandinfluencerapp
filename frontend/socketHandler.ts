@@ -1,50 +1,88 @@
 import { io, Socket } from 'socket.io-client';
 import { notificationStore } from '@/rxjs/notificationStore';
 import { authStore } from '@/rxjs/authStore';
+import { submissions$ } from '@/rxjs/submissionStore';
 
 class SocketHandler {
   private socket: Socket | null = null;
+  private isConnecting = false;
 
   connect() {
-    if (this.socket?.connected) return;
+    if (this.socket?.connected || this.isConnecting) return;
+
+    this.isConnecting = true;
 
     this.socket = io('http://localhost:4000', {
-      autoConnect: true,
       transports: ['websocket'],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
 
     this.socket.on('connect', () => {
+      console.log('Socket connected:', this.socket?.id);
+      this.isConnecting = false;
+
       this.joinUserRooms();
     });
 
-    this.socket.on('disconnect', () => {
-    });
-
-    this.socket.on('submission-event', (data) => {
-      const { key, payload } = data;
-
-      notificationStore.handleKafkaEvent(key, payload);
+    this.socket.on('disconnect', (reason) => {
+      console.warn('Socket disconnected:', reason);
     });
 
     this.socket.on('connect_error', (err) => {
-      console.error('Socket error:', err);
+      console.error('Socket error:', err.message);
+      this.isConnecting = false;
+    });
+
+    this.socket.on('submission-event', (data) => {
+      console.log('SOCKET EVENT:', data);
+
+      const { key, payload } = data || {};
+
+      if (!key || !payload) return;
+
+      notificationStore.handleKafkaEvent(key, payload);
+
+      if (payload.campaignId && payload.submissionId) {
+        const current = submissions$.getValue();
+        const campaignSubs = current[payload.campaignId] || [];
+
+        const updatedSubs = campaignSubs.map((s) =>
+          s._id === payload.submissionId
+            ? { ...s, status: payload.status }
+            : s,
+        );
+
+        submissions$.next({
+          ...current,
+          [payload.campaignId]: updatedSubs,
+        });
+      }
     });
   }
 
   disconnect() {
     if (!this.socket) return;
 
+    this.socket.removeAllListeners();
     this.socket.disconnect();
     this.socket = null;
+    this.isConnecting = false;
+
+    console.log('🔌 Socket manually disconnected');
   }
 
   private joinUserRooms() {
     const user = authStore.getCurrentUser();
 
-    if (!user || !user.role) {
+    if (!user || !user.role || !user.id) {
       console.warn('⚠️ No user found for socket room join');
       return;
     }
+
+    console.log('👤 Joining rooms for:', user.role, user.id);
 
     if (user.role === 'influencer') {
       this.socket?.emit('join-influencer', user.id);
@@ -53,6 +91,11 @@ class SocketHandler {
     if (user.role === 'brand') {
       this.socket?.emit('join-brand', user.id);
     }
+  }
+
+  rejoinRooms() {
+    if (!this.socket?.connected) return;
+    this.joinUserRooms();
   }
 }
 
