@@ -24,16 +24,22 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
 
       {show ? (
         <div className="space-y-4 transition-all duration-300">
-          {notifications.map((n) => (
-            <NotificationCard
-              key={n.id}
-              imageSrc="/images/fit.jpg"
-              campaignName={n.campaignTitle}
-              status={n.type === 'new_submission' ? 'accepted' : n.type}
-              date={new Date(n.timestamp).toLocaleDateString()}
-              message={n.message}
-            />
-          ))}
+          {notifications.length === 0 ? (
+            <div className="flex justify-center items-center py-6">
+              <p className="text-sm text-gray-500">No Notifications</p>
+            </div>
+          ) : (
+            notifications.map((n) => (
+              <NotificationCard
+                key={n.id}
+                imageSrc="/images/fit.jpg"
+                campaignName={n.campaignTitle}
+                status={n.type}
+                date={new Date(n.date).toLocaleDateString()}
+                message={n.message}
+              />
+            ))
+          )}
         </div>
       ) : (
         <div
