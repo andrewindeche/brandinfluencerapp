@@ -11,7 +11,7 @@ import { setUser } from './userStore';
 import { loginSchema } from './validation/loginSchema';
 import { registerSchema } from './validation/registerSchema';
 import { UserRole, AuthFormState, LoginResult } from '../types';
-import { ErrorResponseData, AxiosCustomError } from '../interfaces';
+import { AxiosCustomError } from '../interfaces';
 
 function isAxiosCustomError(err: unknown): err is AxiosCustomError {
   return (
@@ -176,6 +176,7 @@ export const authStore = {
     const current = _authState$.value;
     return {
       ...current,
+      id: current.id,
       profileImage: current.profileImage?.includes('undefined')
         ? '/images/default.png'
         : current.profileImage,
@@ -223,6 +224,7 @@ export const authStore = {
       localStorage.setItem('token', data.access_token);
       setAuthToken(data.access_token);
       updateAuthState({
+        id: data.user.id || data.user._id,
         role: data.user?.role || 'unknown',
         success: true,
         bio: data.user.bio || '',
