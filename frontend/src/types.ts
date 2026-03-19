@@ -3,6 +3,7 @@ import { ErrorResponseData } from "./interfaces";
 export type UserRole = 'brand' | 'influencer' | 'admin' | 'unknown';
 
 export type AuthFormState = {
+  id?: string;
   email: string;
   role: UserRole;
   name: string;
