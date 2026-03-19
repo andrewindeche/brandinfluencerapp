@@ -9,13 +9,40 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   date,
   message,
 }) => {
-  const isAccepted = status === 'accepted';
+  const getStatusStyles = () => {
+    switch (status) {
+      case 'accepted':
+        return {
+          text: 'Submission Accepted',
+          color: 'text-green-500',
+          bg: 'bg-white',
+        };
+      case 'rejected':
+        return {
+          text: 'Submission Rejected',
+          color: 'text-red-500',
+          bg: 'bg-gray-200',
+        };
+      case 'new_submission':
+        return {
+          text: 'New Submission',
+          color: 'text-blue-500',
+          bg: 'bg-blue-50',
+        };
+      default:
+        return {
+          text: 'Update',
+          color: 'text-gray-500',
+          bg: 'bg-gray-100',
+        };
+    }
+  };
+
+  const { text, color, bg } = getStatusStyles();
 
   return (
     <div
-      className={`p-4 rounded-xl shadow-lg flex items-start space-x-4 text-sm ${
-        isAccepted ? 'bg-white' : 'bg-gray-200'
-      }`}
+      className={`p-4 rounded-xl shadow-lg flex items-start space-x-4 text-sm ${bg}`}
     >
       <Image
         src={imageSrc}
@@ -24,16 +51,16 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
         height={200}
         className="w-16 h-16 rounded-lg"
       />
+
       <div className="w-full">
         <div className="flex justify-between items-center mb-2">
           <p className="font-bold text-blue-500">{campaignName}</p>
-          <p
-            className={`font-semibold ${isAccepted ? 'text-green-500' : 'text-red-500'}`}
-          >
-            {isAccepted ? 'Submission Accepted' : 'Submission Rejected'}
-          </p>
-          <p className="text-gray-500">{date}</p>
+
+          <p className={`font-semibold ${color}`}>{text}</p>
+
+          <p className="text-gray-500 text-xs">{date}</p>
         </div>
+
         <p className="text-gray-700 text-[12px]">{message}</p>
       </div>
     </div>
