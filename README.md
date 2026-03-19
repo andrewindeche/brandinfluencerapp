@@ -17,8 +17,7 @@
 | 13.Grafana            | Data visualization & analytics                    | [dashboard]; [visualization];                |
 | 14.Kubernetes         | Container orchestration                           | [deployment]; [scaling];                     |
 | 15.Cypress            | End to End Testing                                | [E2E]; [component];                          |
-| 16.Kafka              | Event Streaming Platform                           | [Events]; 
-[Producer]; [Consumer]; 
+| 16.Kafka              | Event Streaming Platform                           | [Events];[Producer]; [Consumer];  
 
 ## <h1> Description</h1>
 
