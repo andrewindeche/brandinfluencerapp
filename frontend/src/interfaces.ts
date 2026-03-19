@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { ProfileUpdateStatus, CampaignType } from './types';
+import { ProfileUpdateStatus, CampaignType, NotificationStatus } from './types';
 
 export interface ErrorResponseData {
   code?: string;
@@ -26,7 +26,7 @@ export interface KafkaNotification extends BaseNotification {
 export interface Notification extends BaseNotification {
   campaign: string;
   status: "accepted" | "rejected"| 'new_submission';
-  type?: 'submission.accepted' | 'submission.rejected' | 'submission.created';
+  type?: NotificationStatus;
   timestamp?: number;
   date: string;
 }
@@ -137,7 +137,7 @@ export interface NotificationWidgetProps {
 export interface NotificationCardProps {
   imageSrc: string;
   campaignName: string;
-  status: 'accepted' | 'rejected';
+  status: NotificationStatus;
   date: string;
   message: string;
 }
