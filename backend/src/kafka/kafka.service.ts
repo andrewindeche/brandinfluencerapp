@@ -32,7 +32,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     }
 
     await admin.disconnect();
-
   }
 
   async onModuleDestroy() {
@@ -55,7 +54,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async subscribeToTopic(topic: string, p0: (key: any, payload: any) => Promise<void>) {
+  async subscribeToTopic(
+    topic: string,
+    p0: (key: any, payload: any) => Promise<void>,
+  ) {
     if (this.subscribedTopics.has(topic)) return;
 
     await this.consumer.subscribe({
@@ -66,9 +68,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     this.subscribedTopics.add(topic);
   }
 
-  async runConsumer(
-    handler: (key: string, value: any) => Promise<void>,
-  ) {
+  async runConsumer(handler: (key: string, value: any) => Promise<void>) {
     if (this.isRunning) {
       return;
     }
@@ -79,9 +79,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
       eachMessage: async ({ message }: EachMessagePayload) => {
         try {
           const key = message.key?.toString() || '';
-          const value = JSON.parse(
-            message.value?.toString() || '{}',
-          );
+          const value = JSON.parse(message.value?.toString() || '{}');
           await handler(key, value);
         } catch (err) {
           console.error('❌ Error processing Kafka message:', err);
