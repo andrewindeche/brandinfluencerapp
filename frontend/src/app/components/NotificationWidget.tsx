@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import NotificationCard from './NotificationCard';
-import { Notification, NotificationWidgetProps } from '../../interfaces';
+import { NotificationWidgetProps } from '../../interfaces';
 
 const NotificationWidget: React.FC<NotificationWidgetProps> = ({
   notifications,
@@ -34,9 +34,9 @@ const NotificationWidget: React.FC<NotificationWidgetProps> = ({
               <NotificationCard
                 key={n.id}
                 imageSrc="/images/fit.jpg"
-                campaignName={n.campaign}
-                status={n.status}
-                date={n.date}
+                campaignName={n.campaignTitle}
+                status={n.type}
+                date={new Date(n.date).toLocaleDateString()}
                 message={n.message}
               />
             ))
