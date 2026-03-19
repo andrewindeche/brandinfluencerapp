@@ -11,59 +11,71 @@ const typeMap = {
   'submission.created': 'new_submission',
 } as const;
 
+type KafkaKey = keyof typeof typeMap;
+
 export const notificationStore = {
   notifications$,
   influencerNotifications$,
   brandNotifications$,
 
   addNotification(notification: NotificationType) {
-    notifications$.next([notification, ...notifications$.getValue()]);
+    const current = notifications$.getValue();
+
+    const exists = current.some((n) => n.id === notification.id);
+    if (exists) return;
+
+    notifications$.next([notification, ...current]);
   },
 
   addInfluencerNotification(notification: NotificationType) {
-    influencerNotifications$.next([
-      notification,
-      ...influencerNotifications$.getValue(),
-    ]);
+    const current = influencerNotifications$.getValue();
+    influencerNotifications$.next([notification, ...current]);
   },
 
   addBrandNotification(notification: NotificationType) {
-    brandNotifications$.next([notification, ...brandNotifications$.getValue()]);
+    const current = brandNotifications$.getValue();
+    brandNotifications$.next([notification, ...current]);
   },
 
   handleKafkaEvent(key: string, payload: any) {
     if (!payload || !(key in typeMap)) return;
 
-    const base: NotificationType = {
-      id: crypto.randomUUID(),
-      type: typeMap[key as keyof typeof typeMap],
+    const typedKey = key as KafkaKey;
+
+    const notification: NotificationType = {
+      id: payload.submissionId || crypto.randomUUID(),
+
+      type: typeMap[typedKey],
+
       campaignId: payload.campaignId,
       submissionId: payload.submissionId,
       influencerId: payload.influencerId,
       brandId: payload.brandId,
-      timestamp: Date.now().toString(),
-      date: new Date(),
-      message: '',
-      campaignTitle: '',
+
+      campaignTitle: payload.campaignTitle || 'Campaign',
+
+      message:
+        payload.message ||
+        (typedKey === 'submission.accepted'
+          ? 'Your submission was accepted 🎉'
+          : typedKey === 'submission.rejected'
+            ? 'Your submission was rejected'
+            : `New submission received`),
+
+      timestamp: payload.timestamp || Date.now().toString(),
+      date: payload.timestamp ? new Date(payload.timestamp) : new Date(),
     };
 
-    switch (key) {
+    switch (typedKey) {
       case 'submission.accepted':
-        base.message = `Your submission ${payload.submissionId} was accepted.`;
-        this.addNotification(base);
-        this.addInfluencerNotification(base);
-        break;
-
       case 'submission.rejected':
-        base.message = `Your submission ${payload.submissionId} was rejected.`;
-        this.addNotification(base);
-        this.addInfluencerNotification(base);
+        this.addNotification(notification);
+        this.addInfluencerNotification(notification);
         break;
 
       case 'submission.created':
-        base.message = `New submission ${payload.submissionId} received for campaign ${payload.campaignId}.`;
-        this.addNotification(base);
-        this.addBrandNotification(base);
+        this.addNotification(notification);
+        this.addBrandNotification(notification);
         break;
     }
   },
