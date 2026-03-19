@@ -17,7 +17,10 @@ export class NotificationService implements OnModuleInit {
           case 'submission.created':
             this.notificationGateway.sendToBrand(payload.brandId, {
               key,
-              payload,
+              payload: {
+                ...payload,
+                campaignTitle: payload.campaignTitle || 'Campaign',
+              },
             });
             break;
 
