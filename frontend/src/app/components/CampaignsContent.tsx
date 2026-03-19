@@ -17,6 +17,7 @@ import { CampaignType } from '../../types';
 import { NotificationType } from '@/interfaces';
 import { useSpring, animated } from '@react-spring/web';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
+import { notificationStore } from '@/rxjs/notificationStore';
 
 const notifications: {
   id: number;
@@ -299,6 +300,11 @@ const CampaignsContent: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, [currentCampaignId]);
+
+  useEffect(() => {
+    const sub = notificationStore.notifications$.subscribe(setNotifications);
+    return () => sub.unsubscribe();
+  }, []);
 
   useEffect(() => {
     submissionStore.fetchSubmissions(currentCampaignId, submissionSearchQuery);
