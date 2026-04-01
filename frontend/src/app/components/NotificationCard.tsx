@@ -1,5 +1,6 @@
 import React from 'react';
 import { NotificationCardProps, NotificationType } from '../../interfaces';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const NotificationCard: React.FC<
   NotificationCardProps & {
@@ -14,6 +15,8 @@ const NotificationCard: React.FC<
   message,
   influencerName,
   submissionContent,
+  expanded,
+  onToggleExpand,
   onAccept,
   onReject,
   isProcessing,
@@ -57,6 +60,7 @@ const NotificationCard: React.FC<
 
   const { text, color, bg, border, badgeBg } = getStatusStyles();
   const showActions = status === 'new_submission' && (onAccept || onReject);
+  const isExpandable = status === 'accepted' || status === 'rejected';
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString('en-US', {
@@ -80,18 +84,36 @@ const NotificationCard: React.FC<
             </p>
           )}
         </div>
-        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badgeBg}`}>
-          {text}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badgeBg}`}>
+            {text}
+          </span>
+          {isExpandable && onToggleExpand && (
+            <button
+              onClick={onToggleExpand}
+              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            >
+              {expanded ? (
+                <ChevronUp className="w-4 h-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
-      {submissionContent && (
-        <p className="text-sm text-gray-600 mb-2 line-clamp-2 bg-gray-50 p-2 rounded-lg">
-          {submissionContent}
-        </p>
+      {expanded && (
+        <div className="mt-2 mb-2">
+          <p className="text-sm text-gray-700 bg-white p-3 rounded-lg border border-gray-200">
+            {message}
+          </p>
+        </div>
       )}
 
-      <p className="text-xs text-gray-500 mb-3">{message}</p>
+      {!expanded && (
+        <p className="text-xs text-gray-500 mb-3 truncate">{message}</p>
+      )}
 
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-400">{formattedDate}</span>
