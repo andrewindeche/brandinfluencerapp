@@ -13,6 +13,20 @@ import { registerSchema } from './validation/registerSchema';
 import { UserRole, AuthFormState, LoginResult } from '../types';
 import { AxiosCustomError } from '../interfaces';
 
+let socketHandler: { connect: () => void; disconnect: () => void } | null = null;
+
+if (typeof window !== 'undefined') {
+  import('../../socketHandler').then((module) => {
+    socketHandler = module.socketHandler;
+  });
+}
+
+function connectSocket() {
+  if (socketHandler) {
+    socketHandler.connect();
+  }
+}
+
 function isAxiosCustomError(err: unknown): err is AxiosCustomError {
   return (
     typeof err === 'object' &&
@@ -246,6 +260,7 @@ export const authStore = {
         `http://localhost:4000/${data.user.profileImage}`,
       );
       localStorage.setItem('bio', data.user.bio || '');
+      connectSocket();
       return { success: true, role: data.user.role };
     } catch (err: unknown) {
       console.error('Login error:', err);
