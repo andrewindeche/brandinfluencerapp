@@ -194,6 +194,7 @@ export class CampaignsService {
         submissionId: submission._id.toString(),
         campaignId,
         influencerId,
+        brandId: campaign.brand.toString(),
       },
     );
 
@@ -379,6 +380,7 @@ export class CampaignsService {
     const submission = await this.submissionModel
       .findById(submissionId)
       .populate('campaign')
+      .populate('influencer')
       .exec();
 
     if (!submission) throw new NotFoundException('Submission not found');
@@ -396,6 +398,9 @@ export class CampaignsService {
 
     await this.cacheManager.del(`submissions_${campaign._id || campaign}`);
 
+    const influencerId = (submission as any).influencer?._id?.toString() 
+      || (submission as any).influencer?.toString();
+
     await this.kafkaService.sendMessage(
       'submission-events',
       'submission.accepted',
@@ -403,6 +408,7 @@ export class CampaignsService {
         submissionId,
         campaignId: campaign._id.toString(),
         brandId,
+        influencerId,
       },
     );
 
@@ -416,6 +422,7 @@ export class CampaignsService {
     const submission = await this.submissionModel
       .findById(submissionId)
       .populate('campaign')
+      .populate('influencer')
       .exec();
     if (!submission) throw new NotFoundException('Submission not found');
 
@@ -435,6 +442,9 @@ export class CampaignsService {
 
     await this.cacheManager.del(`submissions_${campaign?._id || campaign}`);
 
+    const influencerId = (submission as any).influencer?._id?.toString() 
+      || (submission as any).influencer?.toString();
+
     await this.kafkaService.sendMessage(
       'submission-events',
       'submission.rejected',
@@ -442,6 +452,7 @@ export class CampaignsService {
         submissionId,
         campaignId: campaign._id.toString(),
         brandId,
+        influencerId,
       },
     );
 
