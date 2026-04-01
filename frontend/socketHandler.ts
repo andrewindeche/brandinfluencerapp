@@ -75,21 +75,27 @@ class SocketHandler {
   }
 
   private joinUserRooms() {
-    const user = authStore.getCurrentUser();
+    let userId: string | undefined = authStore.getCurrentUser()?.id;
+    const userRole = authStore.getCurrentUser()?.role;
 
-    if (!user || !user.role || !user.id) {
+    if (!userId) {
+      const storedId = localStorage.getItem('userId');
+      if (storedId) userId = storedId;
+    }
+
+    if (!userId || !userRole) {
       console.warn('⚠️ No user found for socket room join');
       return;
     }
 
-    console.log('👤 Joining rooms for:', user.role, user.id);
+    console.log('👤 Joining rooms for:', userRole, userId);
 
-    if (user.role === 'influencer') {
-      this.socket?.emit('join-influencer', user.id);
+    if (userRole === 'influencer') {
+      this.socket?.emit('join-influencer', userId);
     }
 
-    if (user.role === 'brand') {
-      this.socket?.emit('join-brand', user.id);
+    if (userRole === 'brand') {
+      this.socket?.emit('join-brand', userId);
     }
   }
 

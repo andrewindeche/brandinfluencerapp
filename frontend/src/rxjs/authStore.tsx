@@ -236,6 +236,7 @@ export const authStore = {
         throw new Error('User object missing in login response');
       }
       localStorage.setItem('token', data.access_token);
+      localStorage.setItem('userId', data.user.id || data.user._id);
       setAuthToken(data.access_token);
       updateAuthState({
         id: data.user.id || data.user._id,
@@ -261,6 +262,13 @@ export const authStore = {
       );
       localStorage.setItem('bio', data.user.bio || '');
       connectSocket();
+      
+      setTimeout(() => {
+        if (socketHandler) {
+          (socketHandler as any).rejoinRooms?.();
+        }
+      }, 500);
+      
       return { success: true, role: data.user.role };
     } catch (err: unknown) {
       console.error('Login error:', err);
