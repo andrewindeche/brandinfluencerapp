@@ -626,7 +626,7 @@ const CampaignsContent: React.FC = () => {
           </div>
         </div>
 
-        <NotificationWidget notifications={notifications} />
+        <NotificationWidget notifications={notifications} showToast={showToast} />
       </div>
 
       <animated.div
