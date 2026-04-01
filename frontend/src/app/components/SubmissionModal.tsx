@@ -6,7 +6,7 @@ import {
   DialogTitle,
   Transition,
 } from '@headlessui/react';
-import { X } from 'lucide-react';
+import { X, Pencil, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { TransitionChild } from '@headlessui/react';
 import { SubmissionModalProps } from '../../interfaces';
@@ -20,14 +20,202 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
   onSubmit,
   joined,
   status,
+  campaignSubmissions,
+  onSelectSubmission,
+  viewingSubmission,
+  onUpdateSubmission,
+  onDeleteSubmission,
 }) => {
   const [text, setText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [showNewForm, setShowNewForm] = useState(false);
 
   const handleSubmit = () => {
     if (text.trim() === '') return;
     onSubmit(text);
     setText('');
+    setShowNewForm(false);
     onClose();
+  };
+
+  const handleUpdate = async () => {
+    if (!viewingSubmission || !onUpdateSubmission || text.trim() === '') return;
+    await onUpdateSubmission(viewingSubmission._id, text);
+    setText('');
+    setIsEditing(false);
+    onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!viewingSubmission || !onDeleteSubmission) return;
+    await onDeleteSubmission(viewingSubmission._id);
+    onClose();
+  };
+
+  const handleBackToList = () => {
+    if (onSelectSubmission) {
+      onSelectSubmission(null as any);
+    }
+    setIsEditing(false);
+    setShowNewForm(false);
+    setText('');
+  };
+
+  const isViewing = viewingSubmission && !isEditing;
+  const hasSubmissions = campaignSubmissions && campaignSubmissions.length > 0;
+  const showSubmissionsList = hasSubmissions && !viewingSubmission && !showNewForm;
+
+  const renderContent = () => {
+    if (showSubmissionsList) {
+      return (
+        <div className="space-y-3">
+          <button
+            onClick={() => setShowNewForm(true)}
+            className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition mb-3"
+          >
+            + Add New Submission
+          </button>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {campaignSubmissions.map((sub) => (
+              <div
+                key={sub._id}
+                onClick={() => onSelectSubmission?.(sub)}
+                className="p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 hover:border-blue-300 transition-all"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-xs px-2 py-1 rounded ${
+                    sub.status === 'accepted' ? 'bg-green-500' :
+                    sub.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
+                  } text-white`}>
+                    {sub.status || 'pending'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : ''}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-700 line-clamp-3">{sub.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (isViewing) {
+      return (
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <p className="text-gray-800 whitespace-pre-wrap">{viewingSubmission.content}</p>
+        </div>
+      );
+    }
+
+    if (showNewForm || !hasSubmissions) {
+      return (
+        <div className="space-y-4">
+          <textarea
+            rows={5}
+            placeholder="Write your submission..."
+            className="resize-y w-full rounded-xl border border-gray-300 p-3 text-gray-900 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-400 shadow-sm transition-shadow"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            spellCheck={false}
+          />
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const renderButtons = () => {
+    if (isViewing && onDeleteSubmission) {
+      return (
+        <>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 text-sm font-medium rounded-xl border border-red-300 text-red-600 hover:bg-red-50 transition flex items-center gap-1"
+          >
+            <Trash2 size={16} /> Delete
+          </button>
+          <div className="flex gap-3 ml-auto">
+            {onUpdateSubmission && (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition flex items-center gap-1"
+                >
+                  <Pencil size={16} /> Edit
+                </button>
+                <button
+                  onClick={handleBackToList}
+                  className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                >
+                  Back
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    if (isEditing) {
+      return (
+        <>
+          <div className="flex gap-3 ml-auto">
+            <button
+              onClick={() => { setIsEditing(false); setText(viewingSubmission?.content || ''); }}
+              className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdate}
+              disabled={text.trim() === ''}
+              className={`px-4 py-2 text-sm font-medium rounded-xl text-white transition ${
+                text.trim() === '' ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              Save
+            </button>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {showNewForm && (
+          <button
+            onClick={() => setShowNewForm(false)}
+            className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          >
+            Back to Submissions
+          </button>
+        )}
+        <div className="flex gap-3 ml-auto">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={
+              !joined || text.trim() === '' || status === 'inactive'
+            }
+            className={`px-4 py-2 text-sm font-medium rounded-xl text-white transition ${
+              text.trim() === '' || status === 'inactive'
+                ? 'bg-blue-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            Submit
+          </button>
+        </div>
+      </>
+    );
   };
 
   return (
@@ -55,57 +243,49 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
               </button>
 
               <div className="space-y-6">
-                <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-                  <Image
-                    src={imageSrc}
-                    alt={campaignTitle}
-                    width={800}
-                    height={300}
-                    className="w-full h-48 sm:h-56 object-cover"
-                    priority
-                  />
-                </div>
+                {!showSubmissionsList && (
+                  <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                    <Image
+                      src={imageSrc}
+                      alt={campaignTitle}
+                      width={800}
+                      height={300}
+                      className="w-full h-48 sm:h-56 object-cover"
+                      priority
+                    />
+                  </div>
+                )}
 
                 <div>
                   <DialogTitle className="text-xl sm:text-2xl font-semibold text-gray-900">
-                    {campaignTitle}
+                    {showSubmissionsList ? `Your Submissions - ${campaignTitle}` : campaignTitle}
                   </DialogTitle>
-                  <Description className="mt-1 text-gray-700 text-sm sm:text-base leading-relaxed">
-                    {message.length > 140
-                      ? message.slice(0, 140) + '...'
-                      : message}
-                  </Description>
+                  {viewingSubmission && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        viewingSubmission.status === 'accepted' ? 'bg-green-500' :
+                        viewingSubmission.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
+                      } text-white`}>
+                        {viewingSubmission.status || 'pending'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {viewingSubmission.createdAt ? new Date(viewingSubmission.createdAt).toLocaleDateString() : ''}
+                      </span>
+                    </div>
+                  )}
+                  {!showSubmissionsList && (
+                    <Description className="mt-2 text-gray-700 text-sm sm:text-base leading-relaxed">
+                      {message.length > 140
+                        ? message.slice(0, 140) + '...'
+                        : message}
+                    </Description>
+                  )}
                 </div>
 
-                <textarea
-                  rows={5}
-                  placeholder="Write your submission..."
-                  className="resize-y w-full rounded-xl border border-gray-300 p-3 text-gray-900 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-400 shadow-sm transition-shadow"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  spellCheck={false}
-                />
+                {renderContent()}
 
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={
-                      !joined || text.trim() === '' || status === 'inactive'
-                    }
-                    className={`px-4 py-2 text-sm font-medium rounded-xl text-white transition ${
-                      text.trim() === '' || status === 'inactive'
-                        ? 'bg-blue-300 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
-                  >
-                    Submit
-                  </button>
+                <div className="flex justify-between gap-3">
+                  {renderButtons()}
                 </div>
               </div>
             </DialogPanel>
