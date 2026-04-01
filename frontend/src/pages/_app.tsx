@@ -7,6 +7,7 @@ import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { InactivityModal } from '@/app/components/InactivityModal';
 import { useEffect } from 'react';
 import { setAuthToken } from '../rxjs/axiosInstance';
+import { socketHandler } from '../../socketHandler';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -37,7 +38,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) setAuthToken(token);
+    if (token) {
+      setAuthToken(token);
+      socketHandler.connect();
+    }
   }, []);
 
   const showToast = useCallback(
