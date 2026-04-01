@@ -320,4 +320,20 @@ export class CampaignController {
   async rejectSubmission(@Param('id') id: string, @Req() req) {
     return this.campaignService.rejectSubmission(id, req.user.userId);
   }
+
+  @Patch('submissions/:id')
+  async updateSubmission(
+    @Param('id') id: string,
+    @Body('content') content: string,
+    @Req() req,
+  ) {
+    const influencerId = req.user.sub ?? req.user.userId;
+    return this.campaignService.updateSubmission(id, content, influencerId);
+  }
+
+  @Delete('submissions/:id')
+  async deleteSubmission(@Param('id') id: string, @Req() req) {
+    const influencerId = req.user.sub ?? req.user.userId;
+    return this.campaignService.deleteSubmission(id, influencerId);
+  }
 }
