@@ -19,11 +19,8 @@ import { SendForgotPasswordEmailService } from './send-forgot-password-email/sen
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { RedisModule } from './redis/redis.module';
 import mongoose from 'mongoose';
-import { KafkaService } from './kafka/kafka.service';
 import { NotificationModule } from './notification/notification.module';
 import { KafkaModule } from './kafka/kafka.module';
-import { NotificationService } from './notification/notification.service';
-import { NotificationGateway } from './notification/notification.gateway';
 
 @Module({
   imports: [
@@ -58,6 +55,7 @@ import { NotificationGateway } from './notification/notification.gateway';
     PassportModule,
     MetricsModule,
     RedisModule,
+    KafkaModule,
     NotificationModule,
   ],
   controllers: [AppController],
