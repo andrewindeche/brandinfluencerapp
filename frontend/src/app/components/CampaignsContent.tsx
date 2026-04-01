@@ -19,29 +19,6 @@ import { useSpring, animated } from '@react-spring/web';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import { notificationStore } from '@/rxjs/notificationStore';
 
-const notifications: {
-  id: number;
-  campaign: string;
-  status: 'accepted' | 'rejected';
-  date: string;
-  message: string;
-}[] = [
-  {
-    id: 1,
-    campaign: 'Sport Campaign',
-    status: 'accepted',
-    date: '16/01/2025',
-    message: 'Your submission for Sport Campaign has been approved.',
-  },
-  {
-    id: 2,
-    campaign: 'Music Fest',
-    status: 'rejected',
-    date: '15/01/2025',
-    message: 'Unfortunately, your submission for Music Fest was not approved.',
-  },
-];
-
 const SubmissionCard: React.FC<{
   sub: SubmissionType;
   isFadingOut: boolean;
@@ -302,7 +279,7 @@ const CampaignsContent: React.FC = () => {
   }, [currentCampaignId]);
 
   useEffect(() => {
-    const sub = notificationStore.notifications$.subscribe(setNotifications);
+    const sub = notificationStore.brandNotifications$.subscribe(setNotifications);
     return () => sub.unsubscribe();
   }, []);
 

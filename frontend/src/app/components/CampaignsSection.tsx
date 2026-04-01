@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2, X } from 'lucide-react';
 import TipBox from './TipBox';
 import SubmissionModal from './SubmissionModal';
 import { CampaignType } from '../../types';
@@ -9,6 +9,7 @@ import { CampaignsSectionProps } from '../../interfaces';
 import { campaignStore } from '@/rxjs/campaignStore';
 import Toast from './Toast';
 import { submissionStore } from '@/rxjs/submissionStore';
+import { SubmissionType } from '@/interfaces';
 
 const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   campaigns,
@@ -30,6 +31,24 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>(
     'success',
   );
+  const [campaignSubmissions, setCampaignSubmissions] = useState<Record<string, SubmissionType[]>>({});
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+  const [editingSubmission, setEditingSubmission] = useState<SubmissionType | null>(null);
+  const [editContent, setEditContent] = useState<string>('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
+  const [deletingSubmission, setDeletingSubmission] = useState<SubmissionType | null>(null);
+  const [viewingSubmission, setViewingSubmission] = useState<SubmissionType | null>(null);
+
+  useEffect(() => {
+    campaigns.forEach(async (campaign) => {
+      if (campaign.joined) {
+        const subs = await campaignStore.fetchSubmissions(campaign.id);
+        if (subs) {
+          setCampaignSubmissions(prev => ({ ...prev, [campaign.id]: subs }));
+        }
+      }
+    });
+  }, [campaigns]);
 
   const showToast = (
     message: string,
@@ -44,6 +63,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
 
   const handleCardClick = (campaign: CampaignType) => {
     setSelectedCampaign(campaign);
+    setViewingSubmission(null);
     setModalOpen(true);
   };
 
@@ -62,11 +82,58 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
 
     if (newSubmission) {
       showToast('Submission sent successfully ✅', 'success');
+      const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+      if (subs) {
+        setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+      }
     } else {
       showToast(
         'Failed to submit. Make sure you joined the campaign first!',
         'error',
       );
+    }
+  };
+
+  const handleEditClick = (sub: SubmissionType, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSubmission(sub);
+    setEditContent(sub.content || '');
+    setEditModalOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editingSubmission || !selectedCampaign) return;
+    try {
+      await campaignStore.updateSubmission(selectedCampaign.id, editingSubmission._id, editContent);
+      showToast('Submission updated successfully', 'success');
+      setEditModalOpen(false);
+      const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+      if (subs) {
+        setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+      }
+    } catch (err) {
+      showToast('Failed to update submission', 'error');
+    }
+  };
+
+  const handleDeleteClick = (sub: SubmissionType, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeletingSubmission(sub);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingSubmission || !selectedCampaign) return;
+    try {
+      await campaignStore.deleteSubmission(selectedCampaign.id, deletingSubmission._id);
+      showToast('Submission deleted successfully', 'success');
+      setDeleteConfirmOpen(false);
+      const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+      if (subs) {
+        setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+      }
+    } catch (err) {
+      showToast('Failed to delete submission', 'error');
     }
   };
 
@@ -187,13 +254,32 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                 />
                 <SubmissionModal
                   isOpen={modalOpen}
-                  onClose={() => setModalOpen(false)}
+                  onClose={() => { setModalOpen(false); setViewingSubmission(null); }}
                   campaignTitle={selectedCampaign?.title ?? ''}
                   imageSrc={selectedCampaign?.images?.[0] || '/images/fit.jpg'}
                   message={selectedCampaign?.instructions || ''}
                   onSubmit={handleSubmit}
                   joined={selectedCampaign?.joined ?? false}
                   status={selectedCampaign?.status ?? 'inactive'}
+                  campaignSubmissions={selectedCampaign ? campaignSubmissions[selectedCampaign.id] : undefined}
+                  onSelectSubmission={(sub) => setViewingSubmission(sub)}
+                  viewingSubmission={viewingSubmission}
+                  onUpdateSubmission={viewingSubmission ? async (id, content) => {
+                    if (!selectedCampaign) return;
+                    await campaignStore.updateSubmission(selectedCampaign.id, id, content);
+                    const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+                    if (subs) {
+                      setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+                    }
+                  } : undefined}
+                  onDeleteSubmission={viewingSubmission ? async (id) => {
+                    if (!selectedCampaign) return;
+                    await campaignStore.deleteSubmission(selectedCampaign.id, id);
+                    const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+                    if (subs) {
+                      setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+                    }
+                  } : undefined}
                 />
                 <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
                   <div className="flex justify-between items-center">
@@ -315,6 +401,59 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
           Next
         </button>
       </div>
+      {editModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <h3 className="text-lg font-bold text-white mb-4">Edit Submission</h3>
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+              rows={4}
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSave}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmOpen && deletingSubmission && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-sm">
+            <h3 className="text-lg font-bold text-white mb-4">Delete Submission?</h3>
+            <p className="text-gray-300 mb-4">
+              Are you sure you want to delete this submission? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteConfirmOpen(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 text-white rounded"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toastMessage && (
         <Toast
           message={toastMessage}
