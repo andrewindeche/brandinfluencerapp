@@ -61,6 +61,7 @@ export class AuthService {
         expiresIn: '7d',
       }),
       user: {
+        id: fullUser._id,
         username: fullUser.username,
         role: fullUser.role,
         bio: fullUser.bio,
