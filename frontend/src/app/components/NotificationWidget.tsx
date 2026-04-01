@@ -34,9 +34,13 @@ const NotificationWidget: React.FC<NotificationWidgetProps> = ({
               <NotificationCard
                 key={n.id}
                 imageSrc="/images/fit.jpg"
-                campaignName={n.campaignTitle}
-                status={n.type}
-                date={new Date(n.date).toLocaleDateString()}
+                campaignName={n.campaignTitle || 'Campaign'}
+                status={
+                  n.type === 'new_submission'
+                    ? 'accepted'
+                    : (n.type as 'accepted' | 'rejected')
+                }
+                date={new Date(Number(n.timestamp)).toLocaleDateString()}
                 message={n.message}
               />
             ))
