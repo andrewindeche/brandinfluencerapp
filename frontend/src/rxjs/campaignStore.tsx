@@ -1,17 +1,39 @@
 import { BehaviorSubject, defer } from 'rxjs';
 import axiosInstance, { setAuthToken } from './axiosInstance';
 import { CampaignAPIResponse, CampaignType } from '../types';
+import { SubmissionType } from '../interfaces';
 
 const campaigns$ = new BehaviorSubject<CampaignType[]>([]);
+const submissions$ = new BehaviorSubject<Record<string, SubmissionType[]>>({});
 
 export const campaignStore = {
   campaigns$,
+  submissions$,
 
   setCampaigns: (list: CampaignType[]) => campaigns$.next(list),
 
   addCampaign: (campaign: CampaignType) => {
     const current = campaigns$.value;
     campaigns$.next([...current, campaign]);
+  },
+
+  getSubmissionsForCampaign: (campaignId: string): SubmissionType[] => {
+    return submissions$.getValue()[campaignId] || [];
+  },
+
+  fetchSubmissions: async (campaignId: string) => {
+    try {
+      const { data } = await axiosInstance.get(`/campaign/${campaignId}/submissions`);
+      const subs = (data.submissions || []) as SubmissionType[];
+      submissions$.next({
+        ...submissions$.getValue(),
+        [campaignId]: subs,
+      });
+      return subs;
+    } catch (err) {
+      console.error('Failed to fetch submissions:', err);
+      return [];
+    }
   },
 
   setAuth: (token: string | null) => {
@@ -178,5 +200,41 @@ export const campaignStore = {
       campaigns$.next(updatedList);
       return data;
     });
+  },
+
+  updateSubmission: async (campaignId: string, submissionId: string, content: string) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/campaign/submissions/${submissionId}`,
+        { content },
+      );
+      const currentSubs = submissions$.getValue()[campaignId] || [];
+      const updatedSubs = currentSubs.map((s) =>
+        s._id === submissionId ? { ...s, content: data.content } : s,
+      );
+      submissions$.next({
+        ...submissions$.getValue(),
+        [campaignId]: updatedSubs,
+      });
+      return data;
+    } catch (err) {
+      console.error('Failed to update submission:', err);
+      throw err;
+    }
+  },
+
+  deleteSubmission: async (campaignId: string, submissionId: string) => {
+    try {
+      await axiosInstance.delete(`/campaign/submissions/${submissionId}`);
+      const currentSubs = submissions$.getValue()[campaignId] || [];
+      const filteredSubs = currentSubs.filter((s) => s._id !== submissionId);
+      submissions$.next({
+        ...submissions$.getValue(),
+        [campaignId]: filteredSubs,
+      });
+    } catch (err) {
+      console.error('Failed to delete submission:', err);
+      throw err;
+    }
   },
 };
