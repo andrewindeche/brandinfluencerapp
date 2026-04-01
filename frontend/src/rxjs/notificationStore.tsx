@@ -17,6 +17,11 @@ export const notificationStore = {
   notifications$,
   influencerNotifications$,
   brandNotifications$,
+  clearNotifications() {
+    notifications$.next([]);
+    brandNotifications$.next([]);
+    influencerNotifications$.next([]);
+  },
 
   addNotification(notification: NotificationType) {
     const current = notifications$.getValue();
