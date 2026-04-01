@@ -13,7 +13,6 @@ import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { RedisService } from 'src/redis/redis.service';
 import { KafkaService } from 'src/kafka/kafka.service';
-import { producer } from '../../kafka/kafka.provider';
 
 @Injectable()
 export class CampaignsService {
@@ -447,12 +446,5 @@ export class CampaignsService {
     );
 
     return submission as any;
-  }
-
-  async notifySubmissionEvent(eventType: string, payload: any) {
-    await producer.send({
-      topic: 'submission-events',
-      messages: [{ key: eventType, value: JSON.stringify(payload) }],
-    });
   }
 }
