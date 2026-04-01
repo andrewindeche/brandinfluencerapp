@@ -1,49 +1,71 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { Producer, Consumer, EachMessagePayload } from 'kafkajs';
-import { kafka, producer, consumer } from './kafka.provider';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { EachMessagePayload } from 'kafkajs';
+import { kafka, createProducer, createConsumer } from './kafka.provider';
 
 @Injectable()
 export class KafkaService implements OnModuleInit, OnModuleDestroy {
-  private producer: Producer = producer;
-  private consumer: Consumer = consumer;
+  private readonly logger = new Logger(KafkaService.name);
+  private readonly producer = createProducer();
+  private readonly consumer = createConsumer(
+    process.env.KAFKA_GROUP_ID || 'notification-service',
+  );
 
   private isRunning = false;
-  private subscribedTopics = new Set<string>();
+  private subscribedTopics = new Map<string, (key: string, payload: any) => Promise<void>>();
 
   async onModuleInit() {
-    await this.producer.connect();
-    await this.consumer.connect();
+    try {
+      await this.producer.connect();
+      this.logger.log('Kafka producer connected');
 
-    const admin = kafka.admin();
-    await admin.connect();
+      await this.consumer.connect();
+      this.logger.log('Kafka consumer connected');
 
-    const topics = await admin.listTopics();
+      const admin = kafka.admin();
+      await admin.connect();
 
-    if (!topics.includes('submission-events')) {
-      await admin.createTopics({
-        topics: [
-          {
-            topic: 'submission-events',
-            numPartitions: 1,
-            replicationFactor: 1,
-          },
-        ],
-      });
+      const topics = await admin.listTopics();
+
+      if (!topics.includes('submission-events')) {
+        await admin.createTopics({
+          topics: [
+            {
+              topic: 'submission-events',
+              numPartitions: 1,
+              replicationFactor: 1,
+            },
+          ],
+        });
+        this.logger.log('Created submission-events topic');
+      }
+
+      await admin.disconnect();
+    } catch (error) {
+      this.logger.error('Failed to initialize Kafka', error);
     }
-
-    await admin.disconnect();
   }
 
   async onModuleDestroy() {
-    await this.producer.disconnect();
-    await this.consumer.disconnect();
+    try {
+      await this.producer.disconnect();
+      await this.consumer.disconnect();
+      this.logger.log('Kafka disconnected');
+    } catch (error) {
+      this.logger.error('Error disconnecting Kafka', error);
+    }
   }
 
   async sendMessage(topic: string, key: string, value: any) {
-    await this.producer.send({
-      topic,
-      messages: [{ key, value: JSON.stringify(value) }],
-    });
+    try {
+      await this.producer.send({
+        topic,
+        messages: [{ key, value: JSON.stringify(value) }],
+      });
+      this.logger.debug(`Message sent to ${topic}: ${key}`);
+    } catch (error) {
+      this.logger.error(`Failed to send message to ${topic}`, error);
+      throw error;
+    }
   }
 
   async testKafka() {
@@ -56,19 +78,30 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
   async subscribeToTopic(
     topic: string,
-    p0: (key: any, payload: any) => Promise<void>,
+    handler: (key: string, payload: any) => Promise<void>,
   ) {
-    if (this.subscribedTopics.has(topic)) return;
+    if (this.subscribedTopics.has(topic)) {
+      this.logger.warn(`Topic ${topic} already subscribed`);
+      return;
+    }
 
-    await this.consumer.subscribe({
-      topic,
-      fromBeginning: false,
-    });
+    try {
+      await this.consumer.subscribe({
+        topic,
+        fromBeginning: false,
+      });
 
-    this.subscribedTopics.add(topic);
+      this.subscribedTopics.set(topic, handler);
+      this.logger.log(`Subscribed to topic: ${topic}`);
+
+      await this.runConsumer();
+    } catch (error) {
+      this.logger.error(`Failed to subscribe to topic ${topic}`, error);
+      throw error;
+    }
   }
 
-  async runConsumer(handler: (key: string, value: any) => Promise<void>) {
+  private async runConsumer() {
     if (this.isRunning) {
       return;
     }
@@ -76,15 +109,24 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     this.isRunning = true;
 
     await this.consumer.run({
-      eachMessage: async ({ message }: EachMessagePayload) => {
+      eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
         try {
           const key = message.key?.toString() || '';
           const value = JSON.parse(message.value?.toString() || '{}');
-          await handler(key, value);
+
+          this.logger.debug(`Received message on ${topic}: ${key}`);
+
+          for (const [subscribedTopic, handler] of this.subscribedTopics) {
+            if (subscribedTopic === topic) {
+              await handler(key, value);
+            }
+          }
         } catch (err) {
-          console.error('❌ Error processing Kafka message:', err);
+          this.logger.error('Error processing Kafka message:', err);
         }
       },
     });
+
+    this.logger.log('Kafka consumer started');
   }
 }
