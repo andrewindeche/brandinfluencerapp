@@ -466,4 +466,73 @@ export class CampaignsService {
 
     return submission as any;
   }
+
+  async updateSubmission(
+    submissionId: string,
+    content: string,
+    influencerId: string,
+  ): Promise<Submission> {
+    const submission = await this.submissionModel
+      .findById(submissionId)
+      .populate('campaign')
+      .exec();
+
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    const submissionInfluencerId = (submission as any).influencer?._id?.toString() 
+      || (submission as any).influencer?.toString();
+
+    if (submissionInfluencerId !== influencerId) {
+      throw new BadRequestException('Not authorized to update this submission');
+    }
+
+    const campaignId = (submission as any).campaign?._id?.toString() 
+      || (submission as any).campaign?.toString();
+
+    (submission as any).content = content;
+    await (submission as any).save();
+
+    if (campaignId) {
+      await this.cacheManager.del(`submissions_${campaignId}`);
+    }
+
+    return submission as any;
+  }
+
+  async deleteSubmission(
+    submissionId: string,
+    influencerId: string,
+  ): Promise<{ success: boolean }> {
+    const submission = await this.submissionModel
+      .findById(submissionId)
+      .populate('campaign')
+      .exec();
+
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    const submissionInfluencerId = (submission as any).influencer?._id?.toString() 
+      || (submission as any).influencer?.toString();
+
+    if (submissionInfluencerId !== influencerId) {
+      throw new BadRequestException('Not authorized to delete this submission');
+    }
+
+    const campaignId = (submission as any).campaign?._id?.toString() 
+      || (submission as any).campaign?.toString();
+
+    await this.submissionModel.deleteOne({ _id: submissionId });
+
+    if (campaignId) {
+      await this.campaignModel.findByIdAndUpdate(campaignId, {
+        $pull: { submissions: new Types.ObjectId(submissionId) },
+      });
+      await this.cacheManager.del(`submissions_${campaignId}`);
+    }
+
+    return { success: true };
+  }
 }
