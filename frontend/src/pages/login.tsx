@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { authState$, authStore, AuthFormState } from '../rxjs/authStore';
+import { authState$, authStore } from '../rxjs/authStore';
+import { AuthFormState } from '../types';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
