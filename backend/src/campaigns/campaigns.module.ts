@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
 import { CampaignsService } from './service/campaigns.service';
 import { SessionService } from '../session/session.service';
@@ -19,10 +20,15 @@ import { KafkaModule } from 'src/kafka/kafka.module';
       { name: Submission.name, schema: SubmissionSchema },
       { name: 'Influencer', schema: InfluencerSchema },
     ]),
-    CacheModule.register({
-      store: redisStore,
-      host: 'localhost',
-      port: 6380,
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get<string>('REDIS_HOST', 'localhost'),
+        port: configService.get<number>('REDIS_PORT', 6379),
+        password: configService.get<string>('REDIS_PASSWORD'),
+      }),
+      inject: [ConfigService],
     }),
     RedisModule,
     KafkaModule,
