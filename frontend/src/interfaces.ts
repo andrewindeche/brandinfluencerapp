@@ -35,6 +35,7 @@ export interface SubmissionType {
   _id: string;
   content: string;
   submittedAt?: string;
+  createdAt?: string;
   status?: 'pending' | 'accepted' | 'rejected';
   influencer: {
     _id: string;
@@ -140,6 +141,10 @@ export interface NotificationCardProps {
   status: NotificationStatus;
   date: string;
   message: string;
+  influencerName?: string;
+  submissionContent?: string;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 export interface CampaignsSectionProps {
@@ -161,4 +166,9 @@ export interface SubmissionModalProps {
   onSubmit: (text: string) => void;
   joined: boolean;
   status: 'active' | 'inactive';
+  campaignSubmissions?: SubmissionType[];
+  onSelectSubmission?: (submission: SubmissionType) => void;
+  viewingSubmission?: SubmissionType | null;
+  onUpdateSubmission?: (submissionId: string, content: string) => Promise<void>;
+  onDeleteSubmission?: (submissionId: string) => Promise<void>;
 }
