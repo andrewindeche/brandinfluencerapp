@@ -7,3 +7,6 @@ REDIS_PASSWORD="Password44#"
 SUPERUSER_USERNAME=admin
 SUPERUSER_EMAIL=admin@example.com
 SUPERUSER_PASSWORD=supersecurepassword
+KAFKA_BROKERS=localhost:9092
+KAFKA_CLIENT_ID=campaign-service
+KAFKA_GROUP_ID=notification-service
