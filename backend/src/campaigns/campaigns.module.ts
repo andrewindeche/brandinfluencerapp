@@ -12,6 +12,7 @@ import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
 import { KafkaModule } from 'src/kafka/kafka.module';
+import { UserSchema } from '../user/user.schema';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { KafkaModule } from 'src/kafka/kafka.module';
       { name: Campaign.name, schema: CampaignSchema },
       { name: Submission.name, schema: SubmissionSchema },
       { name: 'Influencer', schema: InfluencerSchema },
+      { name: 'User', schema: UserSchema },
     ]),
     CacheModule.registerAsync({
       imports: [ConfigModule],

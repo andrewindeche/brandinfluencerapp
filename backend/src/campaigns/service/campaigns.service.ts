@@ -13,6 +13,7 @@ import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { RedisService } from 'src/redis/redis.service';
 import { KafkaService } from 'src/kafka/kafka.service';
+import { User } from '../../user/user.schema';
 
 @Injectable()
 export class CampaignsService {
@@ -20,6 +21,7 @@ export class CampaignsService {
     @InjectModel(Campaign.name) private readonly campaignModel: Model<Campaign>,
     @InjectModel(Submission.name)
     private readonly submissionModel: Model<Submission>,
+    @InjectModel('User') private readonly userModel: Model<User>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly redisService: RedisService,
     private readonly kafkaService: KafkaService,
@@ -187,6 +189,8 @@ export class CampaignsService {
     campaign.submissions.push(submission._id as Types.ObjectId);
     await campaign.save();
 
+    const influencer = await this.userModel.findById(influencerId).lean();
+
     await this.kafkaService.sendMessage(
       'submission-events',
       'submission.created',
@@ -194,7 +198,11 @@ export class CampaignsService {
         submissionId: submission._id.toString(),
         campaignId,
         influencerId,
+        influencerName: influencer?.username || 'Unknown Influencer',
         brandId: campaign.brand.toString(),
+        campaignTitle: campaign.title,
+        content,
+        timestamp: new Date().toISOString(),
       },
     );
 
