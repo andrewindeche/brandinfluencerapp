@@ -21,7 +21,6 @@ class SocketHandler {
     });
 
     this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket?.id);
       this.isConnecting = false;
 
       this.joinUserRooms();
@@ -37,12 +36,13 @@ class SocketHandler {
     });
 
     this.socket.on('submission-event', (data) => {
-      console.log('SOCKET EVENT:', data);
 
-      const { key, payload } = data || {};
-
-      if (!key || !payload) return;
-
+      const key = data?.key;
+      const payload = data?.payload || data;
+      if (!key || !payload) {
+        console.warn('Invalid socket event - missing key or payload', data);
+        return;
+      }
       notificationStore.handleKafkaEvent(key, payload);
 
       if (payload.campaignId && payload.submissionId) {
@@ -70,8 +70,6 @@ class SocketHandler {
     this.socket.disconnect();
     this.socket = null;
     this.isConnecting = false;
-
-    console.log('🔌 Socket manually disconnected');
   }
 
   private joinUserRooms() {
@@ -80,17 +78,17 @@ class SocketHandler {
 
     if (!userId) {
       const storedId = localStorage.getItem('userId');
-      if (storedId) userId = storedId;
+      if (storedId) {
+        userId = storedId;
+      }
     }
 
     if (!userId || !userRole) {
-      console.warn('⚠️ No user found for socket room join');
+      console.warn('[SocketHandler] ⚠️ No user found for socket room join', { userId, userRole });
       return;
     }
-
-    console.log('👤 Joining rooms for:', userRole, userId);
-
     if (userRole === 'influencer') {
+  
       this.socket?.emit('join-influencer', userId);
     }
 
