@@ -42,8 +42,22 @@ export const notificationStore = {
     brandNotifications$.next([notification, ...current]);
   },
 
+  removeNotification(id: string) {
+    const current = notifications$.getValue();
+    notifications$.next(current.filter((n) => n.id !== id));
+
+    const brandCurrent = brandNotifications$.getValue();
+    brandNotifications$.next(brandCurrent.filter((n) => n.id !== id));
+
+    const influencerCurrent = influencerNotifications$.getValue();
+    influencerNotifications$.next(influencerCurrent.filter((n) => n.id !== id));
+  },
+
   handleKafkaEvent(key: string, payload: any) {
-    if (!payload || !(key in typeMap)) return;
+    if (!payload || !(key in typeMap)) {
+      console.warn('[NotificationStore] Invalid event - missing payload or unknown key:', key);
+      return;
+    }
 
     const typedKey = key as KafkaKey;
 
