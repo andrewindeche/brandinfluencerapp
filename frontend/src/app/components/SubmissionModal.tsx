@@ -6,7 +6,7 @@ import {
   DialogTitle,
   Transition,
 } from '@headlessui/react';
-import { X, Pencil, Trash2 } from 'lucide-react';
+import { X, Pencil, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { TransitionChild } from '@headlessui/react';
 import { SubmissionModalProps } from '../../interfaces';
@@ -25,6 +25,9 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
   viewingSubmission,
   onUpdateSubmission,
   onDeleteSubmission,
+  onAcceptSubmission,
+  onRejectSubmission,
+  isBrand,
 }) => {
   const [text, setText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -49,6 +52,18 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
   const handleDelete = async () => {
     if (!viewingSubmission || !onDeleteSubmission) return;
     await onDeleteSubmission(viewingSubmission._id);
+    onClose();
+  };
+
+  const handleAccept = async () => {
+    if (!viewingSubmission || !onAcceptSubmission) return;
+    await onAcceptSubmission(viewingSubmission._id);
+    onClose();
+  };
+
+  const handleReject = async () => {
+    if (!viewingSubmission || !onRejectSubmission) return;
+    await onRejectSubmission(viewingSubmission._id);
     onClose();
   };
 
@@ -128,6 +143,38 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
   };
 
   const renderButtons = () => {
+    if (isViewing && isBrand) {
+      const canAccept = viewingSubmission?.status === 'pending' || !viewingSubmission?.status;
+      return (
+        <>
+          {canAccept && onAcceptSubmission && (
+            <button
+              onClick={handleAccept}
+              className="px-4 py-2 text-sm font-medium rounded-xl border border-green-300 text-green-600 hover:bg-green-50 transition flex items-center gap-1"
+            >
+              <CheckCircle size={16} /> Accept
+            </button>
+          )}
+          {canAccept && onRejectSubmission && (
+            <button
+              onClick={handleReject}
+              className="px-4 py-2 text-sm font-medium rounded-xl border border-red-300 text-red-600 hover:bg-red-50 transition flex items-center gap-1"
+            >
+              <XCircle size={16} /> Reject
+            </button>
+          )}
+          <div className="flex gap-3 ml-auto">
+            <button
+              onClick={handleBackToList}
+              className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+            >
+              Back
+            </button>
+          </div>
+        </>
+      );
+    }
+
     if (isViewing && onDeleteSubmission) {
       return (
         <>
