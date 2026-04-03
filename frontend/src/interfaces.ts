@@ -171,4 +171,7 @@ export interface SubmissionModalProps {
   viewingSubmission?: SubmissionType | null;
   onUpdateSubmission?: (submissionId: string, content: string) => Promise<void>;
   onDeleteSubmission?: (submissionId: string) => Promise<void>;
+  onAcceptSubmission?: (submissionId: string) => Promise<void>;
+  onRejectSubmission?: (submissionId: string) => Promise<void>;
+  isBrand?: boolean;
 }
