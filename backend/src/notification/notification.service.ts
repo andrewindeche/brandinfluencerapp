@@ -13,6 +13,7 @@ export class NotificationService implements OnModuleInit {
     await this.kafkaService.subscribeToTopic(
       'submission-events',
       async (key, payload) => {
+        console.log('[NotificationService] Received Kafka event:', key, payload);
         switch (key) {
           case 'submission.created':
             this.notificationGateway.sendToBrand(payload.brandId, {
