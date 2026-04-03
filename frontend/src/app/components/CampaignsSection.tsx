@@ -280,6 +280,23 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
                     }
                   } : undefined}
+                  onAcceptSubmission={viewingSubmission ? async (id) => {
+                    if (!selectedCampaign) return;
+                    await submissionStore.acceptSubmission(selectedCampaign.id, id);
+                    const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+                    if (subs) {
+                      setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+                    }
+                  } : undefined}
+                  onRejectSubmission={viewingSubmission ? async (id) => {
+                    if (!selectedCampaign) return;
+                    await submissionStore.rejectSubmission(selectedCampaign.id, id);
+                    const subs = await campaignStore.fetchSubmissions(selectedCampaign.id);
+                    if (subs) {
+                      setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subs }));
+                    }
+                  } : undefined}
+                  isBrand={true}
                 />
                 <div className="bg-[#005B96] text-white p-2 rounded-b-lg">
                   <div className="flex justify-between items-center">
