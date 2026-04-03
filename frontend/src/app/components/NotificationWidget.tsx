@@ -29,6 +29,7 @@ const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (mess
 
       if (updated) {
         showToast?.('Submission accepted!', 'success');
+        notificationStore.removeNotification(notification.id);
       } else {
         showToast?.('Failed to accept submission', 'error');
       }
@@ -57,6 +58,7 @@ const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (mess
 
       if (updated) {
         showToast?.('Submission rejected', 'success');
+        notificationStore.removeNotification(notification.id);
       } else {
         showToast?.('Failed to reject submission', 'error');
       }
