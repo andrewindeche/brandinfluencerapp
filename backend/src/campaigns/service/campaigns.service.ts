@@ -417,6 +417,7 @@ export class CampaignsService {
         campaignId: campaign._id.toString(),
         brandId,
         influencerId,
+        campaignTitle: campaign.title,
       },
     );
 
@@ -461,6 +462,7 @@ export class CampaignsService {
         campaignId: campaign._id.toString(),
         brandId,
         influencerId,
+        campaignTitle: campaign.title,
       },
     );
 
