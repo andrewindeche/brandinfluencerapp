@@ -69,13 +69,26 @@ if (typeof window !== 'undefined') {
   const savedUsername = localStorage.getItem('username') || '';
   const savedBio = localStorage.getItem('bio') || '';
   const savedProfileImage = localStorage.getItem('profileImage') || '';
+  const savedUserId = localStorage.getItem('userId') || '';
+  const savedUser = localStorage.getItem('user');
 
-  if (savedUsername || savedBio || savedProfileImage) {
+  let savedRole: string | undefined;
+  if (savedUser) {
+    try {
+      const userObj = JSON.parse(savedUser);
+      savedRole = userObj.role;
+    } catch (e) {}
+  }
+
+  if (savedUsername || savedBio || savedProfileImage || savedUserId) {
     _authState$.next({
       ..._authState$.value,
       username: savedUsername,
       bio: savedBio,
       profileImage: savedProfileImage,
+      id: savedUserId,
+      role: savedRole as any,
+      roleDetected: !!savedRole,
     });
   }
 }
