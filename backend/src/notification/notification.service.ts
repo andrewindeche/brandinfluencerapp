@@ -15,6 +15,7 @@ export class NotificationService implements OnModuleInit {
       async (key, payload) => {
         switch (key) {
           case 'submission.created':
+            console.log('[NotificationService] Sending to brand:', payload.brandId);
             this.notificationGateway.sendToBrand(payload.brandId, {
               key,
               payload: {

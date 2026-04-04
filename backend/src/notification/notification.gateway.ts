@@ -33,6 +33,7 @@ export class NotificationGateway {
   }
 
   sendToBrand(brandId: string, payload: any) {
+    console.log('[NotificationGateway] sendToBrand - brandId:', brandId, 'room:', `brand-${brandId}`);
     this.server.to(`brand-${brandId}`).emit('submission-event', payload);
   }
 

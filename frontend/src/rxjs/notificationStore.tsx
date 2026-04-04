@@ -38,6 +38,7 @@ export const notificationStore = {
   },
 
   addBrandNotification(notification: NotificationType) {
+    console.log('[NotificationStore] Adding brand notification:', notification);
     const current = brandNotifications$.getValue();
     brandNotifications$.next([notification, ...current]);
   },
@@ -54,6 +55,8 @@ export const notificationStore = {
   },
 
   handleKafkaEvent(key: string, payload: any) {
+    console.log('[NotificationStore] handleKafkaEvent called with key:', key, 'payload:', payload);
+    
     if (!payload || !(key in typeMap)) {
       console.warn('[NotificationStore] Invalid event - missing payload or unknown key:', key);
       return;
