@@ -8,7 +8,7 @@ import { CampaignType } from '../../types';
 import { CampaignsSectionProps } from '../../interfaces';
 import { campaignStore } from '@/rxjs/campaignStore';
 import Toast from './Toast';
-import { submissionStore } from '@/rxjs/submissionStore';
+import { submissionStore, submissions$ } from '@/rxjs/submissionStore';
 import { SubmissionType } from '@/interfaces';
 
 const CampaignsSection: React.FC<CampaignsSectionProps> = ({
@@ -49,6 +49,16 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
       }
     });
   }, [campaigns]);
+
+  useEffect(() => {
+    const subscription = submissions$.subscribe((allSubs) => {
+      if (selectedCampaign) {
+        const subsForCampaign = allSubs[selectedCampaign.id] || [];
+        setCampaignSubmissions(prev => ({ ...prev, [selectedCampaign.id]: subsForCampaign }));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [selectedCampaign]);
 
   const showToast = (
     message: string,

@@ -279,7 +279,10 @@ const CampaignsContent: React.FC = () => {
   }, [currentCampaignId]);
 
   useEffect(() => {
-    const sub = notificationStore.brandNotifications$.subscribe(setNotifications);
+    const sub = notificationStore.brandNotifications$.subscribe((notifs) => {
+      console.log('[CampaignsContent] Brand notifications updated:', notifs);
+      setNotifications(notifs);
+    });
     return () => sub.unsubscribe();
   }, []);
 
@@ -569,9 +572,22 @@ const CampaignsContent: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleViewSubmissions(campaign)}
-                        className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
+                        className="relative flex items-center gap-1 bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
                       >
                         <Eye size={14} /> View
+                        {notifications.filter(
+                          (n) =>
+                            n.campaignId === campaign.id &&
+                            n.type === 'new_submission',
+                        ).length > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold animate-pulse">
+                            {notifications.filter(
+                              (n) =>
+                                n.campaignId === campaign.id &&
+                                n.type === 'new_submission',
+                            ).length}
+                          </span>
+                        )}
                       </button>
                     </div>
                   </div>
