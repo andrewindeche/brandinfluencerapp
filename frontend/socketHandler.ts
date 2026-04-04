@@ -36,6 +36,8 @@ class SocketHandler {
     });
 
     this.socket.on('submission-event', (data) => {
+      console.log('[SocketHandler] Received submission-event:', data);
+      console.log('[SocketHandler] Current socket rooms:', this.socket?.rooms);
 
       const key = data?.key;
       const payload = data?.payload || data;
@@ -43,6 +45,7 @@ class SocketHandler {
         console.warn('Invalid socket event - missing key or payload', data);
         return;
       }
+      console.log('[SocketHandler] Key:', key, 'Payload:', payload);
       notificationStore.handleKafkaEvent(key, payload);
 
       if (payload.campaignId && payload.submissionId) {
@@ -73,8 +76,9 @@ class SocketHandler {
   }
 
   private joinUserRooms() {
-    let userId: string | undefined = authStore.getCurrentUser()?.id;
-    const userRole = authStore.getCurrentUser()?.role;
+    const authUser = authStore.getCurrentUser();
+    let userId: string | undefined = authUser?.id;
+    let userRole = authUser?.role;
 
     if (!userId) {
       const storedId = localStorage.getItem('userId');
@@ -83,16 +87,36 @@ class SocketHandler {
       }
     }
 
-    if (!userId || !userRole) {
+    if (!userRole || userRole === 'unknown') {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const userObj = JSON.parse(storedUser);
+          userRole = userObj.role;
+        } catch (e) {}
+      }
+    }
+
+    if (!userRole || userRole === 'unknown') {
+      const storedUserType = localStorage.getItem('userType');
+      if (storedUserType === 'brand' || storedUserType === 'influencer') {
+        userRole = storedUserType;
+      }
+    }
+
+    console.log('[SocketHandler] joinUserRooms - userId:', userId, 'userRole:', userRole);
+
+    if (!userId || !userRole || userRole === 'unknown') {
       console.warn('[SocketHandler] ⚠️ No user found for socket room join', { userId, userRole });
       return;
     }
     if (userRole === 'influencer') {
-  
+      console.log('[SocketHandler] Joining influencer room:', userId);
       this.socket?.emit('join-influencer', userId);
     }
 
     if (userRole === 'brand') {
+      console.log('[SocketHandler] Joining brand room:', userId);
       this.socket?.emit('join-brand', userId);
     }
   }

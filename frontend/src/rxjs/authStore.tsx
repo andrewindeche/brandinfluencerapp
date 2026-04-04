@@ -204,6 +204,7 @@ export const authStore = {
     return {
       ...current,
       id: current.id,
+      role: current.role,
       profileImage: current.profileImage?.includes('undefined')
         ? '/images/default.png'
         : current.profileImage,
@@ -280,8 +281,8 @@ export const authStore = {
         if (socketHandler) {
           (socketHandler as any).rejoinRooms?.();
         }
-      }, 500);
-      
+      }, 1000);
+       
       return { success: true, role: data.user.role };
     } catch (err: unknown) {
       console.error('Login error:', err);
@@ -369,6 +370,13 @@ export const authStore = {
         success: true,
         serverMessage: 'Registration successful.',
       });
+      connectSocket();
+      
+      setTimeout(() => {
+        if (socketHandler) {
+          (socketHandler as any).rejoinRooms?.();
+        }
+      }, 500);
     } catch (err: unknown) {
       let errors: Record<string, string> = {};
       let message = 'Unexpected error occurred.';
