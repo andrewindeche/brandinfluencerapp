@@ -18,7 +18,7 @@ export interface Influencer extends User {
     twitter?: string;
   };
   category: string;
-  bio: string;
+  bio?: string;
   tips?: string;
   interests?: string[];
   submissions: Submission[];
@@ -31,12 +31,7 @@ export interface Brand extends User {
   bio?: string;
   interests?: string[];
   role: 'brand';
-}
-
-export interface Brand extends User {
-  bio: string;
   profileImage?: string;
-  role: 'brand';
   createdAt?: Date;
   updatedAt?: Date;
 }
