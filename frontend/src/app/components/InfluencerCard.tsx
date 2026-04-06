@@ -14,7 +14,8 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
 
   return (
     <div
-      className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 bg-white`}
+      className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105`}
+      style={{ borderColor: '#023EBA', backgroundColor: 'black' }}
     >
       <div className="absolute top-2 left-8 transform -translate-x-1/2 rotate-12 bg-green-500 text-white text-center px-2 py-0.5 rounded-2xl font-bold text-sm sm:text-[7px]">
         <span className="inline-block transform -rotate-12 text-white">
@@ -35,15 +36,15 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
           {influencer.name}
         </p>
       </div>
-      <div className="absolute bottom-0 w-full bg-gray-100 text-gray-800 text-[10px] py-2 px-4 rounded-t-lg">
-        <div className="border-t border-b border-gray-300 py-1 px-1">
+      <div className="absolute bottom-0 w-full bg-black text-white text-[10px] py-2 px-4 rounded-t-lg">
+        <div className=" border-t border-b border-white py-1 px-1">
           <div className="flex justify-between items-center mb-1">
             <p className="font-bold mb-1">
               {influencer.message.split('\n')[0]}
             </p>
-            <p className="text-right text-gray-500 text-xxs">16/01/2025</p>
+            <p className="text-right text-gray-300 text-xxs">16/01/2025</p>
           </div>
-          <p className="text-gray-600 mb-2">
+          <p className="text-gray-300 mb-2">
             {influencer.message.split('\n')[1]}
           </p>
 
@@ -51,7 +52,7 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
           {fullMessage.length > MAX_CHAR_COUNT && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-blue-500 hover:underline"
+              className="text-yellow-400 hover:underline"
             >
               {expanded ? 'Read Less' : 'Read More'}
             </button>
