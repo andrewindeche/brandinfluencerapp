@@ -24,6 +24,11 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
     });
   };
 
+  const handleCollapseAll = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleShow();
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'accepted':
@@ -97,10 +102,7 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
           {notificationCount > 0 && show && (
             <>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpandedCards(new Set());
-                }}
+                onClick={handleCollapseAll}
                 className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
               >
                 Collapse all
