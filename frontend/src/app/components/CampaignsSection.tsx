@@ -164,7 +164,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
     });
   }, [campaigns, searchQuery, statusFilter]);
 
-  const campaignsNeedingSubmission = useMemo(() => {
+  const activeNotJoinedCampaigns = useMemo(() => {
     return campaigns.filter((campaign) => 
       campaign.status === 'active' && !campaign.joined
     );
@@ -193,9 +193,9 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
         duration={10000}
       />
 
-      {campaignsNeedingSubmission.length > 0 && (
+      {activeNotJoinedCampaigns.length > 0 && (
         <div className="mb-4 font-medium text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded">
-          You have {campaignsNeedingSubmission.length} open campaign{campaignsNeedingSubmission.length > 1 ? 's' : ''} awaiting submission!
+          You have {activeNotJoinedCampaigns.length} open campaign{activeNotJoinedCampaigns.length > 1 ? 's' : ''} awaiting submission!
         </div>
       )}
 
