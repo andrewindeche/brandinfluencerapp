@@ -15,6 +15,7 @@ import { SessionService } from '../session/session.service';
 import { RedisService } from '../redis/redis.service';
 import { SendForgotPasswordEmailService } from '../send-forgot-password-email/send-forgot-password-email.service';
 import { RedisModule } from '../redis/redis.module';
+import { MetricsModule } from '../test-metrics/test-metrics.module';
 
 const jwtSecret =
   process.env.JWT_SECRET ||
@@ -39,6 +40,7 @@ const jwtSecret =
     }),
     BrandModule,
     RedisModule,
+    MetricsModule,
   ],
   providers: [
     AuthService,

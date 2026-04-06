@@ -22,6 +22,7 @@ import { LoginUserDto } from '../dto/login-user.dto';
 import { ForgotPasswordService } from '../../forgot-password/forgot-password.service';
 import { ForgotPasswordDto } from '../../send-forgot-password-email/dto/ForgotPasswordDto';
 import { UserService } from '../../user/user.service';
+import { MetricsService } from '../../test-metrics/metrics.service';
 import * as bcrypt from 'bcryptjs';
 
 @Controller('auth')
@@ -32,6 +33,7 @@ export class AuthController {
     private readonly forgotPasswordService: ForgotPasswordService,
     private readonly sessionService: SessionService,
     private readonly usersService: UserService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   @Post('influencer/login')
@@ -44,7 +46,12 @@ export class AuthController {
       loginDto.password,
       'influencer',
     );
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      this.metricsService.incrementLoginAttempts('influencer', 'failed');
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    this.metricsService.incrementLoginAttempts('influencer', 'success');
 
     const sessionId = uuidv4();
     await this.sessionService.setSession(sessionId, {
@@ -72,7 +79,12 @@ export class AuthController {
         loginDto.password,
         'brand',
       );
-      if (!user) throw new UnauthorizedException('Invalid credentials');
+      if (!user) {
+        this.metricsService.incrementLoginAttempts('brand', 'failed');
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      this.metricsService.incrementLoginAttempts('brand', 'success');
 
       const sessionId = uuidv4();
       await this.sessionService.setSession(sessionId, {

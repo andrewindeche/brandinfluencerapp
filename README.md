@@ -65,6 +65,31 @@ A dockerized version of Kafka has been used for local Development for message br
 docker-compose up -d
 ```
 
+<p><b>Prometheus & Grafana</b></p>
+Monitoring stack for tracking performance, login attempts, memory leaks, and anomalies.
+
+1. Start the monitoring services:
+
+```bash
+docker-compose up -d
+```
+
+2. Access Prometheus:
+   - URL: http://localhost:9090
+   - View metrics: Query `login_attempts_total`, `process_memory_bytes`, `http_request_duration_seconds`, etc.
+
+3. Access Grafana:
+   - URL: http://localhost:3002
+   - Login: admin / admin
+   - Add Prometheus as datasource: http://localhost:9090
+   - Create dashboards to visualize:
+     - Login attempts by role (success vs failed)
+     - Memory usage (detect memory leaks)
+     - CPU usage (performance)
+     - HTTP request duration (p95 latency)
+     - Failed HTTP requests (anomalies)
+     - Application uptime
+
 ## <h1> Endpoints </h1>
 
 1. Register User POST: http://localhost:4000/auth/influencer/register

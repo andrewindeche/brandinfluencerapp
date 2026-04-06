@@ -6,12 +6,19 @@ import {
   makeHistogramProvider,
 } from '@willsoto/nestjs-prometheus';
 import { register } from 'prom-client';
+import { MetricsService } from './metrics.service';
 
 register.clear();
 
 @Module({
   imports: [PrometheusModule.register({ path: '/metrics' })],
   providers: [
+    MetricsService,
+    makeCounterProvider({
+      name: 'login_attempts_total',
+      help: 'Total login attempts',
+      labelNames: ['role', 'status'],
+    }),
     makeCounterProvider({
       name: 'test_cases_total',
       help: 'Total test cases executed',
@@ -56,7 +63,6 @@ register.clear();
       help: 'Application uptime',
     }),
 
-    // Resource Utilization Metrics
     makeGaugeProvider({
       name: 'db_active_connections',
       help: 'Active database connections',
@@ -79,5 +85,6 @@ register.clear();
       help: 'Total transactions processed',
     }),
   ],
+  exports: [MetricsService],
 })
 export class MetricsModule {}
