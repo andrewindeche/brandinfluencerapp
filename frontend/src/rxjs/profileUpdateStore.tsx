@@ -25,13 +25,15 @@ export const profileUpdateStore = {
     const { bio: currentBio, profileImage: currentImage } =
       authStore.getCurrentUser();
 
+    console.log('[ProfileUpdateStore] Current state:', { currentBio, currentImage, newBio: bio, newImage: profileImage });
+
     setProfileUpdateState({ status: 'loading', error: null });
 
     let updatedImage = currentImage;
     let uploadedFilename: string | undefined;
 
     try {
-      if (typeof profileImage === 'object') {
+      if (profileImage && typeof profileImage === 'object') {
         const formData = new FormData();
         formData.append('profileImage', profileImage);
 
@@ -46,6 +48,7 @@ export const profileUpdateStore = {
         uploadedFilename = response.data.imageUrl;
         updatedImage = uploadedFilename;
       } else if (
+        profileImage &&
         typeof profileImage === 'string' &&
         profileImage !== currentImage
       ) {
@@ -53,20 +56,30 @@ export const profileUpdateStore = {
         await axiosInstance.patch('/users/profile-image', { profileImage });
       }
 
-      if (bio !== currentBio) {
-        await axiosInstance.patch('/users/bio', { bio });
-      }
+      localStorage.setItem(
+        'profileImage',
+        updatedImage || '/images/image4.png',
+      );
+    } catch (imageError) {
+      console.log('[ProfileUpdateStore] Image update failed, continuing with bio only');
+    }
 
+    if (bio !== currentBio) {
+      console.log('[ProfileUpdateStore] Updating bio:', { currentBio, newBio: bio });
+      try {
+        await axiosInstance.patch('/users/bio', { bio });
+      } catch (bioError) {
+        console.log('[ProfileUpdateStore] Bio update failed:', bioError);
+      }
+    }
+
+    try {
       authStore.updateAuthState({
         bio,
         profileImage: updatedImage || '/images/image4.png',
       });
 
       localStorage.setItem('bio', bio);
-      localStorage.setItem(
-        'profileImage',
-        updatedImage || '/images/image4.png',
-      );
 
       setProfileUpdateState({ status: 'success', error: null });
       showToast('Profile updated successfully!', 'success');
