@@ -195,6 +195,7 @@ export const authStore = {
     localStorage.clear();
     sessionStorage.removeItem('toastMessage');
     localStorage.removeItem('token');
+    localStorage.removeItem('userType');
     setAuthToken(null);
     _authState$.next(initialAuthState);
   },

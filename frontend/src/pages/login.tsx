@@ -58,6 +58,11 @@ const LoginForm: React.FC = () => {
     return () => sub.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    setUserType('unknown');
+    authStore.setField('role', 'unknown');
+  }, []);
+
   const { errors } = authState;
 
   useEffect(() => {
