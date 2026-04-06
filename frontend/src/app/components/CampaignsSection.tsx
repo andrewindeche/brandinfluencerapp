@@ -164,6 +164,12 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
     });
   }, [campaigns, searchQuery, statusFilter]);
 
+  const campaignsNeedingSubmission = useMemo(() => {
+    return campaigns.filter((campaign) => 
+      campaign.status === 'active' && !campaign.joined
+    );
+  }, [campaigns]);
+
   const totalPages = Math.ceil(filteredCampaigns.length / pageSize);
 
   const paginatedCampaigns = useMemo(() => {
@@ -187,9 +193,9 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
         duration={10000}
       />
 
-      {filteredCampaigns.length > 0 && (
+      {campaignsNeedingSubmission.length > 0 && (
         <div className="mb-4 font-medium text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded">
-          You have open campaigns awaiting submission!
+          You have {campaignsNeedingSubmission.length} open campaign{campaignsNeedingSubmission.length > 1 ? 's' : ''} awaiting submission!
         </div>
       )}
 
