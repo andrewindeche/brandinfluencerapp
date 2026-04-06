@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Notification, NotificationsSectionProps } from '../../interfaces';
-import { Bell, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, X, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { notificationStore } from '@/rxjs/notificationStore';
 
 const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   notifications,
@@ -94,15 +95,26 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         </div>
         <div className="flex items-center gap-2">
           {notificationCount > 0 && show && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedCards(new Set());
-              }}
-              className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
-            >
-              Collapse all
-            </button>
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedCards(new Set());
+                }}
+                className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+              >
+                Collapse all
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  notificationStore.clearNotifications();
+                }}
+                className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors flex items-center gap-1"
+              >
+                <Trash2 className="w-3 h-3" /> Clear all
+              </button>
+            </>
           )}
           <div className={`transform transition-transform ${show ? 'rotate-180' : ''}`}>
             <ChevronDown className="w-5 h-5 text-gray-400" />
