@@ -72,8 +72,8 @@ const InfluencerPage: React.FC = () => {
 
     const allSubmissions = submissions$.getValue();
     Object.keys(allSubmissions).forEach((campaignId) => {
-      import('../rxjs/submissionStore').then(({ submissionStore }) => {
-        submissionStore.fetchSubmissions(campaignId);
+      import('../rxjs/submissionStore').then((module) => {
+        module.submissionStore.fetchSubmissions(campaignId);
       });
     });
   }, []);

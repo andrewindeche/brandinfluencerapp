@@ -222,7 +222,7 @@ const CampaignsContent: React.FC = () => {
 
   useEffect(() => {
     campaigns.forEach((campaign) => {
-      import('../rxjs/submissionStore').then(({ submissionStore }) => {
+      import('../../rxjs/submissionStore').then(({ submissionStore }) => {
         submissionStore.fetchSubmissions(campaign.id);
       });
     });
