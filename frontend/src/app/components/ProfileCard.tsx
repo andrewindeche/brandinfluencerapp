@@ -21,6 +21,11 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
   username,
   profileImage,
   bio,
+  likes,
+  shares,
+  campaigns,
+  posts,
+  submissions,
   onSave,
   loading = false,
   showToast,
@@ -31,11 +36,6 @@ const ProfileWithStats: React.FC<ProfileWithStatsProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
-  const [likes] = useState(() => getRandom(50, 300));
-  const [shares] = useState(() => getRandom(10, 100));
-  const [campaigns] = useState(() => getRandom(1, 10));
-  const [posts] = useState(() => getRandom(3, 25));
-  const [submissions] = useState(() => getRandom(1, 15));
 
   const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

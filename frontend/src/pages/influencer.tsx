@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useToast } from '../hooks/useToast';
@@ -10,9 +10,9 @@ import CampaignsSection from '../app/components/CampaignsSection';
 import { campaignStore } from '../rxjs/campaignStore';
 import { CampaignType } from '@/types';
 import ProfileWithStats from '../app/components/ProfileCard';
-import { getRandom } from '../app/utils/random';
 import { notificationStore } from '../rxjs/notificationStore';
 import { NotificationType } from '@/interfaces';
+import { submissions$ } from '../rxjs/submissionStore';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -23,21 +23,52 @@ const InfluencerPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const { toast, showToast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [likes] = useState(getRandom(50, 200));
-  const [shares] = useState(getRandom(10, 100));
-  const [posts] = useState(getRandom(5, 15));
-  const [submissions] = useState(getRandom(2, 10));
 
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
   }>({});
   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
+  const [userId, setUserId] = useState<string>('');
+
+  const stats = useMemo(() => {
+    const allSubmissions = submissions$.getValue();
+    let totalSubmissions = 0;
+    let acceptedSubmissions = 0;
+    let rejectedSubmissions = 0;
+
+    Object.values(allSubmissions).forEach((subs) => {
+      if (Array.isArray(subs)) {
+        const userSubs = subs.filter(
+          (s) => String(s.influencer?._id || s.influencer) === userId
+        );
+        totalSubmissions += userSubs.length;
+        acceptedSubmissions += userSubs.filter((s) => s.status === 'accepted').length;
+        rejectedSubmissions += userSubs.filter((s) => s.status === 'rejected').length;
+      }
+    });
+
+    return {
+      submissions: totalSubmissions,
+      accepted: acceptedSubmissions,
+      rejected: rejectedSubmissions,
+      posts: totalSubmissions,
+      likes: acceptedSubmissions * 10,
+      shares: Math.floor(acceptedSubmissions * 2.5),
+    };
+  }, [campaigns, userId]);
 
   useEffect(() => {
     campaignStore.fetchCampaigns().then(() => {
       const sub = campaignStore.campaigns$.subscribe(setCampaigns);
       return () => sub.unsubscribe();
+    });
+
+    const allSubmissions = submissions$.getValue();
+    Object.keys(allSubmissions).forEach((campaignId) => {
+      import('../rxjs/submissionStore').then(({ submissionStore }) => {
+        submissionStore.fetchSubmissions(campaignId);
+      });
     });
   }, []);
 
@@ -50,6 +81,7 @@ const InfluencerPage: React.FC = () => {
           '/images/image4.png',
       );
       setBio(state.bio || localStorage.getItem('bio') || '');
+      setUserId(state.id || localStorage.getItem('userId') || '');
     });
     return () => sub.unsubscribe();
   }, []);
@@ -149,11 +181,11 @@ const InfluencerPage: React.FC = () => {
               username={username}
               profileImage={profileImage}
               bio={bio}
-              likes={likes}
-              shares={shares}
+              likes={stats.likes}
+              shares={stats.shares}
               campaigns={campaigns.length}
-              posts={posts}
-              submissions={submissions}
+              posts={stats.posts}
+              submissions={stats.submissions}
               onSave={handleProfileSave}
               loading={loading}
               showToast={showToast}

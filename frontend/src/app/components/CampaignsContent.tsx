@@ -186,13 +186,33 @@ const CampaignsContent: React.FC = () => {
   const [profileImage, setProfileImage] = useState(
     '/images/screenshots/HandM.jpg',
   );
+  const [userId, setUserId] = useState<string>('');
 
   const { showToast } = useToast();
 
-  const [likes] = useState(getRandom(50, 200));
-  const [shares] = useState(getRandom(10, 100));
-  const [posts] = useState(getRandom(5, 15));
-  const [submissions] = useState(getRandom(2, 10));
+  const stats = useMemo(() => {
+    const allSubmissions = submissions$.getValue();
+    let totalSubmissions = 0;
+    let acceptedSubmissions = 0;
+    let rejectedSubmissions = 0;
+
+    Object.values(allSubmissions).forEach((subs) => {
+      if (Array.isArray(subs)) {
+        totalSubmissions += subs.length;
+        acceptedSubmissions += subs.filter((s) => s.status === 'accepted').length;
+        rejectedSubmissions += subs.filter((s) => s.status === 'rejected').length;
+      }
+    });
+
+    return {
+      submissions: totalSubmissions,
+      accepted: acceptedSubmissions,
+      rejected: rejectedSubmissions,
+      posts: totalSubmissions,
+      likes: acceptedSubmissions * 10,
+      shares: Math.floor(acceptedSubmissions * 2.5),
+    };
+  }, [campaigns]);
 
   const maxCharCount = 70;
 
@@ -205,6 +225,7 @@ const CampaignsContent: React.FC = () => {
           '/images/image4.png',
       );
       setBio(state.bio || localStorage.getItem('bio') || '');
+      setUserId(state.id || localStorage.getItem('userId') || '');
     });
     return () => sub.unsubscribe();
   }, []);
@@ -457,11 +478,11 @@ const CampaignsContent: React.FC = () => {
               username={username}
               profileImage={profileImage}
               bio={bio}
-              likes={likes}
-              shares={shares}
+              likes={stats.likes}
+              shares={stats.shares}
               campaigns={campaigns.length}
-              posts={posts}
-              submissions={submissions}
+              posts={stats.posts}
+              submissions={stats.submissions}
               onSave={handleProfileSave}
               loading={loading}
               showToast={showToast}
