@@ -177,6 +177,9 @@ const CampaignsContent: React.FC = () => {
   >('all');
   const submissionsPerPage = 10;
 
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState<string | null>(null);
+
   const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
@@ -322,6 +325,19 @@ const CampaignsContent: React.FC = () => {
     setSubmissionSearchQuery('');
     setSubmissionStatusFilter('all');
     setSubmissionPage(1);
+  };
+
+  const handleDeleteClick = (campaignId: string) => {
+    setCampaignToDelete(campaignId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (campaignToDelete) {
+      await campaignStore.deleteCampaign(campaignToDelete);
+      setCampaignToDelete(null);
+    }
+    setDeleteConfirmOpen(false);
   };
 
   const filteredCampaigns = useMemo(() => {
@@ -562,9 +578,7 @@ const CampaignsContent: React.FC = () => {
                         <Pencil size={14} /> Edit
                       </button>
                       <button
-                        onClick={() =>
-                          campaignStore.deleteCampaign(campaign.id)
-                        }
+                        onClick={() => handleDeleteClick(campaign.id)}
                         className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600"
                       >
                         <Trash2 size={14} /> Delete
@@ -993,6 +1007,31 @@ const CampaignsContent: React.FC = () => {
           </div>
         </div>
       </animated.div>
+
+      {deleteConfirmOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm text-center">
+            <h2 className="text-xl font-semibold mb-2">Delete Campaign</h2>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to delete this campaign? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setDeleteConfirmOpen(false)}
+                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
