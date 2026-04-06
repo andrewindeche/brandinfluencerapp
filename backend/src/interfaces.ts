@@ -19,6 +19,7 @@ export interface Influencer extends User {
   };
   category: string;
   bio: string;
+  tips?: string;
   submissions: Submission[];
   campaign?: Types.ObjectId;
   role: 'influencer';
