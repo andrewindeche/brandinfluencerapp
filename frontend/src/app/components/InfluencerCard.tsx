@@ -17,9 +17,9 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
       className={`relative w-full max-w-xs sm:w-[12rem] h-[24rem] rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105`}
       style={{ borderColor: '#023EBA', backgroundColor: 'black' }}
     >
-      <div className="absolute top-2 left-8 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-40 text-white text-center px-2 py-0.5 rounded-2xl font-bold text-sm sm:text-[7px]">
+      <div className="absolute top-2 left-8 transform -translate-x-1/2 rotate-12 bg-black bg-opacity-20 text-white text-center px-2 py-0.5 rounded-2xl font-bold text-sm sm:text-[7px]">
         <span className="inline-block transform -rotate-12 text-white">
-          {influencer.likes} likes
+          {influencer.likes}%
         </span>
       </div>
       <Image
@@ -31,7 +31,7 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
         style={{ objectFit: 'cover' }}
         className="object-cover"
       />
-      <div className="absolute bottom-40 left-5 rotate-12 bg-black bg-opacity-60 w-3/4  px-2 py-2 rounded-2xl text-center">
+      <div className="absolute bottom-40 left-5 rotate-12 bg-black bg-opacity-20 w-3/4  px-2 py-2 rounded-2xl text-center">
         <p className="text-white text-xs font-bold transform -rotate-12">
           {influencer.name}
         </p>
