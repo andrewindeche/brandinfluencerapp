@@ -190,13 +190,19 @@ const CampaignsContent: React.FC = () => {
 
   const { showToast } = useToast();
 
+  const [submissionsValue, setSubmissionsValue] = useState<Record<string, any[]>>({});
+
+  useEffect(() => {
+    const sub = submissions$.subscribe(setSubmissionsValue);
+    return () => sub.unsubscribe();
+  }, []);
+
   const stats = useMemo(() => {
-    const allSubmissions = submissions$.getValue();
     let totalSubmissions = 0;
     let acceptedSubmissions = 0;
     let rejectedSubmissions = 0;
 
-    Object.values(allSubmissions).forEach((subs) => {
+    Object.values(submissionsValue).forEach((subs) => {
       if (Array.isArray(subs)) {
         totalSubmissions += subs.length;
         acceptedSubmissions += subs.filter((s) => s.status === 'accepted').length;
@@ -212,6 +218,14 @@ const CampaignsContent: React.FC = () => {
       likes: acceptedSubmissions * 10,
       shares: Math.floor(acceptedSubmissions * 2.5),
     };
+  }, [campaigns, submissionsValue]);
+
+  useEffect(() => {
+    campaigns.forEach((campaign) => {
+      import('../rxjs/submissionStore').then(({ submissionStore }) => {
+        submissionStore.fetchSubmissions(campaign.id);
+      });
+    });
   }, [campaigns]);
 
   const maxCharCount = 70;

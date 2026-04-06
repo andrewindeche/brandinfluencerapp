@@ -31,13 +31,19 @@ const InfluencerPage: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [userId, setUserId] = useState<string>('');
 
+  const [submissionsValue, setSubmissionsValue] = useState<Record<string, any[]>>({});
+
+  useEffect(() => {
+    const sub = submissions$.subscribe(setSubmissionsValue);
+    return () => sub.unsubscribe();
+  }, []);
+
   const stats = useMemo(() => {
-    const allSubmissions = submissions$.getValue();
     let totalSubmissions = 0;
     let acceptedSubmissions = 0;
     let rejectedSubmissions = 0;
 
-    Object.values(allSubmissions).forEach((subs) => {
+    Object.values(submissionsValue).forEach((subs) => {
       if (Array.isArray(subs)) {
         const userSubs = subs.filter(
           (s) => String(s.influencer?._id || s.influencer) === userId
@@ -56,7 +62,7 @@ const InfluencerPage: React.FC = () => {
       likes: acceptedSubmissions * 10,
       shares: Math.floor(acceptedSubmissions * 2.5),
     };
-  }, [campaigns, userId]);
+  }, [campaigns, userId, submissionsValue]);
 
   useEffect(() => {
     campaignStore.fetchCampaigns().then(() => {
