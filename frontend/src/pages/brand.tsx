@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
 import type { Influencer } from '../interfaces';
@@ -6,6 +6,14 @@ import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
 import { useRouter } from 'next/router';
 import { authState$ } from '@/rxjs/authStore';
+import axiosInstance from '../rxjs/axiosInstance';
+
+interface MatchedInfluencer extends Influencer {
+  id: string;
+  category: string;
+  interests?: string[];
+  matchPercentage: number;
+}
 
 const BrandPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'influencers' | 'campaigns'>(
@@ -18,6 +26,8 @@ const BrandPage: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string>(
     '/images/screenshots/HandM.jpg',
   );
+  const [matchedInfluencers, setMatchedInfluencers] = useState<MatchedInfluencer[]>([]);
+  const [influencersLoading, setInfluencersLoading] = useState(false);
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
 
@@ -52,6 +62,22 @@ const BrandPage: React.FC = () => {
     return () => clearTimeout(timeout);
   }, []);
 
+  useEffect(() => {
+    if (activeTab === 'influencers' && authorized) {
+      setInfluencersLoading(true);
+      axiosInstance.get('/users/influencers/matched')
+        .then((res) => {
+          setMatchedInfluencers(res.data || []);
+        })
+        .catch(() => {
+          setMatchedInfluencers([]);
+        })
+        .finally(() => {
+          setInfluencersLoading(false);
+        });
+    }
+  }, [activeTab, authorized]);
+
   if (!checked) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
@@ -62,44 +88,16 @@ const BrandPage: React.FC = () => {
 
   if (!authorized) return null;
 
-  const influencers: Influencer[] = [
-    {
-      name: 'APRIL',
-      likes: 100,
-      message:
-        "Influencer Network\nJoin our Influencer Network Today!\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
-      image: '/images/image3.png',
-      alt: 'April - TikTok',
-    },
-    {
-      name: 'JESY',
-      likes: 50,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
-      image: '/images/image2.png',
-      alt: 'Jesy - YouTuber',
-    },
-    {
-      name: 'KATE',
-      likes: 20,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
-      image: '/images/image2.png',
-      alt: 'kate - Instagram',
-    },
-    {
-      name: 'BRAD',
-      likes: 20,
-      message:
-        "Social Media\nJoin our tiktok account\nI hope this message finds you well! My name is (Your Name) from (Your Brand), and we're excited to invite you to join our influencer network. We've been following your content on (Platform) and love how it aligns with our brand values.",
-      image: '/images/image4.png',
-      alt: 'kate - Instagram',
-    },
-  ];
+  const MAX_PER_PAGE = 3;
+  const [influencerPage, setInfluencerPage] = useState(1);
 
-  const influencerCount = influencers.length;
+  const sortedInfluencers = useMemo(() => {
+    return [...matchedInfluencers].sort((a, b) => b.matchPercentage - a.matchPercentage);
+  }, [matchedInfluencers]);
+
+  const influencerCount = sortedInfluencers.length;
   const influencerMaxPage = Math.ceil(influencerCount / MAX_PER_PAGE);
-  const paginatedInfluencers = influencers.slice(
+  const paginatedInfluencers = sortedInfluencers.slice(
     (influencerPage - 1) * MAX_PER_PAGE,
     influencerPage * MAX_PER_PAGE,
   );
@@ -156,15 +154,32 @@ const BrandPage: React.FC = () => {
       <div className="mt-2 w-full max-w-screen-xl mx-auto flex flex-col gap-4">
         {activeTab === 'campaigns' ? (
           <CampaignsContent />
+        ) : influencersLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-white">Finding the best matches for you...</p>
+            </div>
+          </div>
+        ) : paginatedInfluencers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-white">
+            <p className="text-xl font-medium">No matched influencers found</p>
+            <p className="text-sm mt-2 opacity-80">Add interests to your profile to get better matches</p>
+          </div>
         ) : (
           <>
             <div className="flex flex-wrap justify-center gap-20">
               {paginatedInfluencers.map((influencer) => (
                 <InfluencerCard
-                  key={influencer.name}
+                  key={influencer.id}
                   influencer={{
-                    ...influencer,
-                    message: influencer.message,
+                    name: influencer.username || 'Unknown',
+                    likes: influencer.matchPercentage,
+                    message: `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`,
+                    image: influencer.profileImage || '/images/image4.png',
+                    alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
+                    interests: influencer.interests,
+                    matchPercentage: influencer.matchPercentage,
                   }}
                 />
               ))}

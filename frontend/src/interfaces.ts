@@ -66,6 +66,8 @@ export interface Influencer {
   image: string;
   name: string;
   message: string;
+  interests?: string[];
+  matchPercentage?: number;
 }
 
 export interface ProfileUpdateState {

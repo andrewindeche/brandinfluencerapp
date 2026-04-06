@@ -114,4 +114,75 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
+
+  async findInfluencers(): Promise<User[]> {
+    return this.userModel.find({ role: 'influencer' }).exec();
+  }
+
+  async getMatchedInfluencers(brandId: string): Promise<any[]> {
+    const brand = await this.userModel.findById(brandId).exec();
+    if (!brand) throw new NotFoundException('Brand not found');
+
+    const brandInterests = (brand as any).interests || [];
+    const brandBio = (brand as any).bio?.toLowerCase() || '';
+
+    const influencers = await this.userModel.find({ role: 'influencer' }).exec();
+
+    const matchedInfluencers = influencers.map((inf) => {
+      const influencer = inf as any;
+      const interests = influencer.interests || [];
+      const bio = influencer.bio?.toLowerCase() || '';
+      const category = influencer.category?.toLowerCase() || '';
+
+      let interestMatchCount = 0;
+      let bioWordMatchCount = 0;
+
+      if (brandInterests.length > 0 && interests.length > 0) {
+        const commonInterests = brandInterests.filter((i: string) =>
+          interests.map((x: string) => x.toLowerCase()).includes(i.toLowerCase())
+        );
+        interestMatchCount = commonInterests.length;
+      }
+
+      if (brandBio && bio) {
+        const brandWords = brandBio.split(/\s+/).filter(w => w.length > 3);
+        bioWordMatchCount = brandWords.filter((word: string) => bio.includes(word)).length;
+      }
+
+      const interestScore = brandInterests.length > 0 
+        ? (interestMatchCount / Math.max(brandInterests.length, interests.length)) * 50 
+        : 0;
+      const bioScore = brandBio.length > 0 
+        ? (bioWordMatchCount / Math.min(brandBio.split(/\s+/).length, 10)) * 50 
+        : 0;
+      const categoryScore = category && brandBio.includes(category) ? 20 : 0;
+
+      const totalScore = Math.min(interestScore + bioScore + categoryScore, 100);
+
+      return {
+        id: influencer._id,
+        username: influencer.username,
+        category: influencer.category,
+        bio: influencer.bio,
+        profileImage: influencer.profileImage,
+        interests: interests,
+        matchPercentage: Math.round(totalScore),
+      };
+    });
+
+    return matchedInfluencers
+      .filter(inf => inf.matchPercentage > 0)
+      .sort((a, b) => b.matchPercentage - a.matchPercentage);
+  }
+
+  async updateInterests(userId: string, interests: string[]): Promise<User> {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { interests },
+      { returnDocument: 'after' },
+    );
+
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
 }

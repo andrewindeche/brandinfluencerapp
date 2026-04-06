@@ -20,10 +20,17 @@ export interface Influencer extends User {
   category: string;
   bio: string;
   tips?: string;
+  interests?: string[];
   submissions: Submission[];
   campaign?: Types.ObjectId;
   role: 'influencer';
   profileImage?: string;
+}
+
+export interface Brand extends User {
+  bio?: string;
+  interests?: string[];
+  role: 'brand';
 }
 
 export interface Brand extends User {

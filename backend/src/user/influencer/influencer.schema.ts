@@ -12,6 +12,7 @@ export const InfluencerSchema = new Schema<Influencer>({
   category: { type: String, required: true },
   bio: { type: String, required: true },
   tips: { type: String, default: '' },
+  interests: [{ type: String }],
   submissions: [{ type: MongooseSchema.Types.ObjectId, ref: 'Submission' }],
   campaign: { type: MongooseSchema.Types.ObjectId, ref: 'Campaign' },
   profileImage: { type: String, default: '/images/image4.png' },

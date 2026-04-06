@@ -70,6 +70,26 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('influencers')
+  async getInfluencers() {
+    return this.userService.findInfluencers();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('influencers/matched')
+  async getMatchedInfluencers(@Req() req: Request) {
+    const userId = req.user.userId;
+    return this.userService.getMatchedInfluencers(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('interests')
+  async updateInterests(@Req() req: Request, @Body('interests') interests: string[]) {
+    const userId = req.user.userId;
+    return this.userService.updateInterests(userId, interests);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('auth-test')
   getTest(@Req() req: any) {
     return req.user;
