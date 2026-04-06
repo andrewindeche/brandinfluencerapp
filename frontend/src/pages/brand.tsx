@@ -95,10 +95,7 @@ const BrandPage: React.FC = () => {
   if (!authorized) return null;
 
   const MAX_PER_PAGE = 3;
-
-  const sortedInfluencers = useMemo(() => {
-    return [...matchedInfluencers].sort((a, b) => b.matchPercentage - a.matchPercentage);
-  }, [matchedInfluencers]);
+  const sortedInfluencers = [...matchedInfluencers].sort((a, b) => b.matchPercentage - a.matchPercentage);
 
   const influencerCount = sortedInfluencers.length;
   const influencerMaxPage = Math.ceil(influencerCount / MAX_PER_PAGE);
