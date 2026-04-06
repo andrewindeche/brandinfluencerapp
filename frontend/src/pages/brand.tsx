@@ -177,13 +177,16 @@ const BrandPage: React.FC = () => {
                       ? influencer.profileImage 
                       : `http://localhost:4000/${influencer.profileImage}`)
                   : '/images/image4.png';
+                const bioMessage = influencer.bio 
+                  ? `Bio: ${influencer.bio}`
+                  : `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`;
                 return (
                   <InfluencerCard
                     key={influencer.id}
                     influencer={{
                       name: influencer.username || 'Unknown',
                       likes: influencer.matchPercentage,
-                      message: `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`,
+                      message: bioMessage,
                       image: imageSrc,
                       alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
                     }}
