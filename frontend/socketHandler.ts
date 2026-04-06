@@ -36,16 +36,15 @@ class SocketHandler {
     });
 
     this.socket.on('submission-event', (data) => {
-      console.log('[SocketHandler] Received submission-event:', data);
-      console.log('[SocketHandler] Current socket rooms:', this.socket?.rooms);
+      console.log('[SocketHandler] 🔌 Received submission-event:', JSON.stringify(data));
 
       const key = data?.key;
       const payload = data?.payload || data;
       if (!key || !payload) {
-        console.warn('Invalid socket event - missing key or payload', data);
+        console.warn('[SocketHandler] Invalid socket event - missing key or payload', data);
         return;
       }
-      console.log('[SocketHandler] Key:', key, 'Payload:', payload);
+      console.log('[SocketHandler] Key:', key, 'Payload:', JSON.stringify(payload));
       notificationStore.handleKafkaEvent(key, payload);
 
       if (payload.campaignId && payload.submissionId) {
@@ -111,12 +110,12 @@ class SocketHandler {
       return;
     }
     if (userRole === 'influencer') {
-      console.log('[SocketHandler] Joining influencer room:', userId);
+      console.log('[SocketHandler] 📥 Joining influencer room:', `influencer-${userId}`);
       this.socket?.emit('join-influencer', userId);
     }
 
     if (userRole === 'brand') {
-      console.log('[SocketHandler] Joining brand room:', userId);
+      console.log('[SocketHandler] 📥 Joining brand room:', `brand-${userId}`);
       this.socket?.emit('join-brand', userId);
     }
   }

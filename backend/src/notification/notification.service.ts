@@ -27,6 +27,7 @@ export class NotificationService implements OnModuleInit {
 
           case 'submission.accepted':
           case 'submission.rejected':
+            console.log('[NotificationService] Sending to influencer:', payload.influencerId);
             this.notificationGateway.sendToInfluencer(payload.influencerId, {
               key,
               payload,

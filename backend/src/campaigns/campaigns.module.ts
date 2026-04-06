@@ -9,7 +9,7 @@ import { RedisService } from '../redis/redis.service';
 import { RedisModule } from '../redis/redis.module';
 import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
-import { Submission, SubmissionSchema } from '../auth/schema/submission.schema';
+import { SubmissionSchema } from './schemas/submission.schema';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
 import { KafkaModule } from 'src/kafka/kafka.module';
 import { UserSchema } from '../user/user.schema';
@@ -18,7 +18,7 @@ import { UserSchema } from '../user/user.schema';
   imports: [
     MongooseModule.forFeature([
       { name: Campaign.name, schema: CampaignSchema },
-      { name: Submission.name, schema: SubmissionSchema },
+      { name: 'Submission', schema: SubmissionSchema },
       { name: 'Influencer', schema: InfluencerSchema },
       { name: 'User', schema: UserSchema },
     ]),

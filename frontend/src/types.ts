@@ -58,6 +58,7 @@ export type PasswordResetState = {
 export type ProfileUpdateStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export type User = {
+  id?: string;
   username: string;
   name: string;
   email: string;

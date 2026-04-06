@@ -4,13 +4,14 @@ import { getModelToken } from '@nestjs/mongoose';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Model, Types } from 'mongoose';
 import { Campaign } from '../schemas/campaign.schema';
-import { Submission } from '../../auth/schema/submission.schema';
+import { Submission } from '../../interfaces';
+import { SubmissionDocument } from '../../interfaces';
 import { BadRequestException } from '@nestjs/common';
 
 describe('CampaignsService', () => {
   let service: CampaignsService;
   let campaignModel: jest.Mocked<Model<Campaign>>;
-  let submissionModel: jest.Mocked<Model<Submission>>;
+  let submissionModel: jest.Mocked<Model<SubmissionDocument>>;
   let cacheManager: { get: jest.Mock; set: jest.Mock };
 
   beforeEach(async () => {
@@ -34,7 +35,7 @@ describe('CampaignsService', () => {
           ),
         },
         {
-          provide: getModelToken(Submission.name),
+          provide: getModelToken('Submission'),
           useValue: Object.assign(
             jest.fn().mockImplementation((data) => ({
               ...data,
@@ -60,7 +61,7 @@ describe('CampaignsService', () => {
 
     service = module.get<CampaignsService>(CampaignsService);
     campaignModel = module.get(getModelToken(Campaign.name));
-    submissionModel = module.get(getModelToken(Submission.name));
+    submissionModel = module.get(getModelToken('Submission'));
     cacheManager = module.get(CACHE_MANAGER);
   });
 

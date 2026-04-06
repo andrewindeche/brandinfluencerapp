@@ -8,7 +8,7 @@ import { Model, Types } from 'mongoose';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Campaign } from '../schemas/campaign.schema';
-import { Submission } from '../../auth/schema/submission.schema';
+import { Submission, SubmissionDocument } from '../../interfaces';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { RedisService } from 'src/redis/redis.service';
@@ -19,8 +19,8 @@ import { User } from '../../user/user.schema';
 export class CampaignsService {
   constructor(
     @InjectModel(Campaign.name) private readonly campaignModel: Model<Campaign>,
-    @InjectModel(Submission.name)
-    private readonly submissionModel: Model<Submission>,
+    @InjectModel('Submission')
+    private readonly submissionModel: Model<SubmissionDocument>,
     @InjectModel('User') private readonly userModel: Model<User>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly redisService: RedisService,
@@ -146,7 +146,7 @@ export class CampaignsService {
     }
 
     const submissions = await this.submissionModel
-      .find({ campaign: campaignId })
+      .find({ campaign: new Types.ObjectId(campaignId) })
       .populate('influencer')
       .sort({ submittedAt: -1 })
       .exec();
@@ -186,7 +186,7 @@ export class CampaignsService {
 
     await submission.save();
 
-    campaign.submissions.push(submission._id as Types.ObjectId);
+    campaign.submissions.push(new Types.ObjectId(submission._id));
     await campaign.save();
 
     const influencer = await this.userModel.findById(influencerId).lean();
@@ -384,7 +384,7 @@ export class CampaignsService {
   async acceptSubmission(
     submissionId: string,
     brandId: string,
-  ): Promise<Submission> {
+  ): Promise<SubmissionDocument> {
     const submission = await this.submissionModel
       .findById(submissionId)
       .populate('campaign')
@@ -409,6 +409,8 @@ export class CampaignsService {
     const influencerId = (submission as any).influencer?._id?.toString() 
       || (submission as any).influencer?.toString();
 
+    console.log('[CampaignService] Accept submission - influencer:', (submission as any).influencer, 'extracted id:', influencerId);
+
     await this.kafkaService.sendMessage(
       'submission-events',
       'submission.accepted',
@@ -427,7 +429,7 @@ export class CampaignsService {
   async rejectSubmission(
     submissionId: string,
     brandId: string,
-  ): Promise<Submission> {
+  ): Promise<SubmissionDocument> {
     const submission = await this.submissionModel
       .findById(submissionId)
       .populate('campaign')
@@ -453,6 +455,8 @@ export class CampaignsService {
 
     const influencerId = (submission as any).influencer?._id?.toString() 
       || (submission as any).influencer?.toString();
+
+    console.log('[CampaignService] Reject submission - influencer:', (submission as any).influencer, 'extracted id:', influencerId);
 
     await this.kafkaService.sendMessage(
       'submission-events',
@@ -526,7 +530,7 @@ export class CampaignsService {
     const campaignId = (submission as any).campaign?._id?.toString() 
       || (submission as any).campaign?.toString();
 
-    await this.submissionModel.deleteOne({ _id: submissionId });
+    await this.submissionModel.deleteOne({ _id: new Types.ObjectId(submissionId) });
 
     if (campaignId) {
       await this.campaignModel.findByIdAndUpdate(campaignId, {

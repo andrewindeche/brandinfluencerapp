@@ -38,8 +38,12 @@ export class NotificationGateway {
   }
 
   sendToInfluencer(influencerId: string, payload: any) {
+    const room = `influencer-${influencerId}`;
+    console.log('[NotificationGateway] sendToInfluencer - influencerId:', influencerId, 'room:', room, 'payload:', payload);
+    const clients = this.server.sockets.adapter.rooms.get(room);
+    console.log('[NotificationGateway] Clients in room:', room, 'count:', clients?.size || 0);
     this.server
-      .to(`influencer-${influencerId}`)
+      .to(room)
       .emit('submission-event', payload);
   }
 }
