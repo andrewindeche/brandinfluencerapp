@@ -292,6 +292,7 @@ export const authStore = {
       let message =
         'Login failed. Please Check Password or Username or try again later.';
       let code = 'UNKNOWN_ERROR';
+      const role = _authState$.value.role;
 
       if (isAxiosError(err)) {
         const statusCode = err.response?.status;
@@ -315,7 +316,8 @@ export const authStore = {
               break;
           }
         } else if (statusCode === 429) {
-          message = 'Too many login attempts. Please wait and try again.';
+          const userType = role === 'brand' ? 'brand' : role === 'influencer' ? 'influencer' : 'user';
+          message = `Too many ${userType} login attempts. Please wait and try again.`;
           code = 'TOO_MANY_REQUESTS';
         } else if (data?.message) {
           message = data.message;
