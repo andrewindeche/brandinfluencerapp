@@ -52,6 +52,7 @@ export class UserController {
   @Patch('bio')
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
     const userId = req.user.userId;
+    console.log('[UserController] updateBio - userId:', userId, 'bio:', updateBioDto.bio);
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
 

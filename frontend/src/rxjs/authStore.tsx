@@ -205,6 +205,7 @@ export const authStore = {
       ...current,
       id: current.id,
       role: current.role,
+      bio: current.bio,
       profileImage: current.profileImage?.includes('undefined')
         ? '/images/default.png'
         : current.profileImage,
