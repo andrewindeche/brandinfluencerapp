@@ -25,6 +25,7 @@ const InfluencerPage: React.FC = () => {
   const { toast, showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [tips, setTips] = useState<string>('💡 Click \'Submit\' to send your entry or tap on a campaign card to expand.');
+  const [campaignsLoading, setCampaignsLoading] = useState(true);
 
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
@@ -67,7 +68,9 @@ const InfluencerPage: React.FC = () => {
   }, [campaigns, userId, submissionsValue]);
 
   useEffect(() => {
+    setCampaignsLoading(true);
     campaignStore.fetchCampaigns().then(() => {
+      setCampaignsLoading(false);
       const sub = campaignStore.campaigns$.subscribe(setCampaigns);
       return () => sub.unsubscribe();
     });
@@ -168,6 +171,17 @@ const InfluencerPage: React.FC = () => {
   }
 
   if (!authorized) return null;
+
+  if (campaignsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#E8BB5B]">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium">Loading campaigns...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#E8BB5B] px-4 sm:px-6 lg:px-12 py-6 min-h-screen relative max-w-screen-xl mx-auto">
