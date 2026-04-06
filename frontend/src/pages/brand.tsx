@@ -8,11 +8,19 @@ import { useRouter } from 'next/router';
 import { authState$ } from '@/rxjs/authStore';
 import axiosInstance from '../rxjs/axiosInstance';
 
-interface MatchedInfluencer extends Influencer {
+interface MatchedInfluencer {
   id: string;
-  category: string;
+  username?: string;
+  category?: string;
+  bio?: string;
+  profileImage?: string;
   interests?: string[];
   matchPercentage: number;
+  name?: string;
+  likes?: number;
+  image?: string;
+  message?: string;
+  alt?: string;
 }
 
 const BrandPage: React.FC = () => {
@@ -30,9 +38,6 @@ const BrandPage: React.FC = () => {
   const [influencersLoading, setInfluencersLoading] = useState(false);
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
-
-  const MAX_PER_PAGE = 3;
-  const [influencerPage, setInfluencerPage] = useState(1);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -178,8 +183,6 @@ const BrandPage: React.FC = () => {
                     message: `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`,
                     image: influencer.profileImage || '/images/image4.png',
                     alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
-                    interests: influencer.interests,
-                    matchPercentage: influencer.matchPercentage,
                   }}
                 />
               ))}
