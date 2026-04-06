@@ -36,6 +36,7 @@ const BrandPage: React.FC = () => {
   );
   const [matchedInfluencers, setMatchedInfluencers] = useState<MatchedInfluencer[]>([]);
   const [influencersLoading, setInfluencersLoading] = useState(false);
+  const [influencerPage, setInfluencerPage] = useState(1);
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
 
@@ -94,7 +95,6 @@ const BrandPage: React.FC = () => {
   if (!authorized) return null;
 
   const MAX_PER_PAGE = 3;
-  const [influencerPage, setInfluencerPage] = useState(1);
 
   const sortedInfluencers = useMemo(() => {
     return [...matchedInfluencers].sort((a, b) => b.matchPercentage - a.matchPercentage);
