@@ -409,8 +409,6 @@ export class CampaignsService {
     const influencerId = (submission as any).influencer?._id?.toString() 
       || (submission as any).influencer?.toString();
 
-    console.log('[CampaignService] Accept submission - influencer:', (submission as any).influencer, 'extracted id:', influencerId);
-
     await this.kafkaService.sendMessage(
       'submission-events',
       'submission.accepted',
@@ -455,8 +453,6 @@ export class CampaignsService {
 
     const influencerId = (submission as any).influencer?._id?.toString() 
       || (submission as any).influencer?.toString();
-
-    console.log('[CampaignService] Reject submission - influencer:', (submission as any).influencer, 'extracted id:', influencerId);
 
     await this.kafkaService.sendMessage(
       'submission-events',

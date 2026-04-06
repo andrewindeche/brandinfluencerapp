@@ -33,13 +33,11 @@ export const notificationStore = {
   },
 
   addInfluencerNotification(notification: NotificationType) {
-    console.log('[NotificationStore] addInfluencerNotification called:', notification);
     const current = influencerNotifications$.getValue();
     influencerNotifications$.next([notification, ...current]);
   },
 
   addBrandNotification(notification: NotificationType) {
-    console.log('[NotificationStore] Adding brand notification:', notification);
     const current = brandNotifications$.getValue();
     brandNotifications$.next([notification, ...current]);
   },
@@ -56,14 +54,7 @@ export const notificationStore = {
   },
 
   handleKafkaEvent(key: string, payload: any) {
-    console.log('[NotificationStore] 📥 handleKafkaEvent called');
-    console.log('[NotificationStore]   - key:', key);
-    console.log('[NotificationStore]   - payload.influencerId:', payload?.influencerId);
-    console.log('[NotificationStore]   - payload.brandId:', payload?.brandId);
-    console.log('[NotificationStore]   - key in typeMap:', key in typeMap);
-    
     if (!payload || !(key in typeMap)) {
-      console.warn('[NotificationStore] ❌ Invalid event - missing payload or unknown key:', key);
       return;
     }
 
@@ -93,15 +84,11 @@ export const notificationStore = {
       date: payload.timestamp ? new Date(payload.timestamp) : new Date(),
     };
 
-    console.log('[NotificationStore] 📝 Created notification:', JSON.stringify(notification));
-
     switch (typedKey) {
       case 'submission.accepted':
       case 'submission.rejected':
-        console.log('[NotificationStore] ✅ Processing accepted/rejected - adding to influencerNotifications$');
         this.addNotification(notification);
         this.addInfluencerNotification(notification);
-        console.log('[NotificationStore] 💾 Current influencerNotifications$:', influencerNotifications$.getValue());
         break;
 
       case 'submission.created':

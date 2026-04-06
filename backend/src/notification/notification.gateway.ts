@@ -33,15 +33,11 @@ export class NotificationGateway {
   }
 
   sendToBrand(brandId: string, payload: any) {
-    console.log('[NotificationGateway] sendToBrand - brandId:', brandId, 'room:', `brand-${brandId}`);
     this.server.to(`brand-${brandId}`).emit('submission-event', payload);
   }
 
   sendToInfluencer(influencerId: string, payload: any) {
     const room = `influencer-${influencerId}`;
-    console.log('[NotificationGateway] sendToInfluencer - influencerId:', influencerId, 'room:', room, 'payload:', payload);
-    const clients = this.server.sockets.adapter.rooms.get(room);
-    console.log('[NotificationGateway] Clients in room:', room, 'count:', clients?.size || 0);
     this.server
       .to(room)
       .emit('submission-event', payload);

@@ -280,7 +280,6 @@ const CampaignsContent: React.FC = () => {
 
   useEffect(() => {
     const sub = notificationStore.brandNotifications$.subscribe((notifs) => {
-      console.log('[CampaignsContent] Brand notifications updated:', notifs);
       setNotifications(notifs);
     });
     return () => sub.unsubscribe();

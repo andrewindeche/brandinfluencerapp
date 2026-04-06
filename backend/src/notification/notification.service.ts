@@ -15,7 +15,6 @@ export class NotificationService implements OnModuleInit {
       async (key, payload) => {
         switch (key) {
           case 'submission.created':
-            console.log('[NotificationService] Sending to brand:', payload.brandId);
             this.notificationGateway.sendToBrand(payload.brandId, {
               key,
               payload: {
@@ -27,7 +26,6 @@ export class NotificationService implements OnModuleInit {
 
           case 'submission.accepted':
           case 'submission.rejected':
-            console.log('[NotificationService] Sending to influencer:', payload.influencerId);
             this.notificationGateway.sendToInfluencer(payload.influencerId, {
               key,
               payload,
