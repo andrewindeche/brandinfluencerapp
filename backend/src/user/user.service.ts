@@ -97,4 +97,21 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
+
+  async getTips(userId: string): Promise<string> {
+    const user = await this.userModel.findById(userId).select('tips').exec();
+    if (!user) throw new NotFoundException('User not found');
+    return (user as any).tips || '';
+  }
+
+  async updateTips(userId: string, tips: string): Promise<User> {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { tips },
+      { returnDocument: 'after' },
+    );
+
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
 }

@@ -13,6 +13,7 @@ import ProfileWithStats from '../app/components/ProfileCard';
 import { notificationStore } from '../rxjs/notificationStore';
 import { NotificationType } from '@/interfaces';
 import { submissions$ } from '../rxjs/submissionStore';
+import axiosInstance from '../rxjs/axiosInstance';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -23,6 +24,7 @@ const InfluencerPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const { toast, showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [tips, setTips] = useState<string>('💡 Click \'Submit\' to send your entry or tap on a campaign card to expand.');
 
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
@@ -101,6 +103,17 @@ const InfluencerPage: React.FC = () => {
       }, 100);
     }
   }, [showToast]);
+
+  useEffect(() => {
+    if (!userId) return;
+    axiosInstance.get('/users/tips')
+      .then((res) => {
+        if (res.data && res.data.tips) {
+          setTips(res.data.tips);
+        }
+      })
+      .catch(() => {});
+  }, [userId]);
 
   useEffect(() => {
     const sub =
@@ -214,6 +227,7 @@ const InfluencerPage: React.FC = () => {
             onCampaignAction={handleCampaignAction}
             notificationOpen={showNotifications}
             joined={false}
+            tips={tips}
           />
         </div>
       </div>

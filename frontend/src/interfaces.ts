@@ -155,6 +155,7 @@ export interface CampaignsSectionProps {
   maxCharCount?: number;
   notificationOpen: boolean;
   joined: boolean;
+  tips?: string;
 }
 
 export interface SubmissionModalProps {

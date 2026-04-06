@@ -18,6 +18,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   maxCharCount = 70,
   notificationOpen,
   joined,
+  tips = "💡 Click 'Submit' to send your entry or tap on a campaign card to expand.",
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
@@ -182,7 +183,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
       </h4>
 
       <TipBox
-        tip="💡 Click 'Submit' to send your entry or tap on a campaign card to expand."
+        tip={tips}
         duration={10000}
       />
 

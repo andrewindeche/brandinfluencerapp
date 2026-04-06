@@ -56,6 +56,20 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('tips')
+  async getTips(@Req() req: Request) {
+    const userId = req.user.userId;
+    return this.userService.getTips(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('tips')
+  async updateTips(@Req() req: Request, @Body('tips') tips: string) {
+    const userId = req.user.userId;
+    return this.userService.updateTips(userId, tips);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('auth-test')
   getTest(@Req() req: any) {
     return req.user;
