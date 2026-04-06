@@ -171,18 +171,25 @@ const BrandPage: React.FC = () => {
         ) : (
           <>
             <div className="flex flex-wrap justify-center gap-20">
-              {paginatedInfluencers.map((influencer) => (
-                <InfluencerCard
-                  key={influencer.id}
-                  influencer={{
-                    name: influencer.username || 'Unknown',
-                    likes: influencer.matchPercentage,
-                    message: `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`,
-                    image: influencer.profileImage || '/images/image4.png',
-                    alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
-                  }}
-                />
-              ))}
+              {paginatedInfluencers.map((influencer) => {
+                const imageSrc = influencer.profileImage 
+                  ? (influencer.profileImage.startsWith('http') 
+                      ? influencer.profileImage 
+                      : `http://localhost:4000/${influencer.profileImage}`)
+                  : '/images/image4.png';
+                return (
+                  <InfluencerCard
+                    key={influencer.id}
+                    influencer={{
+                      name: influencer.username || 'Unknown',
+                      likes: influencer.matchPercentage,
+                      message: `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`,
+                      image: imageSrc,
+                      alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
+                    }}
+                  />
+                );
+              })}
             </div>
             {influencerMaxPage > 1 && (
               <div className="flex justify-center mt-4 gap-2">
