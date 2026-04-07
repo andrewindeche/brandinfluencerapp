@@ -2,12 +2,12 @@ import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Irish_Grover, Joti_One, Kaushan_Script } from 'next/font/google';
 import Toast from '../app/components/Toast';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { InactivityModal } from '@/app/components/InactivityModal';
-import { useEffect } from 'react';
 import { setAuthToken } from '../rxjs/axiosInstance';
 import { socketHandler } from '../../socketHandler';
+import { toastEvents$, ToastEvent } from '../rxjs/toastEvents';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -33,7 +33,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const { showWarning } = useInactivityLogout();
   const [toast, setToast] = useState<{
     message: string;
-    type: 'success' | 'error';
+    type: 'success' | 'error' | 'warning';
   } | null>(null);
 
   useEffect(() => {
@@ -44,8 +44,17 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, []);
 
+  useEffect(() => {
+    const sub = toastEvents$.subscribe((event) => {
+      if (event) {
+        setToast({ message: event.message, type: event.type });
+      }
+    });
+    return () => sub.unsubscribe();
+  }, []);
+
   const showToast = useCallback(
-    (message: string, type: 'success' | 'error') => {
+    (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
       setToast({ message, type });
       setTimeout(() => setToast(null), 8000);
     },
