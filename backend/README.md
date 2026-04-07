@@ -58,6 +58,109 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Monitoring with Prometheus and Grafana
+
+This project includes Prometheus for metrics collection and Grafana for visualization.
+
+### Starting the Services
+
+```bash
+# Start all monitoring services (Prometheus, Grafana, Kafka, Zookeeper)
+docker compose up -d
+
+# Or start just the monitoring services
+docker compose up -d prometheus grafana
+```
+
+### Accessing the Services
+
+- **Prometheus**: http://localhost:9090
+  - View metrics, query with PromQL
+  - Access backend metrics at: http://localhost:9090/graph?g0.expr=http_request_duration_seconds
+
+- **Grafana**: http://localhost:3002
+  - Login: `admin` / `admin`
+  - Add Prometheus as a data source:
+    - Go to Configuration > Data Sources > Add data source
+    - Select Prometheus
+    - URL: `http://localhost:9090`
+    - Click "Save & Test"
+
+### Backend Metrics Endpoint
+
+The backend exposes metrics at `http://localhost:4000/metrics` (Prometheus format).
+
+Available metrics include:
+
+- `login_attempts_total` - Counter for login attempts (labels: role, status)
+- `http_request_duration_seconds` - Histogram for HTTP request duration
+- `process_memory_bytes` - Gauge for memory usage
+- `app_uptime_seconds` - Gauge for application uptime
+
+### Creating Dashboards in Grafana
+
+1. Log in to Grafana at http://localhost:3002
+2. Go to Dashboards > New > New Dashboard
+3. Click "Add Visualization" and select Prometheus
+4. Example queries:
+   - **HTTP Requests/sec**: `rate(http_request_duration_seconds_count[5m])`
+   - **Avg Response Time**: `rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])`
+   - **Login Success Rate**: `sum(rate(login_attempts_total{status="success"}[5m])) / sum(rate(login_attempts_total[5m]))`
+   - **Memory Usage**: `process_memory_bytes`
+
+### Kubernetes Deployment
+
+The project includes Kubernetes manifests in `.k8s/` directory.
+
+#### Deploy All Services
+
+```bash
+# MongoDB
+kubectl apply -f .k8s/mongodb-deployment.yaml
+kubectl apply -f .k8s/mongodb-service.yaml
+
+# Redis
+kubectl apply -f .k8s/redis-deployment.yaml
+kubectl apply -f .k8s/redis-service.yaml
+
+# Backend
+kubectl apply -f .k8s/backend-deployment.yaml
+kubectl apply -f .k8s/backend-service.yaml
+
+# Frontend (from frontend/.k8s/)
+kubectl apply -f ../frontend/.k8s/frontend-deployment.yaml
+kubectl apply -f ../frontend/.k8s/frontend-service.yaml
+
+# Verify all pods are running
+kubectl get pods
+```
+
+#### Accessing Services
+
+```bash
+# Frontend
+kubectl port-forward svc/frontend 3000:3000
+# Access at: http://localhost:3000
+
+# Backend
+kubectl port-forward svc/backend 4000:4000
+# Access at: http://localhost:4000
+
+# MongoDB (for debugging)
+kubectl port-forward svc/mongodb 27017:27017
+
+# Redis (for debugging)
+kubectl port-forward svc/redis 6379:6379
+```
+
+#### Update Backend Environment
+
+The backend deployment needs MongoDB connection. Update the deployment:
+
+```bash
+kubectl set env deployment/backend MONGODB_URI=mongodb://mongodb:27017/brandinfluencer
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
