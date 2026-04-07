@@ -86,9 +86,12 @@ export class AuthService {
     password: string,
     role: 'brand' | 'influencer' | 'admin' | 'superuser',
   ): Promise<any> {
-    const user = await this.userModel.findOne({ email, role }).exec();
+    const user = await this.userModel.findOne({ email }).exec();
     if (!user) {
-      throw new UnauthorizedException('User not found or role mismatch');
+      throw new UnauthorizedException('User not found');
+    }
+    if (user.role?.toLowerCase() !== role.toLowerCase()) {
+      throw new UnauthorizedException('User not found for this role');
     }
     if (password) {
       const isPasswordValid = await bcryptjs.compare(password, user.password);

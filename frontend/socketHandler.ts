@@ -2,6 +2,7 @@ import { io, Socket } from 'socket.io-client';
 import { notificationStore } from '@/rxjs/notificationStore';
 import { authStore } from '@/rxjs/authStore';
 import { submissions$ } from '@/rxjs/submissionStore';
+import { connectionStore } from '@/rxjs/connectionStore';
 
 class SocketHandler {
   private socket: Socket | null = null;
@@ -11,6 +12,8 @@ class SocketHandler {
     if (this.socket?.connected || this.isConnecting) return;
 
     this.isConnecting = true;
+    const wasLoggedIn = !!localStorage.getItem('token');
+    connectionStore.setDisconnected(wasLoggedIn);
 
     this.socket = io('http://localhost:4000', {
       transports: ['websocket'],
@@ -22,17 +25,31 @@ class SocketHandler {
 
     this.socket.on('connect', () => {
       this.isConnecting = false;
+      connectionStore.setConnected();
 
       this.joinUserRooms();
     });
 
     this.socket.on('disconnect', (reason) => {
       console.warn('Socket disconnected:', reason);
+      const wasLoggedIn = !!localStorage.getItem('token');
+      connectionStore.setDisconnected(wasLoggedIn);
+    });
+
+    this.socket.on('reconnect', () => {
+      connectionStore.setConnected();
+      this.joinUserRooms();
+    });
+
+    this.socket.on('reconnect_attempt', () => {
+      connectionStore.setReconnecting();
     });
 
     this.socket.on('connect_error', (err) => {
       console.error('Socket error:', err.message);
       this.isConnecting = false;
+      const wasLoggedIn = !!localStorage.getItem('token');
+      connectionStore.setDisconnected(wasLoggedIn);
     });
 
     this.socket.on('submission-event', (data) => {

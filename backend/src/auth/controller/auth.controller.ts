@@ -41,31 +41,44 @@ export class AuthController {
     @Body() loginDto: LoginUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.authService.validateUser(
-      loginDto.email,
-      loginDto.password,
-      'influencer',
-    );
-    if (!user) {
+    try {
+      const user = await this.authService.validateUser(
+        loginDto.email,
+        loginDto.password,
+        'influencer',
+      );
+      if (!user) {
+        this.metricsService.incrementLoginAttempts('influencer', 'failed');
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      this.metricsService.incrementLoginAttempts('influencer', 'success');
+
+      const sessionId = uuidv4();
+      await this.sessionService.setSession(sessionId, {
+        userId: user.id,
+        role: user.role,
+      });
+
+      res.cookie('sessionId', sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 3600 * 1000,
+      });
+
+      return this.authService.loginInfluencer(user);
+    } catch (error: any) {
       this.metricsService.incrementLoginAttempts('influencer', 'failed');
-      throw new UnauthorizedException('Invalid credentials');
+      if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException({
+          message: error.message,
+          code: error.message === 'User not found' ? 'USER_NOT_FOUND' :
+                error.message === 'User not found for this role' ? 'ROLE_MISMATCH' :
+                error.message === 'Invalid password' ? 'INVALID_PASSWORD' : 'INVALID_CREDENTIALS'
+        });
+      }
+      throw error;
     }
-
-    this.metricsService.incrementLoginAttempts('influencer', 'success');
-
-    const sessionId = uuidv4();
-    await this.sessionService.setSession(sessionId, {
-      userId: user.id,
-      role: user.role,
-    });
-
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 3600 * 1000,
-    });
-
-    return this.authService.loginInfluencer(user);
   }
 
   @Post('brand/login')
@@ -99,8 +112,16 @@ export class AuthController {
       });
 
       return this.authService.loginBrand(user);
-    } catch (error) {
-      if (error instanceof UnauthorizedException) throw error;
+    } catch (error: any) {
+      this.metricsService.incrementLoginAttempts('brand', 'failed');
+      if (error instanceof UnauthorizedException) {
+        throw new UnauthorizedException({
+          message: error.message,
+          code: error.message === 'User not found' ? 'USER_NOT_FOUND' :
+                error.message === 'User not found for this role' ? 'ROLE_MISMATCH' :
+                error.message === 'Invalid password' ? 'INVALID_PASSWORD' : 'INVALID_CREDENTIALS'
+        });
+      }
       throw new InternalServerErrorException(
         'An error occurred during brand login.',
       );

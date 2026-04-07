@@ -29,7 +29,9 @@ const LoginForm: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const { toast, showToast, closeToast } = useToast();
+  const { toast, showToast: showDefaultToast, closeToast } = useToast();
+  const { showToast: showErrorToast } = useToast(3000);
+  const { showToast: showSuccessToast } = useToast(5000);
   const { validateWithSchema } = useFormValidation();
   const isRouteLoading = useRouteLoading(300);
   const router = useRouter();
@@ -117,7 +119,8 @@ const LoginForm: React.FC = () => {
       const message =
         ('message' in result ? result.message : undefined) ?? 'Login failed';
       const throttle = 'throttle' in result ? result.throttle : false;
-      showToast(message, throttle ? 'warning' : 'error');
+      showErrorToast(message, throttle ? 'warning' : 'error');
+      setTimeout(() => authStore.setErrors({}), 3000);
       setSubmitting(false);
       return;
     }
@@ -130,7 +133,7 @@ const LoginForm: React.FC = () => {
       sessionStorage.setItem('toastMessage', 'Login successful!');
       router.push(`/${role}`);
     } else {
-      showToast('Login failed: invalid role.', 'error');
+      showErrorToast('Login failed: invalid role.', 'error');
       setSubmitting(false);
     }
   };
@@ -200,7 +203,9 @@ const LoginForm: React.FC = () => {
               id="password"
               value={password}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-lg bg-white"
+              className={`w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 shadow-lg bg-white ${
+                errors?.password ? 'focus:ring-red-400' : 'focus:ring-yellow-400'
+              }`}
               placeholder="Enter your password"
             />
             {errors?.password && (

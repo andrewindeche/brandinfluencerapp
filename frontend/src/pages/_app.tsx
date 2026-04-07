@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Irish_Grover, Joti_One, Kaushan_Script } from 'next/font/google';
 import Toast from '../app/components/Toast';
+import ConnectionStatusIndicator from '../app/components/ConnectionStatusIndicator';
 import { useState, useCallback, useEffect } from 'react';
 import { useInactivityLogout } from '@/hooks/useInactivityLogout';
 import { InactivityModal } from '@/app/components/InactivityModal';
@@ -72,6 +73,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           onClose={() => setToast(null)}
         />
       )}
+      <ConnectionStatusIndicator />
       <InactivityModal visible={showWarning} />
       <Component {...pageProps} showToast={showToast} />
     </main>

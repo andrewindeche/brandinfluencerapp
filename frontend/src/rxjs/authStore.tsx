@@ -289,8 +289,7 @@ export const authStore = {
     } catch (err: unknown) {
       console.error('Login error:', err);
 
-      let message =
-        'Login failed. Please Check Password or Username or try again later.';
+      let message = 'Invalid email or password. Please try again.';
       let code = 'UNKNOWN_ERROR';
       const role = _authState$.value.role;
 
@@ -301,19 +300,30 @@ export const authStore = {
           | undefined;
 
         if (statusCode === 401) {
-          switch (data?.message) {
-            case 'Invalid password':
-              message = 'Incorrect password. Please try again.';
-              code = 'INVALID_PASSWORD';
-              break;
-            case 'User not found or role mismatch':
-              message = 'No account found with that email and role.';
+          const backendMessage = (data?.message || '').toLowerCase();
+          const errorCode = data?.code || '';
+
+          if (backendMessage.includes('not found') || backendMessage.includes('does not exist') || errorCode === 'USER_NOT_FOUND') {
+            message = 'No account found with this email address.';
+            code = 'USER_NOT_FOUND';
+          } else if (backendMessage.includes('role') || errorCode === 'ROLE_MISMATCH') {
+            const userRole = role === 'brand' ? 'brand' : 'influencer';
+            message = `No ${userRole} account found with this email. Try switching your account type.`;
+            code = 'ROLE_MISMATCH';
+          } else if (backendMessage.includes('password') || errorCode === 'INVALID_PASSWORD') {
+            message = 'Incorrect password. Please try again.';
+            code = 'INVALID_PASSWORD';
+          } else if (backendMessage.includes('email') || backendMessage.includes('invalid')) {
+            if (backendMessage.includes('password')) {
+              message = 'Invalid email or password. Please try again.';
+              code = 'INVALID_CREDENTIALS';
+            } else {
+              message = 'No account found with this email address.';
               code = 'USER_NOT_FOUND';
-              break;
-            default:
-              message = 'Unauthorized. Please check your credentials.';
-              code = 'UNAUTHORIZED';
-              break;
+            }
+          } else {
+            message = 'Invalid email or password. Please try again.';
+            code = 'INVALID_CREDENTIALS';
           }
         } else if (statusCode === 429) {
           const userType = role === 'brand' ? 'brand' : role === 'influencer' ? 'influencer' : 'user';
