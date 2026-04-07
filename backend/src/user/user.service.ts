@@ -185,4 +185,59 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
+
+  async getMatchedBrands(influencerId: string): Promise<any[]> {
+    const influencer = await this.userModel.findById(influencerId).exec();
+    if (!influencer) throw new NotFoundException('Influencer not found');
+
+    const influencerInterests = (influencer as any).interests || [];
+    const influencerBio = (influencer as any).bio?.toLowerCase() || '';
+    const influencerCategory = (influencer as any).category?.toLowerCase() || '';
+
+    const brands = await this.userModel.find({ role: 'brand' }).exec();
+
+    const matchedBrands = brands.map((brand) => {
+      const brandData = brand as any;
+      const brandInterests = brandData.interests || [];
+      const brandBio = brandData.bio?.toLowerCase() || '';
+
+      let interestMatchCount = 0;
+      let bioWordMatchCount = 0;
+
+      if (brandInterests.length > 0 && influencerInterests.length > 0) {
+        const commonInterests = influencerInterests.filter((i: string) =>
+          brandInterests.map((x: string) => x.toLowerCase()).includes(i.toLowerCase())
+        );
+        interestMatchCount = commonInterests.length;
+      }
+
+      if (brandBio && influencerBio) {
+        const brandWords = brandBio.split(/\s+/).filter(w => w.length > 3);
+        bioWordMatchCount = brandWords.filter((word: string) => influencerBio.includes(word)).length;
+      }
+
+      const interestScore = brandInterests.length > 0 
+        ? (interestMatchCount / Math.max(brandInterests.length, influencerInterests.length)) * 50 
+        : 0;
+      const bioScore = brandBio.length > 0 
+        ? (bioWordMatchCount / Math.min(brandBio.split(/\s+/).length, 10)) * 50 
+        : 0;
+      const categoryScore = influencerCategory && brandBio.includes(influencerCategory) ? 20 : 0;
+
+      const totalScore = Math.min(interestScore + bioScore + categoryScore, 100);
+
+      return {
+        id: brandData._id,
+        username: brandData.username,
+        bio: brandData.bio,
+        profileImage: brandData.profileImage,
+        interests: brandInterests,
+        matchPercentage: Math.round(totalScore),
+      };
+    });
+
+    return matchedBrands
+      .filter(brand => brand.matchPercentage > 0)
+      .sort((a, b) => b.matchPercentage - a.matchPercentage);
+  }
 }

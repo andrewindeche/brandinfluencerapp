@@ -53,6 +53,7 @@ export const campaignStore = {
         endDate: c.endDate,
         status: c.status,
         joined: c.joined || false,
+        brand: typeof c.brand === 'string' ? c.brand : c.brand?._id,
       }));
       campaignStore.setCampaigns(normalized);
     } catch (err) {

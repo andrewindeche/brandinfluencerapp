@@ -120,6 +120,7 @@ export interface UserMenuProps {
 export interface TipBoxProps {
   tip: string;
   duration?: number;
+  instructions?: React.ReactNode;
 }
 
 export interface WithAuthProps {
@@ -158,6 +159,7 @@ export interface CampaignsSectionProps {
   notificationOpen: boolean;
   joined: boolean;
   tips?: string;
+  matchedBrands?: { id: string; matchPercentage: number }[];
 }
 
 export interface SubmissionModalProps {

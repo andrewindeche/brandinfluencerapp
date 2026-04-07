@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import InfluencerCard from '../app/components/InfluencerCard';
 import CampaignsContent from '../app/components/CampaignsContent';
+import TipBox from '../app/components/TipBox';
 import type { Influencer } from '../interfaces';
 import UserMenu from '../app/components/UserMenu';
 import { useRoleGuard } from '../hooks/useRoleGuard';
@@ -163,59 +164,76 @@ const BrandPage: React.FC = () => {
               <p className="text-white">Finding the best matches for you...</p>
             </div>
           </div>
-        ) : paginatedInfluencers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-white">
-            <p className="text-xl font-medium">No matched influencers found</p>
-            <p className="text-sm mt-2 opacity-80">Add interests to your profile to get better matches</p>
-          </div>
         ) : (
           <>
-            <div className="flex flex-wrap justify-center gap-20">
-              {paginatedInfluencers.map((influencer) => {
-                const imageSrc = influencer.profileImage 
-                  ? (influencer.profileImage.startsWith('http') 
-                      ? influencer.profileImage 
-                      : `http://localhost:4000/${influencer.profileImage}`)
-                  : '/images/image4.png';
-                const bioMessage = influencer.bio 
-                  ? `Bio: ${influencer.bio}`
-                  : `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`;
-                return (
-                  <InfluencerCard
-                    key={influencer.id}
-                    influencer={{
-                      name: influencer.username || 'Unknown',
-                      likes: influencer.matchPercentage,
-                      message: bioMessage,
-                      image: imageSrc,
-                      alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
-                    }}
-                  />
-                );
-              })}
-            </div>
-            {influencerMaxPage > 1 && (
-              <div className="flex justify-center mt-4 gap-2">
-                <button
-                  onClick={() => setInfluencerPage((p) => Math.max(1, p - 1))}
-                  disabled={influencerPage === 1}
-                  className="px-3 py-1 rounded bg-gray-200 text-black disabled:opacity-50"
-                >
-                  Prev
-                </button>
-                <span className="px-2">
-                  Page {influencerPage} of {influencerMaxPage}
-                </span>
-                <button
-                  onClick={() =>
-                    setInfluencerPage((p) => Math.min(influencerMaxPage, p + 1))
-                  }
-                  disabled={influencerPage === influencerMaxPage}
-                  className="px-3 py-1 rounded bg-gray-200 text-black disabled:opacity-50"
-                >
-                  Next
-                </button>
+            <TipBox
+              tip="💡 Browse matched influencers and invite them to your campaigns."
+              duration={10000}
+              instructions={
+                matchedInfluencers.length === 0 ? (
+                  <div>
+                    <p className="font-semibold mb-1">Get started:</p>
+                    <p>Add interests and bio to your profile to match with relevant influencers.</p>
+                  </div>
+                ) : undefined
+              }
+            />
+
+            {matchedInfluencers.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-white">
+                <p className="text-xl font-medium">No matched influencers found</p>
+                <p className="text-sm mt-2 opacity-80">Add interests to your profile to get better matches</p>
               </div>
+            ) : paginatedInfluencers.length > 0 && (
+              <>
+                <div className="flex flex-wrap justify-center gap-20">
+                  {paginatedInfluencers.map((influencer) => {
+                    const imageSrc = influencer.profileImage 
+                      ? (influencer.profileImage.startsWith('http') 
+                          ? influencer.profileImage 
+                          : `http://localhost:4000/${influencer.profileImage}`)
+                      : '/images/image4.png';
+                    const bioMessage = influencer.bio 
+                      ? `Bio: ${influencer.bio}`
+                      : `Match: ${influencer.matchPercentage}% - ${influencer.category || 'Influencer'}`;
+                    return (
+                      <InfluencerCard
+                        key={influencer.id}
+                        influencer={{
+                          name: influencer.username || 'Unknown',
+                          likes: influencer.matchPercentage,
+                          message: bioMessage,
+                          image: imageSrc,
+                          alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                {influencerMaxPage > 1 && (
+                  <div className="flex justify-center mt-4 gap-2">
+                    <button
+                      onClick={() => setInfluencerPage((p) => Math.max(1, p - 1))}
+                      disabled={influencerPage === 1}
+                      className="px-3 py-1 rounded bg-gray-200 text-black disabled:opacity-50"
+                    >
+                      Prev
+                    </button>
+                    <span className="px-2">
+                      Page {influencerPage} of {influencerMaxPage}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setInfluencerPage((p) => Math.min(influencerMaxPage, p + 1))
+                      }
+                      disabled={influencerPage === influencerMaxPage}
+                      className="px-3 py-1 rounded bg-gray-200 text-black disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}

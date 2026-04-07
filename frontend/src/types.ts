@@ -33,6 +33,7 @@ export type CampaignAPIResponse = {
   startDate: string;
   endDate: string;
   status: 'active' | 'inactive';
+  brand?: string | { _id: string; username?: string };
 };
 
 export type CampaignType = {
@@ -44,6 +45,7 @@ export type CampaignType = {
   endDate: string;
   status: 'active' | 'inactive';
   joined?: boolean;
+  brand?: string;
 };
 
 export type PasswordResetState = {

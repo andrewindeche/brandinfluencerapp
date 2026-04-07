@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
 import { TipBoxProps } from '../../interfaces';
 
-const TipBox: React.FC<TipBoxProps> = ({ tip, duration = 10000 }) => {
+const TipBox: React.FC<TipBoxProps> = ({ tip, duration = 10000, instructions }) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -27,7 +27,8 @@ const TipBox: React.FC<TipBoxProps> = ({ tip, duration = 10000 }) => {
 
       {open && (
         <div className="mt-2 bg-white shadow-lg border border-blue-300 rounded-lg p-4 text-sm text-blue-800">
-          {tip}
+          <p className="mb-2">{tip}</p>
+          {instructions && <div className="mt-3 pt-2 border-t border-blue-200">{instructions}</div>}
         </div>
       )}
     </div>

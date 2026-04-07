@@ -19,6 +19,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   notificationOpen,
   joined,
   tips = "💡 Click 'Submit' to send your entry or tap on a campaign card to expand.",
+  matchedBrands = [],
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
@@ -191,6 +192,14 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
       <TipBox
         tip={tips}
         duration={10000}
+        instructions={
+          matchedBrands.length === 0 ? (
+            <div>
+              <p className="font-semibold mb-1">Get started:</p>
+              <p>Update your bio, interests, and category in your profile to match with brands and view campaign details.</p>
+            </div>
+          ) : undefined
+        }
       />
 
       {activeNotJoinedCampaigns.length > 0 && (
@@ -242,12 +251,9 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
       >
         <AnimatePresence>
           {paginatedCampaigns.map((campaign) => {
-            const isExpanded = expanded[campaign.title];
-            const displayedText = isExpanded
-              ? campaign.instructions
-              : `${campaign.instructions.slice(0, maxCharCount)}${
-                  campaign.instructions.length > maxCharCount ? '...' : ''
-                }`;
+            const campaignBrandId = typeof campaign.brand === 'string' ? campaign.brand : campaign.brand?._id;
+            const matchedBrand = matchedBrands.find(mb => mb.id === campaignBrandId);
+            const isMatched = !!matchedBrand;
 
             return (
               <motion.div
@@ -322,18 +328,6 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       {new Date(campaign.startDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <p className="text-xs mt-2">{displayedText}</p>
-                  {campaign.instructions.length > maxCharCount && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onExpandToggle(campaign.title);
-                      }}
-                      className="text-red-400 hover:underline text-xs mt-1"
-                    >
-                      {isExpanded ? 'Read Less' : 'Read More'}
-                    </button>
-                  )}
                   <div className="flex justify-between items-center mt-2">
                     <p className="text-xs font-semibold">
                       Ends: {new Date(campaign.endDate).toLocaleDateString()}
@@ -353,62 +347,15 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       e.stopPropagation();
                       handleCardClick(campaign);
                     }}
-                    className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition"
+                    className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition w-full"
                   >
-                    Submit
+                    {isMatched ? 'View Details' : 'View'}
                   </button>
-                  <div className="flex flex-col mt-2 space-y-2">
-                    {campaign.joined ? (
-                      <>
-                        <p className="text-sm text-green-400 font-bold text-center">
-                          🎉 Joined
-                        </p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            campaignStore.leaveCampaign(campaign.id).subscribe({
-                              next: () => {
-                                campaign.joined = false;
-                              },
-                              error: (err) => {
-                                showToast(
-                                  `${err.message || 'Failed to leave campaign'}`,
-                                  'error',
-                                );
-                              },
-                            });
-                          }}
-                          className="px-3 py-1 text-sm bg-gray-300 text-black font-semibold rounded-full hover:bg-gray-400 transition"
-                        >
-                          ❌ Leave
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          campaignStore.joinCampaign(campaign.id).subscribe({
-                            next: () => {
-                              campaign.joined = true;
-                              showToast(
-                                'Successfully joined campaign 🎉',
-                                'success',
-                              );
-                            },
-                            error: (err) => {
-                              showToast(
-                                `${err.message || 'Failed to join campaign'}`,
-                                'error',
-                              );
-                            },
-                          });
-                        }}
-                        className="px-3 py-1 text-sm bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition"
-                      >
-                        ✅ Join
-                      </button>
-                    )}
-                  </div>
+                  {!isMatched && (
+                    <p className="text-xs mt-2 text-yellow-300 text-center">
+                      Update your profile to view details
+                    </p>
+                  )}
                 </div>
               </motion.div>
             );

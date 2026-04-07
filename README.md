@@ -62,7 +62,7 @@ A dockerized version of Kafka has been used for local Development for message br
 1. Run command to start the dockerized service
 
 ```bash
-docker-compose up -d
+docker compose up -d kafka zookeeper
 ```
 
 <p><b>Prometheus & Grafana</b></p>

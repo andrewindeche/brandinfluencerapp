@@ -26,6 +26,7 @@ const InfluencerPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [tips, setTips] = useState<string>('💡 Click \'Submit\' to send your entry or tap on a campaign card to expand.');
   const [campaignsLoading, setCampaignsLoading] = useState(true);
+  const [matchedBrands, setMatchedBrands] = useState<{ id: string; matchPercentage: number }[]>([]);
 
   const [expandedCards, setExpandedCards] = useState<{
     [key: string]: boolean;
@@ -114,6 +115,15 @@ const InfluencerPage: React.FC = () => {
         if (res.data && res.data.tips) {
           setTips(res.data.tips);
         }
+      })
+      .catch(() => {});
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    axiosInstance.get('/users/brands/matched')
+      .then((res) => {
+        setMatchedBrands(res.data || []);
       })
       .catch(() => {});
   }, [userId]);
@@ -242,6 +252,7 @@ const InfluencerPage: React.FC = () => {
             notificationOpen={showNotifications}
             joined={false}
             tips={tips}
+            matchedBrands={matchedBrands}
           />
         </div>
       </div>

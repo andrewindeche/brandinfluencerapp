@@ -226,6 +226,7 @@ export class CampaignController {
         joined: campaign.influencers.some(
           (inf: any) => inf._id.toString() === influencerId,
         ),
+        brand: campaign.brand,
       }));
     }
 
