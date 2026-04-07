@@ -48,7 +48,7 @@ describe('ForgotPasswordService', () => {
     it('should generate a reset token, store it in Redis, and send an email', async () => {
       const email = 'test@example.com';
       const token = 'mocked-token';
-      const previewLink = 'http://localhost:3000/forgotpassword?token=' + token;
+      const previewLink = 'http://localhost:3030/forgotpassword?token=' + token;
 
       redisService.setToken.mockResolvedValue(true);
       mailService.sendEmail.mockResolvedValue(previewLink);
@@ -62,7 +62,7 @@ describe('ForgotPasswordService', () => {
       );
       expect(mailService.sendEmail).toHaveBeenCalledWith(
         email,
-        `http://localhost:3000/forgotpassword?token=${token}`,
+        `http://localhost:3030/forgotpassword?token=${token}`,
       );
       expect(result).toBe(previewLink);
     });
