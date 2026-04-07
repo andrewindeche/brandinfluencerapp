@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { authState$, authStore } from '../rxjs/authStore';
-import { AuthFormState } from '../types';
 import Toast from '../app/components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useFormValidation } from '@/hooks/useFormValidation';
@@ -18,20 +17,14 @@ function isValidRole(role: unknown): role is 'brand' | 'influencer' | 'admin' {
 }
 
 const LoginForm: React.FC = () => {
-  const [userType, setUserType] = useState<
-    'brand' | 'influencer' | 'admin' | 'unknown'
-  >('unknown');
+  const [userType, setUserType] = useState<'brand' | 'influencer' | 'admin' | 'unknown'>('unknown');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
-  const [authState, setAuthState] = useState<Partial<AuthFormState>>({
-    profileImage: undefined,
-  });
-
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast, showToast: showDefaultToast, closeToast } = useToast(5000);
   const showErrorToast = showDefaultToast;
-  const { showToast: showSuccessToast } = useToast(5000);
   const { validateWithSchema } = useFormValidation();
   const isRouteLoading = useRouteLoading(300);
   const router = useRouter();
@@ -40,6 +33,7 @@ const LoginForm: React.FC = () => {
     const subscription = authState$.subscribe((state) => {
       setEmailState(state.email);
       setUserType(state.role || 'unknown');
+      setErrors(state.errors || {});
     });
 
     if (router.query.signup === 'success') {
@@ -54,18 +48,9 @@ const LoginForm: React.FC = () => {
   }, [router]);
 
   useEffect(() => {
-    const sub = authState$.subscribe((state: AuthFormState) => {
-      setAuthState(state);
-    });
-    return () => sub.unsubscribe();
-  }, []);
-
-  useEffect(() => {
     setUserType('unknown');
     authStore.setField('role', 'unknown');
   }, []);
-
-  const { errors } = authState;
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -77,10 +62,6 @@ const LoginForm: React.FC = () => {
     return () =>
       router.events.off('routeChangeComplete', handleRouteChangeComplete);
   }, [router]);
-
-  useEffect(() => {
-    setSubmitting(false);
-  }, []);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
