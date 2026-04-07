@@ -351,11 +351,6 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                   >
                     {isMatched ? 'View Details' : 'View'}
                   </button>
-                  {!isMatched && (
-                    <p className="text-xs mt-2 text-yellow-300 text-center">
-                      Update your profile to view details
-                    </p>
-                  )}
                 </div>
               </motion.div>
             );
