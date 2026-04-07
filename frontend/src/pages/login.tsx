@@ -29,8 +29,8 @@ const LoginForm: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const { toast, showToast: showDefaultToast, closeToast } = useToast();
-  const { showToast: showErrorToast } = useToast(3000);
+  const { toast, showToast: showDefaultToast, closeToast } = useToast(5000);
+  const showErrorToast = showDefaultToast;
   const { showToast: showSuccessToast } = useToast(5000);
   const { validateWithSchema } = useFormValidation();
   const isRouteLoading = useRouteLoading(300);

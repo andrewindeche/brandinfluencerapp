@@ -6,7 +6,6 @@ import {
   switchMap,
 } from 'rxjs';
 import axiosInstance, { setAuthToken } from './axiosInstance';
-import { AxiosError } from 'axios';
 import { setUser } from './userStore';
 import { loginSchema } from './validation/loginSchema';
 import { registerSchema } from './validation/registerSchema';
@@ -293,50 +292,46 @@ export const authStore = {
       let code = 'UNKNOWN_ERROR';
       const role = _authState$.value.role;
 
-      if (isAxiosError(err)) {
-        const statusCode = err.response?.status;
-        const data = err.response?.data as
-          | Partial<{ message: string; code?: string }>
-          | undefined;
+      const statusCode = (err as any)?.statusCode || (err as any)?.response?.status;
+      const data = (err as any)?.raw || (err as any)?.response?.data || (err as any);
 
-        if (statusCode === 401) {
-          const backendMessage = (data?.message || '').toLowerCase();
-          const errorCode = data?.code || '';
+      if (statusCode === 401) {
+        const backendMessage = (data?.message || '').toLowerCase();
+        const errorCode = data?.code || '';
 
-          if (backendMessage.includes('not found') || backendMessage.includes('does not exist') || errorCode === 'USER_NOT_FOUND') {
-            message = 'No account found with this email address.';
-            code = 'USER_NOT_FOUND';
-          } else if (backendMessage.includes('role') || errorCode === 'ROLE_MISMATCH') {
-            const userRole = role === 'brand' ? 'brand' : 'influencer';
-            message = `No ${userRole} account found with this email. Try switching your account type.`;
-            code = 'ROLE_MISMATCH';
-          } else if (backendMessage.includes('password') || errorCode === 'INVALID_PASSWORD') {
-            message = 'Incorrect password. Please try again.';
-            code = 'INVALID_PASSWORD';
-          } else if (backendMessage.includes('email') || backendMessage.includes('invalid')) {
-            if (backendMessage.includes('password')) {
-              message = 'Invalid email or password. Please try again.';
-              code = 'INVALID_CREDENTIALS';
-            } else {
-              message = 'No account found with this email address.';
-              code = 'USER_NOT_FOUND';
-            }
-          } else {
+        if (backendMessage.includes('not found') || backendMessage.includes('does not exist') || errorCode === 'USER_NOT_FOUND') {
+          message = 'No account found with this email address.';
+          code = 'USER_NOT_FOUND';
+        } else if (backendMessage.includes('role') || errorCode === 'ROLE_MISMATCH') {
+          const userRole = role === 'brand' ? 'brand' : 'influencer';
+          message = `No ${userRole} account found with this email. Try switching your account type.`;
+          code = 'ROLE_MISMATCH';
+        } else if (backendMessage.includes('password') || errorCode === 'INVALID_PASSWORD') {
+          message = 'Incorrect password. Please try again.';
+          code = 'INVALID_PASSWORD';
+        } else if (backendMessage.includes('email') || backendMessage.includes('invalid')) {
+          if (backendMessage.includes('password')) {
             message = 'Invalid email or password. Please try again.';
             code = 'INVALID_CREDENTIALS';
+          } else {
+            message = 'No account found with this email address.';
+            code = 'USER_NOT_FOUND';
           }
-        } else if (statusCode === 429) {
-          const userType = role === 'brand' ? 'brand' : role === 'influencer' ? 'influencer' : 'user';
-          message = `Too many ${userType} login attempts. Please wait and try again.`;
-          code = 'TOO_MANY_REQUESTS';
-        } else if (data?.message) {
-          message = data.message;
+        } else {
+          message = 'Invalid email or password. Please try again.';
+          code = 'INVALID_CREDENTIALS';
         }
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
+      } else if (statusCode === 429) {
+      const userType = role === 'brand' ? 'brand' : role === 'influencer' ? 'influencer' : 'user';
+      message = `Too many ${userType} login attempts. Please wait and try again.`;
+      code = 'TOO_MANY_REQUESTS';
+    } else if (data?.message) {
+      message = data.message;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
 
-      updateAuthState({
+    updateAuthState({
         submitting: false,
         success: false,
         serverMessage: message,

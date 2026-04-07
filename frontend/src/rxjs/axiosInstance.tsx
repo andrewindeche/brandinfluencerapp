@@ -54,20 +54,47 @@ axiosInstance.interceptors.response.use(
 
       if (status === 401) {
         const errorMessage = (data as any)?.message?.toLowerCase() || '';
-        if (errorMessage.includes('expired') || errorMessage.includes('invalid') || errorMessage.includes('unauthorized')) {
+        const errorData = (data as any)?.message;
+        const isObjectMessage = typeof errorData === 'object' && errorData !== null;
+        
+        if (isObjectMessage) {
+          const customMessage = (errorData as any)?.message;
+          const customCode = (errorData as any)?.code;
+          
+          if (customCode === 'USER_NOT_FOUND' || customMessage?.toLowerCase().includes('not found')) {
+            message = 'No account found with this email address.';
+            code = 'USER_NOT_FOUND';
+          } else if (customCode === 'ROLE_MISMATCH' || customMessage?.toLowerCase().includes('role')) {
+            message = `No account found with this email for this account type. Try switching your account type.`;
+            code = 'ROLE_MISMATCH';
+          } else if (customCode === 'INVALID_PASSWORD' || customMessage?.toLowerCase().includes('password')) {
+            message = 'Incorrect password. Please try again.';
+            code = 'INVALID_PASSWORD';
+          } else {
+            message = customMessage || 'Invalid email or password. Please try again.';
+            code = customCode || 'INVALID_CREDENTIALS';
+          }
+        } else if (errorMessage.includes('expired') && !errorMessage.includes('password')) {
           showGlobalToast({ message: 'Your session has expired. Please log in again.', type: 'error', duration: 10000 });
           forceLogout();
           return Promise.reject({ message: 'Session expired', code: 'TOKEN_EXPIRED', statusCode: 401 });
+        } else if (errorMessage.includes('unauthorized')) {
+          message = 'Invalid email or password. Please try again.';
+          code = 'UNAUTHORIZED';
+        } else {
+          message = 'Unauthorized. Please log in.';
+          code = 'UNAUTHORIZED';
         }
-        message = 'Unauthorized. Please log in.';
-        code = 'UNAUTHORIZED';
       } else if (status === 500) {
         const errorMessage = (data as any)?.message?.toLowerCase() || '';
         if (errorMessage.includes('database') || errorMessage.includes('mongo') || errorMessage.includes('connection')) {
-          showGlobalToast({ message: 'Unable to connect to the database. Please try again later.', type: 'error', duration: 15000 });
+          message = 'Unable to connect to the database. Please try again later.';
           code = 'DB_CONNECTION_ERROR';
+        } else if ((data as any)?.message) {
+          message = (data as any).message;
+          code = 'SERVER_ERROR';
         } else {
-          showGlobalToast({ message: 'Server error. Please try again later.', type: 'error', duration: 10000 });
+          message = 'Server error. Please try again later.';
           code = 'SERVER_ERROR';
         }
       } else if (status === 503) {
@@ -78,13 +105,8 @@ axiosInstance.interceptors.response.use(
         code = 'NETWORK_ERROR';
       }
 
-      if (typeof data === 'object' && data !== null) {
-        message =
-          (data as any)?.message ||
-          (data as any)?.error ||
-          message;
-      } else if (typeof data === 'string') {
-        message = data;
+      if (status === 401 && message === 'Unauthorized. Please log in.') {
+        message = 'Invalid email or password. Please try again.';
       }
 
       return Promise.reject({

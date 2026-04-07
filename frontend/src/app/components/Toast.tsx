@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ToastProps } from '../../interfaces';
 
 const Toast: React.FC<ToastProps> = ({
@@ -6,10 +6,6 @@ const Toast: React.FC<ToastProps> = ({
   type = 'success',
   onClose,
 }) => {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 2000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
 
   const bgColor =
     type === 'error'
