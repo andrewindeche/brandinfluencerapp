@@ -22,6 +22,7 @@ interface MatchedInfluencer {
   image?: string;
   message?: string;
   alt?: string;
+  status?: string;
 }
 
 const BrandPage: React.FC = () => {
@@ -40,10 +41,50 @@ const BrandPage: React.FC = () => {
   const [influencerPage, setInfluencerPage] = useState(1);
   const router = useRouter();
   const { authorized, checked } = useRoleGuard(['brand']);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [processedInfluencers, setProcessedInfluencers] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('processedInfluencers');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    }
+    return new Set();
+  });
+
+  useEffect(() => {
+    localStorage.setItem('processedInfluencers', JSON.stringify([...processedInfluencers]));
+  }, [processedInfluencers]);
 
   const handleLogout = () => {
     localStorage.clear();
     router.push('/login');
+  };
+
+  const handleAcceptInfluencer = async (influencerId: string) => {
+    setActionLoading(influencerId);
+    try {
+      await axiosInstance.post(`/users/influencer/${influencerId}/accept`);
+      setProcessedInfluencers(prev => new Set([...prev, influencerId]));
+      setMatchedInfluencers(prev => prev.filter(inf => inf.id !== influencerId));
+      setToast({ message: 'Influencer accepted! You can now invite them to campaigns.', type: 'success' });
+    } catch (error) {
+      setToast({ message: 'Failed to accept influencer', type: 'error' });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectInfluencer = async (influencerId: string) => {
+    setActionLoading(influencerId);
+    try {
+      await axiosInstance.post(`/users/influencer/${influencerId}/reject`);
+      setProcessedInfluencers(prev => new Set([...prev, influencerId]));
+      setMatchedInfluencers(prev => prev.filter(inf => inf.id !== influencerId));
+      setToast({ message: 'Influencer rejected', type: 'success' });
+    } catch (error) {
+      setToast({ message: 'Failed to reject influencer', type: 'error' });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   useEffect(() => {
@@ -96,7 +137,9 @@ const BrandPage: React.FC = () => {
   if (!authorized) return null;
 
   const MAX_PER_PAGE = 3;
-  const sortedInfluencers = [...matchedInfluencers].sort((a, b) => b.matchPercentage - a.matchPercentage);
+  const sortedInfluencers = [...matchedInfluencers]
+    .filter(inf => !processedInfluencers.has(inf.id))
+    .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
   const influencerCount = sortedInfluencers.length;
   const influencerMaxPage = Math.ceil(influencerCount / MAX_PER_PAGE);
@@ -104,6 +147,8 @@ const BrandPage: React.FC = () => {
     (influencerPage - 1) * MAX_PER_PAGE,
     influencerPage * MAX_PER_PAGE,
   );
+
+  const totalMatchedCount = matchedInfluencers.filter(inf => !processedInfluencers.has(inf.id)).length;
 
   return (
     <div className="bg-[#005B96] min-h-screen flex flex-col items-center px-2 sm:px-4 lg:px-4">
@@ -179,15 +224,17 @@ const BrandPage: React.FC = () => {
               }
             />
 
-            {matchedInfluencers.length === 0 ? (
+            {totalMatchedCount === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-white">
-                <p className="text-xl font-medium">No matched influencers found</p>
-                <p className="text-sm mt-2 opacity-80">Add interests to your profile to get better matches</p>
+                <p className="text-xl font-medium">No more influencer matches</p>
+                <p className="text-sm mt-2 opacity-80">You've processed all your matched influencers</p>
               </div>
             ) : paginatedInfluencers.length > 0 && (
               <>
                 <div className="flex flex-wrap justify-center gap-20">
-                  {paginatedInfluencers.map((influencer) => {
+                  {paginatedInfluencers
+                    .filter(inf => !processedInfluencers.has(inf.id))
+                    .map((influencer) => {
                     const imageSrc = influencer.profileImage 
                       ? (influencer.profileImage.startsWith('http') 
                           ? influencer.profileImage 
@@ -205,7 +252,11 @@ const BrandPage: React.FC = () => {
                           message: bioMessage,
                           image: imageSrc,
                           alt: `${influencer.username} - ${influencer.category || 'Influencer'}`,
+                          id: influencer.id,
                         }}
+                        onAccept={handleAcceptInfluencer}
+                        onReject={handleRejectInfluencer}
+                        isLoading={actionLoading === influencer.id}
                       />
                     );
                   })}

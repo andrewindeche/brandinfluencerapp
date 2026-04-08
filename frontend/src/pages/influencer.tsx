@@ -14,6 +14,7 @@ import { notificationStore } from '../rxjs/notificationStore';
 import { NotificationType } from '@/interfaces';
 import { submissions$ } from '../rxjs/submissionStore';
 import axiosInstance from '../rxjs/axiosInstance';
+import NotificationWidget from '../app/components/NotificationWidget';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -254,6 +255,8 @@ const InfluencerPage: React.FC = () => {
             tips={tips}
             matchedBrands={matchedBrands}
           />
+
+          <NotificationWidget notifications={notifications} showToast={showToast} />
         </div>
       </div>
     </div>

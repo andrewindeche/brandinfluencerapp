@@ -72,9 +72,10 @@ const ForgotPasswordForm: React.FC = () => {
       } else {
         showToast('Failed to reset password.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Reset error:', error);
-      showToast('Failed to reset password. Try again later', 'error');
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to reset password. Try again later';
+      showToast(errorMessage, 'error');
     } finally {
       setState((prev) => ({
         ...prev,
