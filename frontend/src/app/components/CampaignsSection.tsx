@@ -21,6 +21,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   tips = "💡 Click 'Submit' to send your entry or tap on a campaign card to expand.",
   matchedBrands = [],
   userBio = '',
+  acceptedBrands = new Set(),
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
@@ -90,9 +91,10 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
     const campaignBrandId = typeof campaign.brand === 'string' ? campaign.brand : campaign.brand?._id;
     const matchedBrand = matchedBrands.find(mb => mb.id === campaignBrandId);
     const isMatched = !!matchedBrand;
+    const isAccepted = acceptedBrands.has(campaignBrandId);
+    const hasJoined = joinedCampaigns.has(campaign.id) || campaign.joined;
     
-    if (isMatched && (!userBio || userBio.trim() === '')) {
-      showToast('Please update your bio to enable submissions', 'warning');
+    if (!hasJoined) {
       return;
     }
     
@@ -384,7 +386,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       {campaign.status === 'active' ? 'Active' : 'Inactive'}
                     </p>
                   </div>
-                  {campaign.status === 'active' && !isMatched && (
+                  {campaign.status === 'active' && !isMatched && !acceptedBrands.has(campaignBrandId) && (
                     <button
                       onClick={(e) => handleJoinCampaign(campaign, e)}
                       disabled={joiningCampaign === campaign.id}
@@ -397,14 +399,13 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                           : 'Join'}
                     </button>
                   )}
-                  {(isMatched || campaign.joined || joinedCampaigns.has(campaign.id)) && (
+                  {acceptedBrands.has(campaignBrandId) && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!joinedCampaigns.has(campaign.id) && !campaign.joined) {
                           setJoinedCampaigns(prev => new Set([...prev, campaign.id]));
                         }
-                        handleCardClick(campaign);
                       }}
                       className={`mt-2 px-3 py-1 text-sm font-semibold rounded-full transition w-full ${
                         joinedCampaigns.has(campaign.id) || campaign.joined
@@ -415,7 +416,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       {joinedCampaigns.has(campaign.id) || campaign.joined ? 'Joined' : 'Join Campaigns'}
                     </button>
                   )}
-                  {!isMatched && campaign.status !== 'active' && (
+                  {isMatched && !acceptedBrands.has(campaignBrandId) && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

@@ -39,6 +39,17 @@ const InfluencerPage: React.FC = () => {
   const [invitationModalOpen, setInvitationModalOpen] = useState(false);
   const [pendingInvitation, setPendingInvitation] = useState<NotificationType | null>(null);
   const [invitationProcessing, setInvitationProcessing] = useState(false);
+  const [acceptedBrands, setAcceptedBrands] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('acceptedBrands');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    }
+    return new Set();
+  });
+
+  useEffect(() => {
+    localStorage.setItem('acceptedBrands', JSON.stringify([...acceptedBrands]));
+  }, [acceptedBrands]);
 
   const [submissionsValue, setSubmissionsValue] = useState<Record<string, any[]>>({});
 
@@ -166,6 +177,9 @@ const InfluencerPage: React.FC = () => {
     if (!pendingInvitation) return;
     setInvitationProcessing(true);
     try {
+      if (pendingInvitation.brandId) {
+        setAcceptedBrands(prev => new Set([...prev, pendingInvitation.brandId]));
+      }
       showToast(`You've joined ${pendingInvitation.brandName || 'the brand'}! You can now make submissions.`, 'success');
       setInvitationModalOpen(false);
       setPendingInvitation(null);
@@ -285,6 +299,7 @@ const InfluencerPage: React.FC = () => {
             tips={tips}
             matchedBrands={matchedBrands}
             userBio={bio}
+            acceptedBrands={acceptedBrands}
           />
 
           <NotificationWidget notifications={notifications} showToast={showToast} />

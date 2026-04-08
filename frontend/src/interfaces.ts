@@ -163,6 +163,7 @@ export interface CampaignsSectionProps {
   tips?: string;
   matchedBrands?: { id: string; matchPercentage: number }[];
   userBio?: string;
+  acceptedBrands?: Set<string>;
 }
 
 export interface SubmissionModalProps {
