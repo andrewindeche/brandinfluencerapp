@@ -90,6 +90,56 @@ docker-compose up -d
      - Failed HTTP requests (anomalies)
      - Application uptime
 
+## <h1> Running with Kubernetes</h1>
+
+<p>This application can be deployed using Kubernetes. The Kubernetes manifests are located in <code>backend/.k8s/</code> and <code>frontend/.k8s/</code>.</p>
+
+<p><b>Prerequisites</b></p>
+<ul>
+<li>Kubernetes cluster (minikube, kind, or cloud provider)</li>
+<li>kubectl CLI installed and configured</li>
+<li>Docker images pushed to a registry (or use local images)</li>
+</ul>
+
+<p><b>Deploy Backend</b></p>
+
+```bash
+kubectl apply -f backend/.k8s/
+```
+
+<p><b>Deploy Frontend</b></p>
+
+```bash
+kubectl apply -f frontend/.k8s/
+```
+
+<p><b>Verify Deployments</b></p>
+
+```bash
+kubectl get deployments
+kubectl get services
+```
+
+<p><b>Access the Application</b></p>
+<ul>
+<li>Frontend: http://localhost:3000 (NodePort) or via Ingress</li>
+<li>Backend: http://localhost:4000 (NodePort)</li>
+</ul>
+
+<p><b>Scale Applications</b></p>
+
+```bash
+kubectl scale deployment frontend --replicas=3
+kubectl scale deployment backend --replicas=3
+```
+
+<p><b>Delete Resources</b></p>
+
+```bash
+kubectl delete -f backend/.k8s/
+kubectl delete -f frontend/.k8s/
+```
+
 ## <h1> Endpoints </h1>
 
 1. Register User POST: http://localhost:4000/auth/influencer/register
