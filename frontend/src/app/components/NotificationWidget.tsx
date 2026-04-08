@@ -3,6 +3,7 @@ import NotificationCard from './NotificationCard';
 import { NotificationWidgetProps } from '../../interfaces';
 import { notificationStore } from '@/rxjs/notificationStore';
 import { submissionStore } from '@/rxjs/submissionStore';
+import axiosInstance from '@/rxjs/axiosInstance';
 import { ToastProps } from '@/interfaces';
 
 const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (message: string, type: ToastProps['type']) => void }> = ({
@@ -16,7 +17,7 @@ const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (mess
     notificationStore.clearNotifications();
   };
 
-  const handleAccept = async (notification: typeof notifications[0]) => {
+  const handleAcceptSubmission = async (notification: typeof notifications[0]) => {
     if (!notification.campaignId || !notification.submissionId) return;
 
     setProcessingIds((prev) => new Set(prev).add(notification.submissionId));
@@ -45,7 +46,7 @@ const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (mess
     }
   };
 
-  const handleReject = async (notification: typeof notifications[0]) => {
+  const handleRejectSubmission = async (notification: typeof notifications[0]) => {
     if (!notification.campaignId || !notification.submissionId) return;
 
     setProcessingIds((prev) => new Set(prev).add(notification.submissionId));
@@ -72,6 +73,62 @@ const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (mess
         return updated;
       });
     }
+  };
+
+  const handleAcceptCampaignInvite = async (notification: typeof notifications[0]) => {
+    if (!notification.campaignId) return;
+
+    const key = `invite-${notification.campaignId}`;
+    setProcessingIds((prev) => new Set(prev).add(key));
+
+    try {
+      await axiosInstance.post(`/campaign/${notification.campaignId}/invite/accept`);
+      showToast?.('You joined the campaign!', 'success');
+      notificationStore.removeNotification(notification.id);
+    } catch (error) {
+      console.error('Error accepting campaign invite:', error);
+      showToast?.('Failed to join campaign', 'error');
+    } finally {
+      setProcessingIds((prev) => {
+        const updated = new Set(prev);
+        updated.delete(key);
+        return updated;
+      });
+    }
+  };
+
+  const handleRejectCampaignInvite = async (notification: typeof notifications[0]) => {
+    if (!notification.campaignId) return;
+
+    const key = `invite-${notification.campaignId}`;
+    setProcessingIds((prev) => new Set(prev).add(key));
+
+    try {
+      await axiosInstance.post(`/campaign/${notification.campaignId}/invite/reject`);
+      showToast?.('Invitation declined', 'success');
+      notificationStore.removeNotification(notification.id);
+    } catch (error) {
+      console.error('Error rejecting campaign invite:', error);
+      showToast?.('Failed to decline invitation', 'error');
+    } finally {
+      setProcessingIds((prev) => {
+        const updated = new Set(prev);
+        updated.delete(key);
+        return updated;
+      });
+    }
+  };
+
+  const getAcceptHandler = (notification: typeof notifications[0]) => {
+    if (notification.type === 'new_submission') return () => handleAcceptSubmission(notification);
+    if (notification.type === 'campaign_invite') return () => handleAcceptCampaignInvite(notification);
+    return undefined;
+  };
+
+  const getRejectHandler = (notification: typeof notifications[0]) => {
+    if (notification.type === 'new_submission') return () => handleRejectSubmission(notification);
+    if (notification.type === 'campaign_invite') return () => handleRejectCampaignInvite(notification);
+    return undefined;
   };
 
   return (
@@ -169,15 +226,21 @@ const NotificationWidget: React.FC<NotificationWidgetProps & { showToast?: (mess
                   status={
                     n.type === 'new_submission'
                       ? 'new_submission'
-                      : (n.type as 'accepted' | 'rejected')
+                      : n.type === 'campaign_invite'
+                        ? 'campaign_invite'
+                        : n.type === 'influencer_accepted'
+                          ? 'influencer_accepted'
+                          : n.type === 'influencer_rejected'
+                            ? 'influencer_rejected'
+                            : (n.type as 'accepted' | 'rejected')
                   }
                   date={n.date ? String(n.date) : n.timestamp}
                   message={n.message}
                   influencerName={(n as any).influencerName}
                   submissionContent={(n as any).content}
-                  onAccept={n.type === 'new_submission' ? () => handleAccept(n) : undefined}
-                  onReject={n.type === 'new_submission' ? () => handleReject(n) : undefined}
-                  isProcessing={processingIds.has(n.submissionId)}
+                  onAccept={getAcceptHandler(n)}
+                  onReject={getRejectHandler(n)}
+                  isProcessing={processingIds.has(n.submissionId) || processingIds.has(`invite-${n.campaignId}`)}
                 />
               ))
             )}

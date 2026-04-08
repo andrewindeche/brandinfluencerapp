@@ -47,6 +47,30 @@ const NotificationCard: React.FC<
           border: 'border-gray-200',
           badgeBg: 'bg-blue-100 text-blue-700',
         };
+      case 'campaign_invite':
+        return {
+          text: 'Invite',
+          color: 'text-purple-600',
+          bg: 'bg-purple-50',
+          border: 'border-purple-200',
+          badgeBg: 'bg-purple-100 text-purple-700',
+        };
+      case 'influencer_accepted':
+        return {
+          text: 'Accepted',
+          color: 'text-green-600',
+          bg: 'bg-green-50',
+          border: 'border-green-200',
+          badgeBg: 'bg-green-100 text-green-700',
+        };
+      case 'influencer_rejected':
+        return {
+          text: 'Rejected',
+          color: 'text-red-600',
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          badgeBg: 'bg-red-100 text-red-700',
+        };
       default:
         return {
           text: 'Update',
@@ -59,7 +83,7 @@ const NotificationCard: React.FC<
   };
 
   const { text, color, bg, border, badgeBg } = getStatusStyles();
-  const showActions = status === 'new_submission' && (onAccept || onReject);
+  const showActions = (status === 'new_submission' || status === 'campaign_invite') && (onAccept || onReject);
   const isExpandable = status === 'accepted' || status === 'rejected';
 
   const formattedDate = date
@@ -125,14 +149,14 @@ const NotificationCard: React.FC<
               disabled={isProcessing}
               className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Reject
+              {status === 'campaign_invite' ? 'Decline' : 'Reject'}
             </button>
             <button
               onClick={onAccept}
               disabled={isProcessing}
               className="px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Accept
+              {status === 'campaign_invite' ? 'Join' : 'Accept'}
             </button>
           </div>
         )}

@@ -32,12 +32,14 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'accepted':
+      case 'influencer_accepted':
         return (
           <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
             <span className="text-green-600 text-lg">✓</span>
           </div>
         );
       case 'rejected':
+      case 'influencer_rejected':
         return (
           <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
             <span className="text-red-600 text-lg">✕</span>
@@ -47,6 +49,12 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         return (
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
             <Bell className="w-4 h-4 text-blue-600" />
+          </div>
+        );
+      case 'campaign_invite':
+        return (
+          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+            <Bell className="w-4 h-4 text-purple-600" />
           </div>
         );
       default:
@@ -61,11 +69,15 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'accepted':
+      case 'influencer_accepted':
         return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Accepted</span>;
       case 'rejected':
+      case 'influencer_rejected':
         return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span>;
       case 'new_submission':
         return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">New</span>;
+      case 'campaign_invite':
+        return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Invite</span>;
       default:
         return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">Update</span>;
     }

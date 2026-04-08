@@ -9,6 +9,11 @@ const typeMap = {
   'submission.accepted': 'accepted',
   'submission.rejected': 'rejected',
   'submission.created': 'new_submission',
+  'campaign.invited': 'campaign_invite',
+  'campaign.invite_accepted': 'campaign_invite_accepted',
+  'campaign.invite_rejected': 'campaign_invite_rejected',
+  'influencer.accepted': 'influencer_accepted',
+  'influencer.rejected': 'influencer_rejected',
 } as const;
 
 type KafkaKey = keyof typeof typeMap;
@@ -54,32 +59,42 @@ export const notificationStore = {
   },
 
   handleKafkaEvent(key: string, payload: any) {
+    console.log('[NotificationStore] Received Kafka event:', key, payload);
+    
     if (!payload || !(key in typeMap)) {
+      console.log('[NotificationStore] Key not in typeMap:', key);
       return;
     }
 
     const typedKey = key as KafkaKey;
 
     const notification: NotificationType = {
-      id: payload.submissionId || crypto.randomUUID(),
-
+      id: payload.submissionId || payload.campaignId || payload.influencerId || crypto.randomUUID(),
       type: typeMap[typedKey],
-
       campaignId: payload.campaignId,
       submissionId: payload.submissionId,
       influencerId: payload.influencerId,
       brandId: payload.brandId,
-
-      campaignTitle: payload.campaignTitle || 'Campaign',
-
+      campaignTitle: typedKey === 'influencer.accepted' 
+        ? `Brand: ${payload.brandName || 'a brand'}`
+        : (payload.campaignTitle || 'Campaign'),
       message:
         payload.message ||
         (typedKey === 'submission.accepted'
           ? 'Your submission was accepted 🎉'
           : typedKey === 'submission.rejected'
             ? 'Your submission was rejected'
-            : `New submission received`),
-
+            : typedKey === 'campaign.invited'
+              ? `You've been invited to join campaign: ${payload.campaignTitle || 'Campaign'}`
+              : typedKey === 'campaign.invite_accepted'
+                ? `Influencer accepted your campaign invitation`
+                : typedKey === 'campaign.invite_rejected'
+                  ? `Influencer declined your campaign invitation`
+                  : typedKey === 'influencer.accepted'
+                    ? `You've been accepted by ${payload.brandName || 'a brand'}! You can now join their campaigns.`
+                    : typedKey === 'influencer.rejected'
+                      ? `You've been rejected by a brand`
+                      : `New submission received`),
       timestamp: payload.timestamp || Date.now().toString(),
       date: payload.timestamp ? new Date(payload.timestamp) : new Date(),
     };
@@ -94,6 +109,23 @@ export const notificationStore = {
       case 'submission.created':
         this.addNotification(notification);
         this.addBrandNotification(notification);
+        break;
+
+      case 'campaign.invited':
+        this.addNotification(notification);
+        this.addInfluencerNotification(notification);
+        break;
+
+      case 'campaign.invite_accepted':
+      case 'campaign.invite_rejected':
+        this.addNotification(notification);
+        this.addBrandNotification(notification);
+        break;
+
+      case 'influencer.accepted':
+      case 'influencer.rejected':
+        this.addNotification(notification);
+        this.addInfluencerNotification(notification);
         break;
     }
   },
