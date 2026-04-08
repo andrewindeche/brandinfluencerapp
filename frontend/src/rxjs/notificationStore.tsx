@@ -39,6 +39,8 @@ export const notificationStore = {
 
   addInfluencerNotification(notification: NotificationType) {
     const current = influencerNotifications$.getValue();
+    const exists = current.some((n) => n.id === notification.id);
+    if (exists) return;
     influencerNotifications$.next([notification, ...current]);
   },
 

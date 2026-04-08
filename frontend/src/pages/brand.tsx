@@ -54,6 +54,13 @@ const BrandPage: React.FC = () => {
     localStorage.setItem('processedInfluencers', JSON.stringify([...processedInfluencers]));
   }, [processedInfluencers]);
 
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   const handleLogout = () => {
     localStorage.clear();
     router.push('/login');
