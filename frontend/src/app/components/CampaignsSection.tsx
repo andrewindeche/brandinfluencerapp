@@ -40,6 +40,18 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
   const [deletingSubmission, setDeletingSubmission] = useState<SubmissionType | null>(null);
   const [viewingSubmission, setViewingSubmission] = useState<SubmissionType | null>(null);
+  const [joiningCampaign, setJoiningCampaign] = useState<string | null>(null);
+  const [joinedCampaigns, setJoinedCampaigns] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('joinedCampaigns');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    }
+    return new Set();
+  });
+
+  useEffect(() => {
+    localStorage.setItem('joinedCampaigns', JSON.stringify([...joinedCampaigns]));
+  }, [joinedCampaigns]);
 
   useEffect(() => {
     campaigns.forEach(async (campaign) => {
@@ -103,6 +115,26 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
         'Failed to submit. Make sure you joined the campaign first!',
         'error',
       );
+    }
+  };
+
+  const handleJoinCampaign = async (campaign: CampaignType, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (joinedCampaigns.has(campaign.id) || campaign.joined) {
+      handleCardClick(campaign);
+      return;
+    }
+
+    setJoiningCampaign(campaign.id);
+    try {
+      await campaignStore.joinCampaign(campaign.id);
+      setJoinedCampaigns(prev => new Set([...prev, campaign.id]));
+      showToast('You joined the campaign!', 'success');
+      handleCardClick(campaign);
+    } catch (err) {
+      showToast('Failed to join campaign', 'error');
+    } finally {
+      setJoiningCampaign(null);
     }
   };
 
@@ -342,15 +374,41 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       {campaign.status === 'active' ? 'Active' : 'Inactive'}
                     </p>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCardClick(campaign);
-                    }}
-                    className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition w-full"
-                  >
-                    {isMatched ? 'View Details' : 'View'}
-                  </button>
+                  {campaign.status === 'active' && !isMatched && (
+                    <button
+                      onClick={(e) => handleJoinCampaign(campaign, e)}
+                      disabled={joiningCampaign === campaign.id}
+                      className="mt-2 px-3 py-1 text-sm bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition w-full disabled:opacity-50"
+                    >
+                      {joiningCampaign === campaign.id 
+                        ? 'Joining...' 
+                        : (joinedCampaigns.has(campaign.id) || campaign.joined)
+                          ? 'View'
+                          : 'Join'}
+                    </button>
+                  )}
+                  {(isMatched || campaign.joined || joinedCampaigns.has(campaign.id)) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick(campaign);
+                      }}
+                      className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition w-full"
+                    >
+                      {isMatched ? 'View Details' : 'View'}
+                    </button>
+                  )}
+                  {!isMatched && campaign.status !== 'active' && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick(campaign);
+                      }}
+                      className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition w-full"
+                    >
+                      View
+                    </button>
+                  )}
                 </div>
               </motion.div>
             );

@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Influencer } from '../../interfaces';
+import axiosInstance from '../../rxjs/axiosInstance';
 
-const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
+interface InfluencerCardProps {
+  influencer: Influencer;
+  onAccept?: (influencerId: string) => void;
+  onReject?: (influencerId: string) => void;
+  isLoading?: boolean;
+}
+
+const InfluencerCard: React.FC<InfluencerCardProps> = ({
   influencer,
+  onAccept,
+  onReject,
+  isLoading: externalLoading,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const fullMessage = influencer.message.split('\n').slice(2).join(' ');
@@ -11,6 +22,18 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
   const displayedMessage = expanded
     ? fullMessage
     : `${fullMessage.slice(0, MAX_CHAR_COUNT)}${fullMessage.length > MAX_CHAR_COUNT ? '...' : ''}`;
+
+  const loading = externalLoading;
+
+  const handleAccept = () => {
+    if (!onAccept || loading) return;
+    onAccept(influencer.id || '');
+  };
+
+  const handleReject = () => {
+    if (!onReject || loading) return;
+    onReject(influencer.id || '');
+  };
 
   return (
     <div
@@ -59,6 +82,27 @@ const InfluencerCard: React.FC<{ influencer: Influencer }> = ({
           )}
         </div>
       </div>
+      
+      {onAccept && onReject && (
+        <div className="absolute top-2 right-2 flex gap-1">
+          <button
+            onClick={handleReject}
+            disabled={loading}
+            className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold"
+            title="Reject"
+          >
+            ✕
+          </button>
+          <button
+            onClick={handleAccept}
+            disabled={loading}
+            className="bg-green-500 hover:bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold"
+            title="Accept & Invite"
+          >
+            ✓
+          </button>
+        </div>
+      )}
     </div>
   );
 };
