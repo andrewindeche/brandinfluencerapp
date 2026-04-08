@@ -88,7 +88,8 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   const pageSize = 6;
 
   const handleCardClick = (campaign: CampaignType) => {
-    setSelectedCampaign(campaign);
+    const campaignBrandId = typeof campaign.brand === 'string' ? campaign.brand : campaign.brand?._id;
+    setSelectedCampaign({ ...campaign, brandId: campaignBrandId });
     setViewingSubmission(null);
     setModalOpen(true);
   };

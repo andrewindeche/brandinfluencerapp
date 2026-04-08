@@ -250,13 +250,10 @@ export class UserService {
   }
 
   async acceptInfluencer(brandId: string, influencerId: string): Promise<void> {
-    console.log('[UserService] acceptInfluencer called:', { brandId, influencerId });
     await this.userModel.findByIdAndUpdate(brandId, {
       $addToSet: { acceptedInfluencers: new Types.ObjectId(influencerId) },
       $pull: { rejectedInfluencers: new Types.ObjectId(influencerId) },
     });
-
-    console.log('[UserService] kafkaService:', this.kafkaService);
     
     try {
       const [influencer, brand] = await Promise.all([
@@ -270,11 +267,9 @@ export class UserService {
         username: influencer?.username || 'Influencer',
         timestamp: new Date().toISOString(),
       };
-      console.log('[UserService] Sending influencer.accepted Kafka message:', kafkaPayload);
       await this.kafkaService.sendMessage('brand-actions', 'influencer.accepted', kafkaPayload);
-      console.log('[UserService] Kafka message sent successfully');
     } catch (error) {
-      console.error('[UserService] Error sending Kafka message:', error);
+      // Silent fail for Kafka
     }
   }
 
@@ -293,7 +288,7 @@ export class UserService {
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('[UserService] Error sending Kafka message:', error);
+      // Silent fail for Kafka
     }
   }
 

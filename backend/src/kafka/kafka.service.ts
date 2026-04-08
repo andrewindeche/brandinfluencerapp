@@ -138,7 +138,6 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
           const key = message.key?.toString() || '';
           const value = JSON.parse(message.value?.toString() || '{}');
 
-          console.log(`[KafkaConsumer] Received message on topic ${topic}, key: ${key}, value:`, value);
           this.logger.debug(`Received message on ${topic}: ${key}`);
 
           for (const [subscribedTopic, handler] of this.subscribedTopics) {
