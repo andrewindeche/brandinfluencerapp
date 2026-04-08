@@ -326,7 +326,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                   imageSrc={selectedCampaign?.images?.[0] || '/images/fit.jpg'}
                   message={selectedCampaign?.instructions || ''}
                   onSubmit={handleSubmit}
-                  joined={selectedCampaign?.joined ?? false}
+                  joined={selectedCampaign ? (joinedCampaigns.has(selectedCampaign.id) || selectedCampaign.joined) : false}
                   status={selectedCampaign?.status ?? 'inactive'}
                   campaignSubmissions={selectedCampaign ? campaignSubmissions[selectedCampaign.id] : undefined}
                   onSelectSubmission={(sub) => setViewingSubmission(sub)}

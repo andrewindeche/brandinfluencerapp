@@ -124,7 +124,7 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
       );
     }
 
-    if (showNewForm || !hasSubmissions) {
+    if (showNewForm || (!hasSubmissions && joined)) {
       return (
         <div className="space-y-4">
           <textarea
@@ -135,6 +135,14 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
             onChange={(e) => setText(e.target.value)}
             spellCheck={false}
           />
+        </div>
+      );
+    }
+
+    if (!joined) {
+      return (
+        <div className="text-center py-8 text-gray-500">
+          <p className="text-sm">Please accept a brand invitation to start submitting to campaigns.</p>
         </div>
       );
     }

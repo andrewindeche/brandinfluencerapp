@@ -101,7 +101,7 @@ export const notificationStore = {
                   : typedKey === 'influencer.accepted'
                     ? `You've been accepted by ${payload.brandName || 'a brand'}! You can now join their campaigns.`
                     : typedKey === 'influencer.rejected'
-                      ? `You've been rejected by a brand`
+                      ? `Matched to brands unsuccessful`
                       : `New submission received`),
       timestamp: payload.timestamp || Date.now().toString(),
       date: payload.timestamp ? new Date(payload.timestamp) : new Date(),
