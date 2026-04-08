@@ -66,12 +66,15 @@ export class NotificationService implements OnModuleInit {
           topic: 'brand-actions',
           handler: async (key, payload) => {
             console.log('[NotificationService] Received brand-actions Kafka message:', key, payload);
-            switch (key) {
+            const eventKey = key || (payload?.key);
+            const eventPayload = payload?.payload || payload;
+            switch (eventKey) {
               case 'influencer.accepted':
               case 'influencer.rejected':
-                this.notificationGateway.sendToInfluencer(payload.influencerId, {
-                  key,
-                  payload,
+                console.log('[NotificationService] Sending to influencer:', eventPayload.influencerId);
+                this.notificationGateway.sendToInfluencer(eventPayload.influencerId, {
+                  key: eventKey,
+                  payload: eventPayload,
                 });
                 break;
             }
