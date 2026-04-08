@@ -28,6 +28,9 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
   onAcceptSubmission,
   onRejectSubmission,
   isBrand,
+  showForm = true,
+  startDate,
+  endDate,
 }) => {
   const [text, setText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -122,6 +125,10 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
           <p className="text-gray-800 whitespace-pre-wrap">{viewingSubmission.content}</p>
         </div>
       );
+    }
+
+    if (!showForm) {
+      return null;
     }
 
     if (showNewForm || (!hasSubmissions && joined)) {
@@ -326,6 +333,13 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
                       <span className="text-xs text-gray-500">
                         {viewingSubmission.createdAt ? new Date(viewingSubmission.createdAt).toLocaleDateString() : ''}
                       </span>
+                    </div>
+                  )}
+                  {(startDate || endDate) && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      {startDate && <span>Start: {new Date(startDate).toLocaleDateString()}</span>}
+                      {startDate && endDate && <span className="mx-2">|</span>}
+                      {endDate && <span>End: {new Date(endDate).toLocaleDateString()}</span>}
                     </div>
                   )}
                   {!showSubmissionsList && (

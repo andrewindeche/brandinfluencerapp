@@ -328,6 +328,9 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                   onSubmit={handleSubmit}
                   joined={selectedCampaign ? (joinedCampaigns.has(selectedCampaign.id) || selectedCampaign.joined) : false}
                   status={selectedCampaign?.status ?? 'inactive'}
+                  showForm={selectedCampaign ? (acceptedBrands.has(campaignBrandId) && (joinedCampaigns.has(selectedCampaign.id) || selectedCampaign.joined)) : false}
+                  startDate={selectedCampaign?.startDate}
+                  endDate={selectedCampaign?.endDate}
                   campaignSubmissions={selectedCampaign ? campaignSubmissions[selectedCampaign.id] : undefined}
                   onSelectSubmission={(sub) => setViewingSubmission(sub)}
                   viewingSubmission={viewingSubmission}

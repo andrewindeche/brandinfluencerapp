@@ -183,4 +183,7 @@ export interface SubmissionModalProps {
   onAcceptSubmission?: (submissionId: string) => Promise<void>;
   onRejectSubmission?: (submissionId: string) => Promise<void>;
   isBrand?: boolean;
+  showForm?: boolean;
+  startDate?: string;
+  endDate?: string;
 }
