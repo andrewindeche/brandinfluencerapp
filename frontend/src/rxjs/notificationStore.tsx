@@ -82,6 +82,7 @@ export const notificationStore = {
       submissionId: payload.submissionId,
       influencerId: payload.influencerId,
       brandId: payload.brandId,
+      brandName: payload.brandName,
       campaignTitle: typedKey === 'influencer.accepted' 
         ? `Brand: ${payload.brandName || 'a brand'}`
         : (payload.campaignTitle || 'Campaign'),

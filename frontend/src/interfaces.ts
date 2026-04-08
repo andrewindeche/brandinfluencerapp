@@ -91,6 +91,7 @@ export interface NotificationType {
   submissionId: string;
   influencerId?: string;
   brandId?: string;
+  brandName?: string;
   date: string | Date;
 }
 
@@ -161,6 +162,7 @@ export interface CampaignsSectionProps {
   joined: boolean;
   tips?: string;
   matchedBrands?: { id: string; matchPercentage: number }[];
+  userBio?: string;
 }
 
 export interface SubmissionModalProps {

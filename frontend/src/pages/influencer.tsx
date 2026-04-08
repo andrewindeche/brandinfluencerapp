@@ -15,6 +15,7 @@ import { NotificationType } from '@/interfaces';
 import { submissions$ } from '../rxjs/submissionStore';
 import axiosInstance from '../rxjs/axiosInstance';
 import NotificationWidget from '../app/components/NotificationWidget';
+import BrandInvitationModal from '../app/components/BrandInvitationModal';
 
 const InfluencerPage: React.FC = () => {
   const { authorized, checked } = useRoleGuard(['influencer']);
@@ -35,6 +36,9 @@ const InfluencerPage: React.FC = () => {
   const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [userId, setUserId] = useState<string>('');
+  const [invitationModalOpen, setInvitationModalOpen] = useState(false);
+  const [pendingInvitation, setPendingInvitation] = useState<NotificationType | null>(null);
+  const [invitationProcessing, setInvitationProcessing] = useState(false);
 
   const [submissionsValue, setSubmissionsValue] = useState<Record<string, any[]>>({});
 
@@ -131,7 +135,14 @@ const InfluencerPage: React.FC = () => {
 
   useEffect(() => {
     const sub =
-      notificationStore.influencerNotifications$.subscribe(setNotifications);
+      notificationStore.influencerNotifications$.subscribe((notifs) => {
+        setNotifications(notifs);
+        const latestAccepted = notifs.find((n) => n.type === 'influencer_accepted');
+        if (latestAccepted && !invitationModalOpen) {
+          setPendingInvitation(latestAccepted);
+          setInvitationModalOpen(true);
+        }
+      });
     return () => sub.unsubscribe();
   }, []);
 
@@ -149,6 +160,25 @@ const InfluencerPage: React.FC = () => {
 
   const handleCampaignAction = (campaign: string) => {
     showToast(`${campaign} was successfully updated!`, 'success');
+  };
+
+  const handleAcceptInvitation = async () => {
+    if (!pendingInvitation) return;
+    setInvitationProcessing(true);
+    try {
+      showToast(`You've joined ${pendingInvitation.brandName || 'the brand'}! You can now make submissions.`, 'success');
+      setInvitationModalOpen(false);
+      setPendingInvitation(null);
+    } catch (error) {
+      showToast('Failed to accept invitation', 'error');
+    } finally {
+      setInvitationProcessing(false);
+    }
+  };
+
+  const handleRejectInvitation = () => {
+    setInvitationModalOpen(false);
+    setPendingInvitation(null);
   };
 
   const handleProfileSave = async (
@@ -254,9 +284,17 @@ const InfluencerPage: React.FC = () => {
             joined={false}
             tips={tips}
             matchedBrands={matchedBrands}
+            userBio={bio}
           />
 
           <NotificationWidget notifications={notifications} showToast={showToast} />
+
+          <BrandInvitationModal
+            notification={pendingInvitation}
+            onAccept={handleAcceptInvitation}
+            onReject={handleRejectInvitation}
+            isProcessing={invitationProcessing}
+          />
         </div>
       </div>
     </div>

@@ -20,6 +20,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   joined,
   tips = "💡 Click 'Submit' to send your entry or tap on a campaign card to expand.",
   matchedBrands = [],
+  userBio = '',
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<
@@ -86,6 +87,15 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   const pageSize = 6;
 
   const handleCardClick = (campaign: CampaignType) => {
+    const campaignBrandId = typeof campaign.brand === 'string' ? campaign.brand : campaign.brand?._id;
+    const matchedBrand = matchedBrands.find(mb => mb.id === campaignBrandId);
+    const isMatched = !!matchedBrand;
+    
+    if (isMatched && (!userBio || userBio.trim() === '')) {
+      showToast('Please update your bio to enable submissions', 'warning');
+      return;
+    }
+    
     setSelectedCampaign(campaign);
     setViewingSubmission(null);
     setModalOpen(true);
@@ -395,7 +405,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       }}
                       className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition w-full"
                     >
-                      {isMatched ? 'View Details' : 'View'}
+                      {isMatched ? 'Join Campaigns' : 'View'}
                     </button>
                   )}
                   {!isMatched && campaign.status !== 'active' && (

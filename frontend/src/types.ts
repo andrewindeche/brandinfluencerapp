@@ -46,6 +46,7 @@ export type CampaignType = {
   status: 'active' | 'inactive';
   joined?: boolean;
   brand?: string | { _id: string; username?: string };
+  brandId?: string;
 };
 
 export type PasswordResetState = {
