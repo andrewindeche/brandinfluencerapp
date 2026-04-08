@@ -175,10 +175,22 @@ export class CampaignController {
         throw new BadRequestException('Invalid campaign ID');
       }
 
-      const submissions: any[] =
-        ((await this.campaignService.getSubmissionsByCampaign(
-          campaignId,
-        )) as any[]) || [];
+      const user = req.user;
+      const influencerId = user.sub ?? user.userId;
+
+      let submissions: any[];
+      
+      if (user.role === 'brand') {
+        submissions = (await this.campaignService.getSubmissionsByCampaign(campaignId)) as any[];
+      } else if (user.role === 'influencer') {
+        submissions = (await this.campaignService.getSubmissionsByCampaign(campaignId)) as any[];
+        submissions = submissions.filter((s) => {
+          const subInfluencerId = s.influencer?._id?.toString() || s.influencer?.toString();
+          return subInfluencerId === influencerId;
+        });
+      } else {
+        submissions = [];
+      }
 
       if (!submissions || submissions.length === 0) {
         return {
@@ -328,5 +340,30 @@ export class CampaignController {
   async deleteSubmission(@Param('id') id: string, @Req() req) {
     const influencerId = req.user.sub ?? req.user.userId;
     return this.campaignService.deleteSubmission(id, influencerId);
+  }
+
+  @Post(':campaignId/invite/:influencerId')
+  async inviteInfluencer(
+    @Param('campaignId') campaignId: string,
+    @Param('influencerId') influencerId: string,
+    @Req() req,
+  ) {
+    const user = req.user;
+    if (user.role !== 'brand') {
+      throw new UnauthorizedException('Only brands can invite influencers');
+    }
+    return this.campaignService.inviteInfluencer(campaignId, influencerId);
+  }
+
+  @Post(':campaignId/invite/accept')
+  async acceptCampaignInvite(@Param('campaignId') campaignId: string, @Req() req) {
+    const influencerId = req.user.sub ?? req.user.userId;
+    return this.campaignService.acceptCampaignInvite(campaignId, influencerId);
+  }
+
+  @Post(':campaignId/invite/reject')
+  async rejectCampaignInvite(@Param('campaignId') campaignId: string, @Req() req) {
+    const influencerId = req.user.sub ?? req.user.userId;
+    return this.campaignService.rejectCampaignInvite(campaignId, influencerId);
   }
 }

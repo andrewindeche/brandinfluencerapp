@@ -537,4 +537,85 @@ export class CampaignsService {
 
     return { success: true };
   }
+
+  async inviteInfluencer(campaignId: string, influencerId: string): Promise<{ success: boolean; message: string }> {
+    const campaign = await this.campaignModel.findById(campaignId);
+    if (!campaign) {
+      throw new NotFoundException('Campaign not found');
+    }
+
+    const influencer = await this.userModel.findById(influencerId);
+    if (!influencer || (influencer as any).role !== 'influencer') {
+      throw new BadRequestException('Invalid influencer');
+    }
+
+    const influencerStatus = (influencer as any).status;
+    if (influencerStatus !== 'accepted') {
+      throw new BadRequestException('Influencer must be accepted by brand first');
+    }
+
+    const alreadyJoined = campaign.influencers.some(
+      (inf: any) => inf._id?.toString() === influencerId || inf.toString() === influencerId,
+    );
+
+    if (alreadyJoined) {
+      throw new BadRequestException('Influencer already in campaign');
+    }
+
+    await this.kafkaService.sendMessage('campaign-invite', 'campaign.invited', {
+      campaignId,
+      influencerId,
+      brandId: campaign.brand?.toString(),
+      campaignTitle: campaign.title,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { success: true, message: 'Invitation sent to influencer' };
+  }
+
+  async acceptCampaignInvite(campaignId: string, influencerId: string): Promise<Campaign> {
+    const campaign = await this.campaignModel.findById(campaignId);
+    if (!campaign) {
+      throw new NotFoundException('Campaign not found');
+    }
+
+    const influencerObjectId = new Types.ObjectId(influencerId);
+    const alreadyJoined = campaign.influencers.some(
+      (inf: any) => inf._id?.toString() === influencerId || inf.toString() === influencerId,
+    );
+
+    if (alreadyJoined) {
+      throw new BadRequestException('Already joined this campaign');
+    }
+
+    campaign.influencers.push(influencerObjectId as any);
+    await campaign.save();
+
+    await this.kafkaService.sendMessage('campaign-invite', 'campaign.invite_accepted', {
+      campaignId,
+      influencerId,
+      brandId: campaign.brand?.toString(),
+      campaignTitle: campaign.title,
+      timestamp: new Date().toISOString(),
+    });
+
+    return campaign;
+  }
+
+  async rejectCampaignInvite(campaignId: string, influencerId: string): Promise<{ success: boolean }> {
+    const campaign = await this.campaignModel.findById(campaignId);
+    if (!campaign) {
+      throw new NotFoundException('Campaign not found');
+    }
+
+    await this.kafkaService.sendMessage('campaign-invite', 'campaign.invite_rejected', {
+      campaignId,
+      influencerId,
+      brandId: campaign.brand?.toString(),
+      campaignTitle: campaign.title,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { success: true };
+  }
 }
