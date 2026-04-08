@@ -9,6 +9,7 @@ import { InfluencerSchema } from '../user/influencer/influencer.schema';
 import { BrandSchema } from '../user/brand/schema/brand.schema';
 import { AuthModule } from '../auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { KafkaModule } from '../kafka/kafka.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MulterModule } from '@nestjs/platform-express';
     MulterModule.register({
       dest: './uploads',
     }),
+    KafkaModule,
   ],
   controllers: [UserController],
   providers: [UserService, RedisService],

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
 import { RedisService } from '../redis/redis.service';
+import { KafkaService } from '../kafka/kafka.service';
 
 @Injectable()
 export class UserService {
@@ -11,6 +12,7 @@ export class UserService {
     @InjectModel('User')
     private userModel: Model<User>,
     private readonly redisService: RedisService,
+    private readonly kafkaService?: KafkaService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -171,7 +173,7 @@ export class UserService {
     });
 
     return matchedInfluencers
-      .filter(inf => inf.matchPercentage > 0)
+      .filter(inf => inf.matchPercentage > 0 && (inf as any).status !== 'rejected')
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
   }
 
@@ -239,5 +241,61 @@ export class UserService {
     return matchedBrands
       .filter(brand => brand.matchPercentage > 0)
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
+  }
+
+  async acceptInfluencer(brandId: string, influencerId: string): Promise<void> {
+    console.log('[UserService] acceptInfluencer called:', { brandId, influencerId });
+    await this.userModel.findByIdAndUpdate(influencerId, { status: 'accepted', brandId });
+
+    if (this.kafkaService) {
+      const [influencer, brand] = await Promise.all([
+        this.userModel.findById(influencerId),
+        this.userModel.findById(brandId),
+      ]);
+      const kafkaPayload = {
+        influencerId,
+        brandId,
+        brandName: brand?.username || 'Brand',
+        username: influencer?.username || 'Influencer',
+        timestamp: new Date().toISOString(),
+      };
+      console.log('[UserService] Sending influencer.accepted Kafka message:', kafkaPayload);
+      await this.kafkaService.sendMessage('brand-actions', 'influencer.accepted', kafkaPayload);
+    }
+  }
+
+  async rejectInfluencer(brandId: string, influencerId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(influencerId, { status: 'rejected' });
+
+    if (this.kafkaService) {
+      const influencer = await this.userModel.findById(influencerId);
+      await this.kafkaService.sendMessage('brand-actions', 'influencer.rejected', {
+        influencerId,
+        brandId,
+        username: influencer?.username || 'Influencer',
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  async createCampaignInviteNotification(brandId: string, influencerId: string, campaignId?: string): Promise<void> {
+    // This would integrate with notification service to send notification to influencer
+    // The notification will be handled via Kafka in the actual implementation
+  }
+
+  async getAcceptedInfluencers(brandId: string): Promise<User[]> {
+    return this.userModel.find({ 
+      role: 'influencer', 
+      status: 'accepted',
+      brandId 
+    }).exec();
+  }
+
+  async getRejectedInfluencers(brandId: string): Promise<User[]> {
+    return this.userModel.find({ 
+      role: 'influencer', 
+      status: 'rejected',
+      brandId 
+    }).exec();
   }
 }

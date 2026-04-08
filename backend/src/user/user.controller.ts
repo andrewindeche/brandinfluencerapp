@@ -3,8 +3,10 @@ import {
   Controller,
   Get,
   Patch,
+  Post,
   Query,
   Req,
+  Param,
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -113,5 +115,26 @@ export class UserController {
     const userId = req.user.userId;
     await this.userService.updateProfileImage(userId, file);
     return { imageUrl: `http://localhost:4000/uploads/${file.filename}` };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('influencer/:influencerId/accept')
+  async acceptInfluencer(@Req() req: any, @Param('influencerId') influencerId: string) {
+    const brandId = req.user.userId;
+    return this.userService.acceptInfluencer(brandId, influencerId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('influencer/:influencerId/reject')
+  async rejectInfluencer(@Req() req: any, @Param('influencerId') influencerId: string) {
+    const brandId = req.user.userId;
+    return this.userService.rejectInfluencer(brandId, influencerId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('influencers/pending')
+  async getPendingInfluencers(@Req() req: any) {
+    const brandId = req.user.userId;
+    return this.userService.getMatchedInfluencers(brandId);
   }
 }

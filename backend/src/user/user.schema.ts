@@ -13,6 +13,8 @@ export const UserSchema = new Schema(
     },
     bio: { type: String, default: '' },
     profileImage: { type: String, default: '' },
+    status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
+    brandId: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true, discriminatorKey: '__t' },
 );
