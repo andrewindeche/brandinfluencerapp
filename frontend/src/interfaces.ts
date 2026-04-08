@@ -61,6 +61,7 @@ export interface SubmissionStoreType {
   ) => Promise<SubmissionType | null>;
 }
 export interface Influencer {
+  id?: string;
   alt: string;
   likes: number;
   image: string;

@@ -5,6 +5,7 @@ import {
   distinctUntilChanged,
   switchMap,
 } from 'rxjs';
+import axios, { AxiosError } from 'axios';
 import axiosInstance, { setAuthToken } from './axiosInstance';
 import { setUser } from './userStore';
 import { loginSchema } from './validation/loginSchema';

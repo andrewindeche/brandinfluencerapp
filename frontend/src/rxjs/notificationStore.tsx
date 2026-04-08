@@ -61,6 +61,11 @@ export const notificationStore = {
   handleKafkaEvent(key: string, payload: any) {
     console.log('[NotificationStore] Received Kafka event:', key, payload);
     
+    if (!key && payload?.key) {
+      key = payload.key;
+      payload = payload.payload || payload;
+    }
+    
     if (!payload || !(key in typeMap)) {
       console.log('[NotificationStore] Key not in typeMap:', key);
       return;
