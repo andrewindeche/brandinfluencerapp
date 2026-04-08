@@ -12,7 +12,7 @@ export class UserService {
     @InjectModel('User')
     private userModel: Model<User>,
     private readonly redisService: RedisService,
-    private readonly kafkaService?: KafkaService,
+    private readonly kafkaService: KafkaService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -256,7 +256,9 @@ export class UserService {
       $pull: { rejectedInfluencers: new Types.ObjectId(influencerId) },
     });
 
-    if (this.kafkaService) {
+    console.log('[UserService] kafkaService:', this.kafkaService);
+    
+    try {
       const [influencer, brand] = await Promise.all([
         this.userModel.findById(influencerId),
         this.userModel.findById(brandId),
@@ -270,6 +272,9 @@ export class UserService {
       };
       console.log('[UserService] Sending influencer.accepted Kafka message:', kafkaPayload);
       await this.kafkaService.sendMessage('brand-actions', 'influencer.accepted', kafkaPayload);
+      console.log('[UserService] Kafka message sent successfully');
+    } catch (error) {
+      console.error('[UserService] Error sending Kafka message:', error);
     }
   }
 
@@ -279,7 +284,7 @@ export class UserService {
       $pull: { acceptedInfluencers: new Types.ObjectId(influencerId) },
     });
 
-    if (this.kafkaService) {
+    try {
       const influencer = await this.userModel.findById(influencerId);
       await this.kafkaService.sendMessage('brand-actions', 'influencer.rejected', {
         influencerId,
@@ -287,6 +292,8 @@ export class UserService {
         username: influencer?.username || 'Influencer',
         timestamp: new Date().toISOString(),
       });
+    } catch (error) {
+      console.error('[UserService] Error sending Kafka message:', error);
     }
   }
 
