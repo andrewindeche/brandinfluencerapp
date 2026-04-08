@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 import { User } from '../interfaces';
 
 export const UserSchema = new Schema(
@@ -15,6 +15,8 @@ export const UserSchema = new Schema(
     profileImage: { type: String, default: '' },
     status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
     brandId: { type: Schema.Types.ObjectId, ref: 'User' },
+    acceptedInfluencers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    rejectedInfluencers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true, discriminatorKey: '__t' },
 );

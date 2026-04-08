@@ -401,13 +401,16 @@ export class CampaignsService {
       throw new BadRequestException('Not authorized');
     }
 
-    (submission as any).status = 'accepted';
-    await (submission as any).save();
+    const updated = await this.submissionModel.findByIdAndUpdate(
+      submissionId,
+      { status: 'accepted' },
+      { new: true },
+    ).populate('campaign').populate('influencer').exec();
 
     await this.cacheManager.del(`submissions_${campaign._id || campaign}`);
 
-    const influencerId = (submission as any).influencer?._id?.toString() 
-      || (submission as any).influencer?.toString();
+    const influencerId = (updated as any).influencer?._id?.toString() 
+      || (updated as any).influencer?.toString();
 
     await this.kafkaService.sendMessage(
       'submission-events',
@@ -421,7 +424,7 @@ export class CampaignsService {
       },
     );
 
-    return submission as any;
+    return updated as any;
   }
 
   async rejectSubmission(
@@ -446,13 +449,16 @@ export class CampaignsService {
       );
     }
 
-    (submission as any).status = 'rejected';
-    await (submission as any).save();
+    const updated = await this.submissionModel.findByIdAndUpdate(
+      submissionId,
+      { status: 'rejected' },
+      { new: true },
+    ).populate('campaign').populate('influencer').exec();
 
     await this.cacheManager.del(`submissions_${campaign?._id || campaign}`);
 
-    const influencerId = (submission as any).influencer?._id?.toString() 
-      || (submission as any).influencer?.toString();
+    const influencerId = (updated as any).influencer?._id?.toString() 
+      || (updated as any).influencer?.toString();
 
     await this.kafkaService.sendMessage(
       'submission-events',
@@ -466,7 +472,7 @@ export class CampaignsService {
       },
     );
 
-    return submission as any;
+    return updated as any;
   }
 
   async updateSubmission(

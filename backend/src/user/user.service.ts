@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
 import { RedisService } from '../redis/redis.service';
@@ -127,6 +127,8 @@ export class UserService {
 
     const brandInterests = (brand as any).interests || [];
     const brandBio = (brand as any).bio?.toLowerCase() || '';
+    const acceptedIds = ((brand as any).acceptedInfluencers || []).map((id: Types.ObjectId) => id.toString());
+    const rejectedIds = ((brand as any).rejectedInfluencers || []).map((id: Types.ObjectId) => id.toString());
 
     const influencers = await this.userModel.find({ role: 'influencer' }).exec();
 
@@ -173,7 +175,11 @@ export class UserService {
     });
 
     return matchedInfluencers
-      .filter(inf => inf.matchPercentage > 0 && (inf as any).status !== 'rejected')
+      .filter(inf => 
+        inf.matchPercentage > 0 && 
+        !acceptedIds.includes(inf.id.toString()) &&
+        !rejectedIds.includes(inf.id.toString())
+      )
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
   }
 
@@ -245,7 +251,10 @@ export class UserService {
 
   async acceptInfluencer(brandId: string, influencerId: string): Promise<void> {
     console.log('[UserService] acceptInfluencer called:', { brandId, influencerId });
-    await this.userModel.findByIdAndUpdate(influencerId, { status: 'accepted', brandId });
+    await this.userModel.findByIdAndUpdate(brandId, {
+      $addToSet: { acceptedInfluencers: new Types.ObjectId(influencerId) },
+      $pull: { rejectedInfluencers: new Types.ObjectId(influencerId) },
+    });
 
     if (this.kafkaService) {
       const [influencer, brand] = await Promise.all([
@@ -265,7 +274,10 @@ export class UserService {
   }
 
   async rejectInfluencer(brandId: string, influencerId: string): Promise<void> {
-    await this.userModel.findByIdAndUpdate(influencerId, { status: 'rejected' });
+    await this.userModel.findByIdAndUpdate(brandId, {
+      $addToSet: { rejectedInfluencers: new Types.ObjectId(influencerId) },
+      $pull: { acceptedInfluencers: new Types.ObjectId(influencerId) },
+    });
 
     if (this.kafkaService) {
       const influencer = await this.userModel.findById(influencerId);
