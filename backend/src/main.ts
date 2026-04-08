@@ -60,6 +60,7 @@ async function bootstrap() {
   app.use('/auth/login', authRateLimiter);
   app.use('/auth/register', authRateLimiter);
   app.use('/auth/forgot-password', authRateLimiter);
+  app.use('/auth/reset-password', authRateLimiter);
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -223,7 +223,6 @@ export class AuthController {
     const user = await this.usersService.findUserByEmail(email);
     if (!user) throw new NotFoundException('User not found');
 
-    const hashedPassword = await bcrypt.hash(password, 10);
     await this.usersService.updatePassword(user._id.toString(), password);
     await this.forgotPasswordService.invalidateToken(token);
 

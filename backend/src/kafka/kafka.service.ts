@@ -12,6 +12,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
   private isRunning = false;
   private subscribedTopics = new Map<string, (key: string, payload: any) => Promise<void>>();
+  private pendingTopics: string[] = [];
 
   async onModuleInit() {
     try {
@@ -26,17 +27,21 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
       const topics = await admin.listTopics();
 
-      if (!topics.includes('submission-events')) {
-        await admin.createTopics({
-          topics: [
-            {
-              topic: 'submission-events',
-              numPartitions: 1,
-              replicationFactor: 1,
-            },
-          ],
-        });
-        this.logger.log('Created submission-events topic');
+      const requiredTopics = ['submission-events', 'campaign-invite', 'brand-actions'];
+      
+      for (const topic of requiredTopics) {
+        if (!topics.includes(topic)) {
+          await admin.createTopics({
+            topics: [
+              {
+                topic,
+                numPartitions: 1,
+                replicationFactor: 1,
+              },
+            ],
+          });
+          this.logger.log(`Created ${topic} topic`);
+        }
       }
 
       await admin.disconnect();
@@ -85,25 +90,44 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
-    try {
-      await this.consumer.subscribe({
-        topic,
-        fromBeginning: false,
-      });
+    this.subscribedTopics.set(topic, handler);
+    this.pendingTopics.push(topic);
+    this.logger.log(`Queued topic: ${topic}`);
 
-      this.subscribedTopics.set(topic, handler);
-      this.logger.log(`Subscribed to topic: ${topic}`);
-
+    if (!this.isRunning) {
       await this.runConsumer();
-    } catch (error) {
-      this.logger.error(`Failed to subscribe to topic ${topic}`, error);
-      throw error;
+    }
+  }
+
+  async subscribeToTopics(
+    topics: { topic: string; handler: (key: string, payload: any) => Promise<void> }[],
+  ) {
+    for (const { topic, handler } of topics) {
+      if (this.subscribedTopics.has(topic)) {
+        this.logger.warn(`Topic ${topic} already subscribed`);
+        continue;
+      }
+      this.subscribedTopics.set(topic, handler);
+      this.pendingTopics.push(topic);
+      this.logger.log(`Queued topic: ${topic}`);
+    }
+
+    if (!this.isRunning) {
+      await this.runConsumer();
     }
   }
 
   private async runConsumer() {
     if (this.isRunning) {
       return;
+    }
+
+    if (this.pendingTopics.length > 0) {
+      for (const topic of this.pendingTopics) {
+        await this.consumer.subscribe({ topic, fromBeginning: false });
+        this.logger.log(`Subscribed to queued topic: ${topic}`);
+      }
+      this.pendingTopics = [];
     }
 
     this.isRunning = true;
@@ -114,6 +138,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
           const key = message.key?.toString() || '';
           const value = JSON.parse(message.value?.toString() || '{}');
 
+          console.log(`[KafkaConsumer] Received message on topic ${topic}, key: ${key}, value:`, value);
           this.logger.debug(`Received message on ${topic}: ${key}`);
 
           for (const [subscribedTopic, handler] of this.subscribedTopics) {
