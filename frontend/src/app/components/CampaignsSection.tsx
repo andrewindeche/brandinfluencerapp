@@ -88,16 +88,6 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
   const pageSize = 6;
 
   const handleCardClick = (campaign: CampaignType) => {
-    const campaignBrandId = typeof campaign.brand === 'string' ? campaign.brand : campaign.brand?._id;
-    const matchedBrand = matchedBrands.find(mb => mb.id === campaignBrandId);
-    const isMatched = !!matchedBrand;
-    const isAccepted = acceptedBrands.has(campaignBrandId);
-    const hasJoined = joinedCampaigns.has(campaign.id) || campaign.joined;
-    
-    if (!hasJoined) {
-      return;
-    }
-    
     setSelectedCampaign(campaign);
     setViewingSubmission(null);
     setModalOpen(true);
