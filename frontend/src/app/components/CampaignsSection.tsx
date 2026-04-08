@@ -401,11 +401,18 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (!joinedCampaigns.has(campaign.id) && !campaign.joined) {
+                          setJoinedCampaigns(prev => new Set([...prev, campaign.id]));
+                        }
                         handleCardClick(campaign);
                       }}
-                      className="mt-2 px-3 py-1 text-sm bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition w-full"
+                      className={`mt-2 px-3 py-1 text-sm font-semibold rounded-full transition w-full ${
+                        joinedCampaigns.has(campaign.id) || campaign.joined
+                          ? 'bg-red-500 text-white hover:bg-red-600'
+                          : 'bg-white text-blue-600 hover:bg-blue-100'
+                      }`}
                     >
-                      {isMatched ? 'Join Campaigns' : 'View'}
+                      {joinedCampaigns.has(campaign.id) || campaign.joined ? 'Joined' : 'Join Campaigns'}
                     </button>
                   )}
                   {!isMatched && campaign.status !== 'active' && (
