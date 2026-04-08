@@ -53,6 +53,7 @@ class SocketHandler {
     });
 
     this.socket.on('submission-event', (data) => {
+      console.log('[SocketHandler] Received submission-event:', data);
       const key = data?.key;
       const payload = data?.payload || data;
       if (!key || !payload) {

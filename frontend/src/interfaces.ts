@@ -83,7 +83,7 @@ export interface ErrorResponse {
 export interface NotificationType {
   id: string;
   campaignTitle: string;
-  type: 'accepted' | 'rejected' | 'new_submission';
+  type: 'accepted' | 'rejected' | 'new_submission' | 'campaign_invite' | 'influencer_accepted' | 'influencer_rejected' | 'campaign_invite_accepted' | 'campaign_invite_rejected';
   message: string;
   timestamp: string;
   campaignId: string;

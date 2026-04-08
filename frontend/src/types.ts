@@ -74,4 +74,4 @@ export type AuthState = {
   profileImage: string | null;
 };
 
-export type NotificationStatus = 'accepted' | 'rejected' | 'new_submission';
+export type NotificationStatus = 'accepted' | 'rejected' | 'new_submission' | 'campaign_invite' | 'influencer_accepted' | 'influencer_rejected' | 'campaign_invite_accepted' | 'campaign_invite_rejected';
