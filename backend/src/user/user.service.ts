@@ -303,19 +303,24 @@ export class UserService {
   }
 
   async acceptBrandInvitation(influencerId: string, brandId: string): Promise<void> {
+    console.log('[acceptBrandInvitation] Saving - influencerId:', influencerId, 'brandId:', brandId);
+    
     await this.userModel.findByIdAndUpdate(influencerId, {
       $addToSet: { acceptedBrands: new Types.ObjectId(brandId) },
     });
+    console.log('[acceptBrandInvitation] Added to acceptedBrands array');
 
     await this.userModel.findByIdAndUpdate(brandId, {
       $addToSet: { acceptedInfluencers: new Types.ObjectId(influencerId) },
       $pull: { rejectedInfluencers: new Types.ObjectId(influencerId) },
     });
+    console.log('[acceptBrandInvitation] Added to brand acceptedInfluencers');
 
     await this.userModel.findByIdAndUpdate(influencerId, {
       status: 'accepted',
       brandId: new Types.ObjectId(brandId),
     });
+    console.log('[acceptBrandInvitation] Updated influencer status');
 
     try {
       const [influencer, brand] = await Promise.all([
@@ -343,11 +348,20 @@ export class UserService {
   }
 
   async getAcceptedBrands(influencerId: string): Promise<any[]> {
+    console.log('[getAcceptedBrands] Processing influencerId:', influencerId);
+    
     const influencer = await this.userModel.findById(influencerId);
-    if (!influencer) return [];
+    if (!influencer) {
+      console.log('[getAcceptedBrands] Influencer not found');
+      return [];
+    }
     
     const influencerData = influencer as any;
+    console.log('[getAcceptedBrands] Influencer status:', influencerData.status);
+    console.log('[getAcceptedBrands] Influencer acceptedBrands:', influencerData.acceptedBrands);
+    
     const acceptedBrandIds = (influencerData.acceptedBrands || []).map((id: Types.ObjectId) => id.toString());
+    console.log('[getAcceptedBrands] acceptedBrandIds:', acceptedBrandIds);
 
     if (acceptedBrandIds.length > 0) {
       const brands = await this.userModel.find({ 
@@ -355,20 +369,24 @@ export class UserService {
         _id: { $in: acceptedBrandIds.map(id => new Types.ObjectId(id)) }
       }).exec();
 
-      return brands.map((brand: any) => ({
+      const result = brands.map((brand: any) => ({
         id: brand._id,
         username: brand.username,
         bio: brand.bio,
         profileImage: brand.profileImage,
       }));
+      console.log('[getAcceptedBrands] Returning from acceptedBrands field:', result);
+      return result;
     }
 
+    console.log('[getAcceptedBrands] Checking brands acceptedInfluencers array...');
     const allBrands = await this.userModel.find({ role: 'brand' }).exec();
     const acceptedBrands = [];
     
     for (const brand of allBrands) {
       const brandData = brand as any;
       const acceptedInfluencers = brandData.acceptedInfluencers || [];
+      console.log('[getAcceptedBrands] Brand:', brandData.username, 'acceptedInfluencers:', acceptedInfluencers.map((i: any) => i.toString()));
       if (acceptedInfluencers.some((id: Types.ObjectId) => id.toString() === influencerId)) {
         acceptedBrands.push({
           id: brandData._id,
@@ -379,6 +397,7 @@ export class UserService {
       }
     }
     
+    console.log('[getAcceptedBrands] Final result:', acceptedBrands);
     return acceptedBrands;
   }
 
