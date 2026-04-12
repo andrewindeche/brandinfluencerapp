@@ -132,6 +132,13 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('brand/:brandId/accept')
+  async acceptBrandInvitation(@Req() req: any, @Param('brandId') brandId: string) {
+    const influencerId = req.user.userId;
+    return this.userService.acceptBrandInvitation(influencerId, brandId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('influencer/:influencerId/reject')
   async rejectInfluencer(@Req() req: any, @Param('influencerId') influencerId: string) {
     const brandId = req.user.userId;

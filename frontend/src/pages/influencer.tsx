@@ -187,6 +187,7 @@ const InfluencerPage: React.FC = () => {
     if (!pendingInvitation) return;
     setInvitationProcessing(true);
     try {
+      await axiosInstance.post(`/users/brand/${pendingInvitation.brandId}/accept`);
       if (pendingInvitation.brandId) {
         setAcceptedBrands(prev => new Set([...prev, pendingInvitation.brandId!]));
       }
