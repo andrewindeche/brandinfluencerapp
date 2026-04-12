@@ -89,17 +89,17 @@ export const submissionStore: SubmissionStoreType = {
 
       const updatedSubmission: SubmissionType = response.data;
 
-      const currentSubmissions = submissions$.getValue()[campaignId] || [];
-      const updatedSubmissions = currentSubmissions.map((s) =>
-        s._id === submissionId ? updatedSubmission : s,
+      const freshResponse = await axiosInstance.get(
+        `/campaign/${campaignId}/submissions`,
       );
-
+      const freshSubmissions = freshResponse.data || [];
+      
       submissions$.next({
         ...submissions$.getValue(),
-        [campaignId]: updatedSubmissions,
+        [campaignId]: freshSubmissions,
       });
 
-      return updatedSubmission;
+      return freshSubmissions.find((s: any) => s._id === submissionId) || updatedSubmission;
     } catch (error: unknown) {
       console.error('Failed to accept submission:', error);
       return null;
@@ -114,17 +114,17 @@ export const submissionStore: SubmissionStoreType = {
 
       const updatedSubmission: SubmissionType = response.data;
 
-      const currentSubmissions = submissions$.getValue()[campaignId] || [];
-      const updatedSubmissions = currentSubmissions.map((s) =>
-        s._id === submissionId ? updatedSubmission : s,
+      const freshResponse = await axiosInstance.get(
+        `/campaign/${campaignId}/submissions`,
       );
-
+      const freshSubmissions = freshResponse.data || [];
+      
       submissions$.next({
         ...submissions$.getValue(),
-        [campaignId]: updatedSubmissions,
+        [campaignId]: freshSubmissions,
       });
 
-      return updatedSubmission;
+      return freshSubmissions.find((s: any) => s._id === submissionId) || updatedSubmission;
     } catch (error: unknown) {
       console.error('Failed to reject submission:', error);
       return null;
