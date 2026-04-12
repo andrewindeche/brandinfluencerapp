@@ -17,6 +17,7 @@ export const UserSchema = new Schema(
     brandId: { type: Schema.Types.ObjectId, ref: 'User' },
     acceptedInfluencers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     rejectedInfluencers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    acceptedBrands: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true, discriminatorKey: '__t' },
 );
