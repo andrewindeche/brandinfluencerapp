@@ -348,9 +348,10 @@ export class UserService {
   }
 
   async getAcceptedBrands(influencerId: string): Promise<any[]> {
-    console.log('[getAcceptedBrands] Processing influencerId:', influencerId);
+    const influencerIdStr = typeof influencerId === 'string' ? influencerId : influencerId.toString();
+    console.log('[getAcceptedBrands] Processing influencerId:', influencerIdStr);
     
-    const influencer = await this.userModel.findById(influencerId);
+    const influencer = await this.userModel.findById(influencerIdStr);
     if (!influencer) {
       console.log('[getAcceptedBrands] Influencer not found');
       return [];
@@ -387,7 +388,7 @@ export class UserService {
       const brandData = brand as any;
       const acceptedInfluencers = brandData.acceptedInfluencers || [];
       console.log('[getAcceptedBrands] Brand:', brandData.username, 'acceptedInfluencers:', acceptedInfluencers.map((i: any) => i.toString()));
-      if (acceptedInfluencers.some((id: Types.ObjectId) => id.toString() === influencerId)) {
+      if (acceptedInfluencers.some((id: Types.ObjectId) => id.toString() === influencerIdStr)) {
         acceptedBrands.push({
           id: brandData._id,
           username: brandData.username,
