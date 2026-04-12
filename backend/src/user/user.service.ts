@@ -344,6 +344,8 @@ export class UserService {
 
   async getAcceptedBrands(influencerId: string): Promise<any[]> {
     const influencer = await this.userModel.findById(influencerId);
+    if (!influencer) return [];
+    
     const influencerData = influencer as any;
     const acceptedBrandIds = (influencerData.acceptedBrands || []).map((id: Types.ObjectId) => id.toString());
 
@@ -352,7 +354,7 @@ export class UserService {
         role: 'brand',
         _id: { $in: acceptedBrandIds.map(id => new Types.ObjectId(id)) }
       }).exec();
-      
+
       return brands.map((brand: any) => ({
         id: brand._id,
         username: brand.username,
