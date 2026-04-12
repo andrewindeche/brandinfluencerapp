@@ -348,7 +348,7 @@ export class UserService {
   }
 
   async getAcceptedBrands(influencerId: string): Promise<any[]> {
-    const influencerIdStr = typeof influencerId === 'string' ? influencerId : influencerId.toString();
+    const influencerIdStr = String(influencerId);
     console.log('[getAcceptedBrands] Processing influencerId:', influencerIdStr);
     
     const influencer = await this.userModel.findById(influencerIdStr);
