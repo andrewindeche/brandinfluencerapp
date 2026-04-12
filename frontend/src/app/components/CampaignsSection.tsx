@@ -89,7 +89,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
 
   const handleCardClick = (campaign: CampaignType) => {
     const campaignBrandId = typeof campaign.brand === 'string' ? campaign.brand : campaign.brand?._id;
-    setSelectedCampaign({ ...campaign, brandId: campaignBrandId });
+    setSelectedCampaign({ ...campaign, brandId: campaignBrandId || '' });
     setViewingSubmission(null);
     setModalOpen(true);
   };
@@ -317,9 +317,9 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                   imageSrc={selectedCampaign?.images?.[0] || '/images/fit.jpg'}
                   message={selectedCampaign?.instructions || ''}
                   onSubmit={handleSubmit}
-                  joined={selectedCampaign ? (joinedCampaigns.has(selectedCampaign.id) || selectedCampaign.joined) : false}
+                  joined={!!selectedCampaign && (joinedCampaigns.has(selectedCampaign.id) || !!selectedCampaign.joined)}
                   status={selectedCampaign?.status ?? 'inactive'}
-                  showForm={selectedCampaign ? (acceptedBrands.has(campaignBrandId) && (joinedCampaigns.has(selectedCampaign.id) || selectedCampaign.joined)) : false}
+                  showForm={!!selectedCampaign && (acceptedBrands.has(selectedCampaign.brandId || '') && (joinedCampaigns.has(selectedCampaign.id) || !!selectedCampaign.joined))}
                   startDate={selectedCampaign?.startDate}
                   endDate={selectedCampaign?.endDate}
                   campaignSubmissions={selectedCampaign ? campaignSubmissions[selectedCampaign.id] : undefined}
@@ -380,7 +380,7 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                       {campaign.status === 'active' ? 'Active' : 'Inactive'}
                     </p>
                   </div>
-                  {campaign.status === 'active' && !isMatched && !acceptedBrands.has(campaignBrandId) && (
+                  {campaign.status === 'active' && !isMatched && !acceptedBrands.has(campaignBrandId || '') && !joinedCampaigns.has(campaign.id) && !campaign.joined && (
                     <button
                       onClick={(e) => handleJoinCampaign(campaign, e)}
                       disabled={joiningCampaign === campaign.id}
@@ -388,17 +388,25 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                     >
                       {joiningCampaign === campaign.id 
                         ? 'Joining...' 
-                        : (joinedCampaigns.has(campaign.id) || campaign.joined)
-                          ? 'View'
-                          : 'Join'}
+                        : 'Join'}
                     </button>
                   )}
-                  {acceptedBrands.has(campaignBrandId) && (
+                  {acceptedBrands.has(campaignBrandId || '') && (
                     <button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.stopPropagation();
                         if (!joinedCampaigns.has(campaign.id) && !campaign.joined) {
-                          setJoinedCampaigns(prev => new Set([...prev, campaign.id]));
+                          setJoiningCampaign(campaign.id);
+                          try {
+                            await campaignStore.joinCampaign(campaign.id).toPromise();
+                            setJoinedCampaigns(prev => new Set([...prev, campaign.id]));
+                          } catch {
+                            showToast('Failed to join campaign', 'error');
+                          } finally {
+                            setJoiningCampaign(null);
+                          }
+                        } else {
+                          handleCardClick(campaign);
                         }
                       }}
                       className={`mt-2 px-3 py-1 text-sm font-semibold rounded-full transition w-full ${
@@ -407,10 +415,10 @@ const CampaignsSection: React.FC<CampaignsSectionProps> = ({
                           : 'bg-white text-blue-600 hover:bg-blue-100'
                       }`}
                     >
-                      {joinedCampaigns.has(campaign.id) || campaign.joined ? 'Joined' : 'Join Campaigns'}
+                      {joiningCampaign === campaign.id ? 'Joining...' : (joinedCampaigns.has(campaign.id) || campaign.joined ? 'View' : 'Join Campaigns')}
                     </button>
                   )}
-                  {isMatched && !acceptedBrands.has(campaignBrandId) && (
+                  {isMatched && !acceptedBrands.has(campaignBrandId || '') && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

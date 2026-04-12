@@ -128,10 +128,14 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
     }
 
     if (!showForm) {
-      return null;
+      return (
+        <div className="text-center py-8 text-gray-500">
+          <p className="text-sm">Please accept a brand invitation to start submitting to campaigns.</p>
+        </div>
+      );
     }
 
-    if (showNewForm || (!hasSubmissions && joined)) {
+    if (showNewForm || !hasSubmissions) {
       return (
         <div className="space-y-4">
           <textarea
@@ -146,15 +150,38 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
       );
     }
 
-    if (!joined) {
-      return (
-        <div className="text-center py-8 text-gray-500">
-          <p className="text-sm">Please accept a brand invitation to start submitting to campaigns.</p>
+    return (
+      <div className="space-y-3">
+        <button
+          onClick={() => setShowNewForm(true)}
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition mb-3"
+        >
+          + Add New Submission
+        </button>
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {campaignSubmissions.map((sub) => (
+            <div
+              key={sub._id}
+              onClick={() => onSelectSubmission?.(sub)}
+              className="p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 hover:border-blue-300 transition-all"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs px-2 py-1 rounded ${
+                  sub.status === 'accepted' ? 'bg-green-500' :
+                  sub.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
+                } text-white`}>
+                  {sub.status || 'pending'}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : ''}
+                </span>
+              </div>
+              <p className="text-sm text-gray-700 line-clamp-3">{sub.content}</p>
+            </div>
+          ))}
         </div>
-      );
-    }
-
-    return null;
+      </div>
+    );
   };
 
   const renderButtons = () => {
@@ -268,7 +295,7 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
               !joined || text.trim() === '' || status === 'inactive'
             }
             className={`px-4 py-2 text-sm font-medium rounded-xl text-white transition ${
-              text.trim() === '' || status === 'inactive'
+              !joined || text.trim() === '' || status === 'inactive'
                 ? 'bg-blue-300 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}

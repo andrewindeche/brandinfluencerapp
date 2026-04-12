@@ -73,6 +73,8 @@ export const campaignStore = {
         startDate: data.campaign.startDate,
         endDate: data.campaign.endDate,
         status: data.campaign.status,
+        joined: true,
+        brand: data.campaign.brand,
       };
 
       const updatedList = campaigns$.value.map((c) =>

@@ -177,6 +177,14 @@ export class CampaignsService {
       throw new Error('Influencer has not joined the campaign');
     }
 
+    const existingSubmission = await this.submissionModel.findOne({
+      campaign: campaign._id,
+      influencer: influencerObjectId,
+    });
+    if (existingSubmission) {
+      throw new Error('Influencer has already submitted to this campaign');
+    }
+
     const submission = new this.submissionModel({
       campaign: campaign._id,
       influencer: influencerObjectId,

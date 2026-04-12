@@ -178,7 +178,7 @@ const InfluencerPage: React.FC = () => {
     setInvitationProcessing(true);
     try {
       if (pendingInvitation.brandId) {
-        setAcceptedBrands(prev => new Set([...prev, pendingInvitation.brandId]));
+        setAcceptedBrands(prev => new Set([...prev, pendingInvitation.brandId!]));
       }
       showToast(`You've joined ${pendingInvitation.brandName || 'the brand'}! You can now make submissions.`, 'success');
       setInvitationModalOpen(false);
