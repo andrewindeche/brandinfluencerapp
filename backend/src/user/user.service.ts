@@ -305,6 +305,26 @@ export class UserService {
     }).exec();
   }
 
+  async getAcceptedBrands(influencerId: string): Promise<any[]> {
+    const brands = await this.userModel.find({ role: 'brand' }).exec();
+    const acceptedBrands = [];
+    
+    for (const brand of brands) {
+      const brandData = brand as any;
+      const acceptedInfluencers = brandData.acceptedInfluencers || [];
+      if (acceptedInfluencers.some((id: Types.ObjectId) => id.toString() === influencerId)) {
+        acceptedBrands.push({
+          id: brandData._id,
+          username: brandData.username,
+          bio: brandData.bio,
+          profileImage: brandData.profileImage,
+        });
+      }
+    }
+    
+    return acceptedBrands;
+  }
+
   async getRejectedInfluencers(brandId: string): Promise<User[]> {
     return this.userModel.find({ 
       role: 'influencer', 

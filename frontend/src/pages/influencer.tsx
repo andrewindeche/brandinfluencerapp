@@ -142,6 +142,16 @@ const InfluencerPage: React.FC = () => {
         setMatchedBrands(res.data || []);
       })
       .catch(() => {});
+
+    axiosInstance.get('/users/brands/accepted')
+      .then((res) => {
+        const acceptedFromDb = (res.data || []).map((b: any) => b.id);
+        setAcceptedBrands(prev => {
+          const merged = new Set([...prev, ...acceptedFromDb]);
+          return merged;
+        });
+      })
+      .catch(() => {});
   }, [userId]);
 
   useEffect(() => {

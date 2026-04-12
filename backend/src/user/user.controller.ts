@@ -93,6 +93,13 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('brands/accepted')
+  async getAcceptedBrands(@Req() req: Request) {
+    const userId = req.user.userId;
+    return this.userService.getAcceptedBrands(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('interests')
   async updateInterests(@Req() req: Request, @Body('interests') interests: string[]) {
     const userId = req.user.userId;
