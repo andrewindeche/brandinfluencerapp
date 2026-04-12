@@ -254,6 +254,11 @@ export class UserService {
       $addToSet: { acceptedInfluencers: new Types.ObjectId(influencerId) },
       $pull: { rejectedInfluencers: new Types.ObjectId(influencerId) },
     });
+
+    await this.userModel.findByIdAndUpdate(influencerId, {
+      status: 'accepted',
+      brandId: new Types.ObjectId(brandId),
+    });
     
     try {
       const [influencer, brand] = await Promise.all([
@@ -297,6 +302,38 @@ export class UserService {
     // The notification will be handled via Kafka in the actual implementation
   }
 
+  async acceptBrandInvitation(influencerId: string, brandId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(influencerId, {
+      $addToSet: { acceptedBrands: new Types.ObjectId(brandId) },
+    });
+
+    await this.userModel.findByIdAndUpdate(brandId, {
+      $addToSet: { acceptedInfluencers: new Types.ObjectId(influencerId) },
+      $pull: { rejectedInfluencers: new Types.ObjectId(influencerId) },
+    });
+
+    await this.userModel.findByIdAndUpdate(influencerId, {
+      status: 'accepted',
+      brandId: new Types.ObjectId(brandId),
+    });
+
+    try {
+      const [influencer, brand] = await Promise.all([
+        this.userModel.findById(influencerId),
+        this.userModel.findById(brandId),
+      ]);
+      await this.kafkaService.sendMessage('brand-actions', 'influencer.accepted', {
+        influencerId,
+        brandId,
+        brandName: brand?.username || 'Brand',
+        username: influencer?.username || 'Influencer',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      // Silent fail for Kafka
+    }
+  }
+
   async getAcceptedInfluencers(brandId: string): Promise<User[]> {
     return this.userModel.find({ 
       role: 'influencer', 
@@ -306,10 +343,28 @@ export class UserService {
   }
 
   async getAcceptedBrands(influencerId: string): Promise<any[]> {
-    const brands = await this.userModel.find({ role: 'brand' }).exec();
+    const influencer = await this.userModel.findById(influencerId);
+    const influencerData = influencer as any;
+    const acceptedBrandIds = (influencerData.acceptedBrands || []).map((id: Types.ObjectId) => id.toString());
+
+    if (acceptedBrandIds.length > 0) {
+      const brands = await this.userModel.find({ 
+        role: 'brand',
+        _id: { $in: acceptedBrandIds.map(id => new Types.ObjectId(id)) }
+      }).exec();
+      
+      return brands.map((brand: any) => ({
+        id: brand._id,
+        username: brand.username,
+        bio: brand.bio,
+        profileImage: brand.profileImage,
+      }));
+    }
+
+    const allBrands = await this.userModel.find({ role: 'brand' }).exec();
     const acceptedBrands = [];
     
-    for (const brand of brands) {
+    for (const brand of allBrands) {
       const brandData = brand as any;
       const acceptedInfluencers = brandData.acceptedInfluencers || [];
       if (acceptedInfluencers.some((id: Types.ObjectId) => id.toString() === influencerId)) {
