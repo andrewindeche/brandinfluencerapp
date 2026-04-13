@@ -11,7 +11,7 @@ import { CampaignController } from './controller/campaign.controller';
 import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { SubmissionSchema } from './schemas/submission.schema';
 import { InfluencerSchema } from '../user/influencer/influencer.schema';
-import { KafkaModule } from 'src/kafka/kafka.module';
+import { KafkaModule } from '../kafka/kafka.module';
 import { UserSchema } from '../user/user.schema';
 
 @Module({

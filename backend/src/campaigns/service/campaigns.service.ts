@@ -11,8 +11,8 @@ import { Campaign } from '../schemas/campaign.schema';
 import { Submission, SubmissionDocument } from '../../interfaces';
 import { CreateCampaignDto } from '../dto/create-campaign.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { RedisService } from 'src/redis/redis.service';
-import { KafkaService } from 'src/kafka/kafka.service';
+import { RedisService } from '../../redis/redis.service';
+import { KafkaService } from '../../kafka/kafka.service';
 import { User } from '../../user/user.schema';
 
 @Injectable()
