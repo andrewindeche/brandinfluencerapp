@@ -92,7 +92,7 @@ export const submissionStore: SubmissionStoreType = {
       const freshResponse = await axiosInstance.get(
         `/campaign/${campaignId}/submissions`,
       );
-      const freshSubmissions = freshResponse.data || [];
+      const freshSubmissions = Array.isArray(freshResponse.data) ? freshResponse.data : [];
       
       submissions$.next({
         ...submissions$.getValue(),
@@ -117,7 +117,7 @@ export const submissionStore: SubmissionStoreType = {
       const freshResponse = await axiosInstance.get(
         `/campaign/${campaignId}/submissions`,
       );
-      const freshSubmissions = freshResponse.data || [];
+      const freshSubmissions = Array.isArray(freshResponse.data) ? freshResponse.data : [];
       
       submissions$.next({
         ...submissions$.getValue(),
