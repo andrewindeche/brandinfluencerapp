@@ -179,13 +179,18 @@ export class CampaignController {
       const influencerId = user.sub ?? user.userId;
 
       let submissions: any[];
-      
+
       if (user.role === 'brand') {
-        submissions = (await this.campaignService.getSubmissionsByCampaign(campaignId)) as any[];
+        submissions = (await this.campaignService.getSubmissionsByCampaign(
+          campaignId,
+        )) as any[];
       } else if (user.role === 'influencer') {
-        submissions = (await this.campaignService.getSubmissionsByCampaign(campaignId)) as any[];
+        submissions = (await this.campaignService.getSubmissionsByCampaign(
+          campaignId,
+        )) as any[];
         submissions = submissions.filter((s) => {
-          const subInfluencerId = s.influencer?._id?.toString() || s.influencer?.toString();
+          const subInfluencerId =
+            s.influencer?._id?.toString() || s.influencer?.toString();
           return subInfluencerId === influencerId;
         });
       } else {
@@ -356,13 +361,19 @@ export class CampaignController {
   }
 
   @Post(':campaignId/invite/accept')
-  async acceptCampaignInvite(@Param('campaignId') campaignId: string, @Req() req) {
+  async acceptCampaignInvite(
+    @Param('campaignId') campaignId: string,
+    @Req() req,
+  ) {
     const influencerId = req.user.sub ?? req.user.userId;
     return this.campaignService.acceptCampaignInvite(campaignId, influencerId);
   }
 
   @Post(':campaignId/invite/reject')
-  async rejectCampaignInvite(@Param('campaignId') campaignId: string, @Req() req) {
+  async rejectCampaignInvite(
+    @Param('campaignId') campaignId: string,
+    @Req() req,
+  ) {
     const influencerId = req.user.sub ?? req.user.userId;
     return this.campaignService.rejectCampaignInvite(campaignId, influencerId);
   }

@@ -19,11 +19,7 @@ export const getKafkaClientId = (): string => {
   return process.env.KAFKA_CLIENT_ID || 'campaign-service';
 };
 
-export const kafka = createKafkaInstance(
-  getKafkaBrokers(),
-  getKafkaClientId(),
-);
+export const kafka = createKafkaInstance(getKafkaBrokers(), getKafkaClientId());
 
 export const createProducer = () => kafka.producer();
-export const createConsumer = (groupId: string) =>
-  kafka.consumer({ groupId });
+export const createConsumer = (groupId: string) => kafka.consumer({ groupId });

@@ -72,9 +72,14 @@ export class AuthController {
       if (error instanceof UnauthorizedException) {
         throw new UnauthorizedException({
           message: error.message,
-          code: error.message === 'User not found' ? 'USER_NOT_FOUND' :
-                error.message === 'User not found for this role' ? 'ROLE_MISMATCH' :
-                error.message === 'Invalid password' ? 'INVALID_PASSWORD' : 'INVALID_CREDENTIALS'
+          code:
+            error.message === 'User not found'
+              ? 'USER_NOT_FOUND'
+              : error.message === 'User not found for this role'
+                ? 'ROLE_MISMATCH'
+                : error.message === 'Invalid password'
+                  ? 'INVALID_PASSWORD'
+                  : 'INVALID_CREDENTIALS',
         });
       }
       throw error;
@@ -117,9 +122,14 @@ export class AuthController {
       if (error instanceof UnauthorizedException) {
         throw new UnauthorizedException({
           message: error.message,
-          code: error.message === 'User not found' ? 'USER_NOT_FOUND' :
-                error.message === 'User not found for this role' ? 'ROLE_MISMATCH' :
-                error.message === 'Invalid password' ? 'INVALID_PASSWORD' : 'INVALID_CREDENTIALS'
+          code:
+            error.message === 'User not found'
+              ? 'USER_NOT_FOUND'
+              : error.message === 'User not found for this role'
+                ? 'ROLE_MISMATCH'
+                : error.message === 'Invalid password'
+                  ? 'INVALID_PASSWORD'
+                  : 'INVALID_CREDENTIALS',
         });
       }
       throw new InternalServerErrorException(

@@ -13,7 +13,11 @@ export const UserSchema = new Schema(
     },
     bio: { type: String, default: '' },
     profileImage: { type: String, default: '' },
-    status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
+    status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending',
+    },
     brandId: { type: Schema.Types.ObjectId, ref: 'User' },
     acceptedInfluencers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     rejectedInfluencers: [{ type: Schema.Types.ObjectId, ref: 'User' }],

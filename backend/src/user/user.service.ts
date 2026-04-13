@@ -127,10 +127,16 @@ export class UserService {
 
     const brandInterests = (brand as any).interests || [];
     const brandBio = (brand as any).bio?.toLowerCase() || '';
-    const acceptedIds = ((brand as any).acceptedInfluencers || []).map((id: Types.ObjectId) => id.toString());
-    const rejectedIds = ((brand as any).rejectedInfluencers || []).map((id: Types.ObjectId) => id.toString());
+    const acceptedIds = ((brand as any).acceptedInfluencers || []).map(
+      (id: Types.ObjectId) => id.toString(),
+    );
+    const rejectedIds = ((brand as any).rejectedInfluencers || []).map(
+      (id: Types.ObjectId) => id.toString(),
+    );
 
-    const influencers = await this.userModel.find({ role: 'influencer' }).exec();
+    const influencers = await this.userModel
+      .find({ role: 'influencer' })
+      .exec();
 
     const matchedInfluencers = influencers.map((inf) => {
       const influencer = inf as any;
@@ -143,25 +149,37 @@ export class UserService {
 
       if (brandInterests.length > 0 && interests.length > 0) {
         const commonInterests = brandInterests.filter((i: string) =>
-          interests.map((x: string) => x.toLowerCase()).includes(i.toLowerCase())
+          interests
+            .map((x: string) => x.toLowerCase())
+            .includes(i.toLowerCase()),
         );
         interestMatchCount = commonInterests.length;
       }
 
       if (brandBio && bio) {
-        const brandWords = brandBio.split(/\s+/).filter(w => w.length > 3);
-        bioWordMatchCount = brandWords.filter((word: string) => bio.includes(word)).length;
+        const brandWords = brandBio.split(/\s+/).filter((w) => w.length > 3);
+        bioWordMatchCount = brandWords.filter((word: string) =>
+          bio.includes(word),
+        ).length;
       }
 
-      const interestScore = brandInterests.length > 0 
-        ? (interestMatchCount / Math.max(brandInterests.length, interests.length)) * 50 
-        : 0;
-      const bioScore = brandBio.length > 0 
-        ? (bioWordMatchCount / Math.min(brandBio.split(/\s+/).length, 10)) * 50 
-        : 0;
+      const interestScore =
+        brandInterests.length > 0
+          ? (interestMatchCount /
+              Math.max(brandInterests.length, interests.length)) *
+            50
+          : 0;
+      const bioScore =
+        brandBio.length > 0
+          ? (bioWordMatchCount / Math.min(brandBio.split(/\s+/).length, 10)) *
+            50
+          : 0;
       const categoryScore = category && brandBio.includes(category) ? 20 : 0;
 
-      const totalScore = Math.min(interestScore + bioScore + categoryScore, 100);
+      const totalScore = Math.min(
+        interestScore + bioScore + categoryScore,
+        100,
+      );
 
       return {
         id: influencer._id,
@@ -175,10 +193,11 @@ export class UserService {
     });
 
     return matchedInfluencers
-      .filter(inf => 
-        inf.matchPercentage > 0 && 
-        !acceptedIds.includes(inf.id.toString()) &&
-        !rejectedIds.includes(inf.id.toString())
+      .filter(
+        (inf) =>
+          inf.matchPercentage > 0 &&
+          !acceptedIds.includes(inf.id.toString()) &&
+          !rejectedIds.includes(inf.id.toString()),
       )
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
   }
@@ -200,7 +219,8 @@ export class UserService {
 
     const influencerInterests = (influencer as any).interests || [];
     const influencerBio = (influencer as any).bio?.toLowerCase() || '';
-    const influencerCategory = (influencer as any).category?.toLowerCase() || '';
+    const influencerCategory =
+      (influencer as any).category?.toLowerCase() || '';
 
     const brands = await this.userModel.find({ role: 'brand' }).exec();
 
@@ -214,25 +234,38 @@ export class UserService {
 
       if (brandInterests.length > 0 && influencerInterests.length > 0) {
         const commonInterests = influencerInterests.filter((i: string) =>
-          brandInterests.map((x: string) => x.toLowerCase()).includes(i.toLowerCase())
+          brandInterests
+            .map((x: string) => x.toLowerCase())
+            .includes(i.toLowerCase()),
         );
         interestMatchCount = commonInterests.length;
       }
 
       if (brandBio && influencerBio) {
-        const brandWords = brandBio.split(/\s+/).filter(w => w.length > 3);
-        bioWordMatchCount = brandWords.filter((word: string) => influencerBio.includes(word)).length;
+        const brandWords = brandBio.split(/\s+/).filter((w) => w.length > 3);
+        bioWordMatchCount = brandWords.filter((word: string) =>
+          influencerBio.includes(word),
+        ).length;
       }
 
-      const interestScore = brandInterests.length > 0 
-        ? (interestMatchCount / Math.max(brandInterests.length, influencerInterests.length)) * 50 
-        : 0;
-      const bioScore = brandBio.length > 0 
-        ? (bioWordMatchCount / Math.min(brandBio.split(/\s+/).length, 10)) * 50 
-        : 0;
-      const categoryScore = influencerCategory && brandBio.includes(influencerCategory) ? 20 : 0;
+      const interestScore =
+        brandInterests.length > 0
+          ? (interestMatchCount /
+              Math.max(brandInterests.length, influencerInterests.length)) *
+            50
+          : 0;
+      const bioScore =
+        brandBio.length > 0
+          ? (bioWordMatchCount / Math.min(brandBio.split(/\s+/).length, 10)) *
+            50
+          : 0;
+      const categoryScore =
+        influencerCategory && brandBio.includes(influencerCategory) ? 20 : 0;
 
-      const totalScore = Math.min(interestScore + bioScore + categoryScore, 100);
+      const totalScore = Math.min(
+        interestScore + bioScore + categoryScore,
+        100,
+      );
 
       return {
         id: brandData._id,
@@ -245,7 +278,7 @@ export class UserService {
     });
 
     return matchedBrands
-      .filter(brand => brand.matchPercentage > 0)
+      .filter((brand) => brand.matchPercentage > 0)
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
   }
 
@@ -259,7 +292,7 @@ export class UserService {
       status: 'accepted',
       brandId: new Types.ObjectId(brandId),
     });
-    
+
     try {
       const [influencer, brand] = await Promise.all([
         this.userModel.findById(influencerId),
@@ -272,7 +305,11 @@ export class UserService {
         username: influencer?.username || 'Influencer',
         timestamp: new Date().toISOString(),
       };
-      await this.kafkaService.sendMessage('brand-actions', 'influencer.accepted', kafkaPayload);
+      await this.kafkaService.sendMessage(
+        'brand-actions',
+        'influencer.accepted',
+        kafkaPayload,
+      );
     } catch (error) {
       // Silent fail for Kafka
     }
@@ -286,25 +323,41 @@ export class UserService {
 
     try {
       const influencer = await this.userModel.findById(influencerId);
-      await this.kafkaService.sendMessage('brand-actions', 'influencer.rejected', {
-        influencerId,
-        brandId,
-        username: influencer?.username || 'Influencer',
-        timestamp: new Date().toISOString(),
-      });
+      await this.kafkaService.sendMessage(
+        'brand-actions',
+        'influencer.rejected',
+        {
+          influencerId,
+          brandId,
+          username: influencer?.username || 'Influencer',
+          timestamp: new Date().toISOString(),
+        },
+      );
     } catch (error) {
       // Silent fail for Kafka
     }
   }
 
-  async createCampaignInviteNotification(brandId: string, influencerId: string, campaignId?: string): Promise<void> {
+  async createCampaignInviteNotification(
+    brandId: string,
+    influencerId: string,
+    campaignId?: string,
+  ): Promise<void> {
     // This would integrate with notification service to send notification to influencer
     // The notification will be handled via Kafka in the actual implementation
   }
 
-  async acceptBrandInvitation(influencerId: string, brandId: string): Promise<void> {
-    console.log('[acceptBrandInvitation] Saving - influencerId:', influencerId, 'brandId:', brandId);
-    
+  async acceptBrandInvitation(
+    influencerId: string,
+    brandId: string,
+  ): Promise<void> {
+    console.log(
+      '[acceptBrandInvitation] Saving - influencerId:',
+      influencerId,
+      'brandId:',
+      brandId,
+    );
+
     await this.userModel.findByIdAndUpdate(influencerId, {
       $addToSet: { acceptedBrands: new Types.ObjectId(brandId) },
     });
@@ -327,48 +380,67 @@ export class UserService {
         this.userModel.findById(influencerId),
         this.userModel.findById(brandId),
       ]);
-      await this.kafkaService.sendMessage('brand-actions', 'influencer.accepted', {
-        influencerId,
-        brandId,
-        brandName: brand?.username || 'Brand',
-        username: influencer?.username || 'Influencer',
-        timestamp: new Date().toISOString(),
-      });
+      await this.kafkaService.sendMessage(
+        'brand-actions',
+        'influencer.accepted',
+        {
+          influencerId,
+          brandId,
+          brandName: brand?.username || 'Brand',
+          username: influencer?.username || 'Influencer',
+          timestamp: new Date().toISOString(),
+        },
+      );
     } catch (error) {
       // Silent fail for Kafka
     }
   }
 
   async getAcceptedInfluencers(brandId: string): Promise<User[]> {
-    return this.userModel.find({ 
-      role: 'influencer', 
-      status: 'accepted',
-      brandId 
-    }).exec();
+    return this.userModel
+      .find({
+        role: 'influencer',
+        status: 'accepted',
+        brandId,
+      })
+      .exec();
   }
 
   async getAcceptedBrands(influencerId: string): Promise<any[]> {
     const influencerIdStr = String(influencerId);
-    console.log('[getAcceptedBrands] Processing influencerId:', influencerIdStr);
-    
+    console.log(
+      '[getAcceptedBrands] Processing influencerId:',
+      influencerIdStr,
+    );
+
     const influencer = await this.userModel.findById(influencerIdStr);
     if (!influencer) {
       console.log('[getAcceptedBrands] Influencer not found');
       return [];
     }
-    
+
     const influencerData = influencer as any;
-    console.log('[getAcceptedBrands] Influencer status:', influencerData.status);
-    console.log('[getAcceptedBrands] Influencer acceptedBrands:', influencerData.acceptedBrands);
-    
-    const acceptedBrandIds = (influencerData.acceptedBrands || []).map((id: Types.ObjectId) => id.toString());
+    console.log(
+      '[getAcceptedBrands] Influencer status:',
+      influencerData.status,
+    );
+    console.log(
+      '[getAcceptedBrands] Influencer acceptedBrands:',
+      influencerData.acceptedBrands,
+    );
+
+    const acceptedBrandIds = (influencerData.acceptedBrands || []).map(
+      (id: Types.ObjectId) => id.toString(),
+    );
     console.log('[getAcceptedBrands] acceptedBrandIds:', acceptedBrandIds);
 
     if (acceptedBrandIds.length > 0) {
-      const brands = await this.userModel.find({ 
-        role: 'brand',
-        _id: { $in: acceptedBrandIds.map(id => new Types.ObjectId(id)) }
-      }).exec();
+      const brands = await this.userModel
+        .find({
+          role: 'brand',
+          _id: { $in: acceptedBrandIds.map((id) => new Types.ObjectId(id)) },
+        })
+        .exec();
 
       const result = brands.map((brand: any) => ({
         id: brand._id,
@@ -376,19 +448,33 @@ export class UserService {
         bio: brand.bio,
         profileImage: brand.profileImage,
       }));
-      console.log('[getAcceptedBrands] Returning from acceptedBrands field:', result);
+      console.log(
+        '[getAcceptedBrands] Returning from acceptedBrands field:',
+        result,
+      );
       return result;
     }
 
-    console.log('[getAcceptedBrands] Checking brands acceptedInfluencers array...');
+    console.log(
+      '[getAcceptedBrands] Checking brands acceptedInfluencers array...',
+    );
     const allBrands = await this.userModel.find({ role: 'brand' }).exec();
     const acceptedBrands = [];
-    
+
     for (const brand of allBrands) {
       const brandData = brand as any;
       const acceptedInfluencers = brandData.acceptedInfluencers || [];
-      console.log('[getAcceptedBrands] Brand:', brandData.username, 'acceptedInfluencers:', acceptedInfluencers.map((i: any) => i.toString()));
-      if (acceptedInfluencers.some((id: Types.ObjectId) => id.toString() === influencerIdStr)) {
+      console.log(
+        '[getAcceptedBrands] Brand:',
+        brandData.username,
+        'acceptedInfluencers:',
+        acceptedInfluencers.map((i: any) => i.toString()),
+      );
+      if (
+        acceptedInfluencers.some(
+          (id: Types.ObjectId) => id.toString() === influencerIdStr,
+        )
+      ) {
         acceptedBrands.push({
           id: brandData._id,
           username: brandData.username,
@@ -397,16 +483,18 @@ export class UserService {
         });
       }
     }
-    
+
     console.log('[getAcceptedBrands] Final result:', acceptedBrands);
     return acceptedBrands;
   }
 
   async getRejectedInfluencers(brandId: string): Promise<User[]> {
-    return this.userModel.find({ 
-      role: 'influencer', 
-      status: 'rejected',
-      brandId 
-    }).exec();
+    return this.userModel
+      .find({
+        role: 'influencer',
+        status: 'rejected',
+        brandId,
+      })
+      .exec();
   }
 }

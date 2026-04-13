@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { EachMessagePayload } from 'kafkajs';
 import { kafka, createProducer, createConsumer } from './kafka.provider';
 
@@ -11,7 +16,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   );
 
   private isRunning = false;
-  private subscribedTopics = new Map<string, (key: string, payload: any) => Promise<void>>();
+  private subscribedTopics = new Map<
+    string,
+    (key: string, payload: any) => Promise<void>
+  >();
   private pendingTopics: string[] = [];
 
   async onModuleInit() {
@@ -27,8 +35,12 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
       const topics = await admin.listTopics();
 
-      const requiredTopics = ['submission-events', 'campaign-invite', 'brand-actions'];
-      
+      const requiredTopics = [
+        'submission-events',
+        'campaign-invite',
+        'brand-actions',
+      ];
+
       for (const topic of requiredTopics) {
         if (!topics.includes(topic)) {
           await admin.createTopics({
@@ -100,7 +112,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   }
 
   async subscribeToTopics(
-    topics: { topic: string; handler: (key: string, payload: any) => Promise<void> }[],
+    topics: {
+      topic: string;
+      handler: (key: string, payload: any) => Promise<void>;
+    }[],
   ) {
     for (const { topic, handler } of topics) {
       if (this.subscribedTopics.has(topic)) {
@@ -133,7 +148,11 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     this.isRunning = true;
 
     await this.consumer.run({
-      eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
+      eachMessage: async ({
+        topic,
+        partition,
+        message,
+      }: EachMessagePayload) => {
         try {
           const key = message.key?.toString() || '';
           const value = JSON.parse(message.value?.toString() || '{}');

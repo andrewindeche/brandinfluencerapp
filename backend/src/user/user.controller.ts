@@ -54,7 +54,12 @@ export class UserController {
   @Patch('bio')
   async updateBio(@Req() req: Request, @Body() updateBioDto: UpdateBioDto) {
     const userId = req.user.userId;
-    console.log('[UserController] updateBio - userId:', userId, 'bio:', updateBioDto.bio);
+    console.log(
+      '[UserController] updateBio - userId:',
+      userId,
+      'bio:',
+      updateBioDto.bio,
+    );
     return this.userService.updateBio(userId, updateBioDto.bio);
   }
 
@@ -101,7 +106,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('interests')
-  async updateInterests(@Req() req: Request, @Body('interests') interests: string[]) {
+  async updateInterests(
+    @Req() req: Request,
+    @Body('interests') interests: string[],
+  ) {
     const userId = req.user.userId;
     return this.userService.updateInterests(userId, interests);
   }
@@ -126,21 +134,30 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('influencer/:influencerId/accept')
-  async acceptInfluencer(@Req() req: any, @Param('influencerId') influencerId: string) {
+  async acceptInfluencer(
+    @Req() req: any,
+    @Param('influencerId') influencerId: string,
+  ) {
     const brandId = req.user.userId;
     return this.userService.acceptInfluencer(brandId, influencerId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('brand/:brandId/accept')
-  async acceptBrandInvitation(@Req() req: any, @Param('brandId') brandId: string) {
+  async acceptBrandInvitation(
+    @Req() req: any,
+    @Param('brandId') brandId: string,
+  ) {
     const influencerId = req.user.userId;
     return this.userService.acceptBrandInvitation(influencerId, brandId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('influencer/:influencerId/reject')
-  async rejectInfluencer(@Req() req: any, @Param('influencerId') influencerId: string) {
+  async rejectInfluencer(
+    @Req() req: any,
+    @Param('influencerId') influencerId: string,
+  ) {
     const brandId = req.user.userId;
     return this.userService.rejectInfluencer(brandId, influencerId);
   }

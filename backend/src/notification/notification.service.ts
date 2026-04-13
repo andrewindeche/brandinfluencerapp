@@ -30,10 +30,13 @@ export class NotificationService implements OnModuleInit {
 
               case 'submission.accepted':
               case 'submission.rejected':
-                this.notificationGateway.sendToInfluencer(payload.influencerId, {
-                  key,
-                  payload,
-                });
+                this.notificationGateway.sendToInfluencer(
+                  payload.influencerId,
+                  {
+                    key,
+                    payload,
+                  },
+                );
                 break;
             }
           },
@@ -43,13 +46,16 @@ export class NotificationService implements OnModuleInit {
           handler: async (key, payload) => {
             switch (key) {
               case 'campaign.invited':
-                this.notificationGateway.sendToInfluencer(payload.influencerId, {
-                  key,
-                  payload: {
-                    ...payload,
-                    campaignTitle: payload.campaignTitle || 'Campaign',
+                this.notificationGateway.sendToInfluencer(
+                  payload.influencerId,
+                  {
+                    key,
+                    payload: {
+                      ...payload,
+                      campaignTitle: payload.campaignTitle || 'Campaign',
+                    },
                   },
-                });
+                );
                 break;
 
               case 'campaign.invite_accepted':
@@ -65,21 +71,24 @@ export class NotificationService implements OnModuleInit {
         {
           topic: 'brand-actions',
           handler: async (key, payload) => {
-            const eventKey = key || (payload?.key);
+            const eventKey = key || payload?.key;
             const eventPayload = payload?.payload || payload;
             switch (eventKey) {
               case 'influencer.accepted':
               case 'influencer.rejected':
-                this.notificationGateway.sendToInfluencer(eventPayload.influencerId, {
-                  key: eventKey,
-                  payload: eventPayload,
-                });
+                this.notificationGateway.sendToInfluencer(
+                  eventPayload.influencerId,
+                  {
+                    key: eventKey,
+                    payload: eventPayload,
+                  },
+                );
                 break;
             }
           },
         },
       ]);
-      
+
       this.logger.log('All Kafka topics subscribed');
     } catch (error) {
       this.logger.error('Failed to subscribe to Kafka topics', error);
